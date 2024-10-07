@@ -1,12 +1,12 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top mb-1">
       <div class="container-fluid">
         <!-- Logo Space -->
-        <a class="navbar-brand" href="#">Logo</a>
+        <a class="navbar-brand" href=""></a>
   
         <!-- Mobile View - Search & Cart Icon -->
         <div class="d-lg-none d-flex">
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <button class="navbar-toggler me-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
           </button>
           <button class="btn p-0 me-3" type="button">
@@ -31,7 +31,20 @@
                 <li><a class="dropdown-item" href="#">Category 3</a></li>
               </ul>
             </li>
-            
+          </ul>
+  
+          <!-- Search Bar -->
+          <form class="d-flex me-4 w-50">
+            <div class="input-group">
+              <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+              <span class="input-group-text">
+                <span class="material-icons">search</span>
+              </span>
+            </div>
+          </form>
+  
+          <!-- Right-side Links -->
+          <ul class="navbar-nav">
             <!-- Udemy Business Link - Dropdown on Hover -->
             <li class="nav-item dropdown">
               <a class="nav-link" href="#" @mouseover="openDropdown('businessDropdown')" @mouseleave="closeDropdown('businessDropdown')">
@@ -44,7 +57,7 @@
             </li>
   
             <!-- Teach on Udemy Link - Dropdown on Hover -->
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown ms-3">
               <a class="nav-link" href="#" @mouseover="openDropdown('teachDropdown')" @mouseleave="closeDropdown('teachDropdown')">
                 Teach on Udemy
               </a>
@@ -53,18 +66,9 @@
                 <li><a class="dropdown-item" href="#">Teach Option 2</a></li>
               </ul>
             </li>
-          </ul>
   
-          <!-- Search Bar -->
-          <form class="d-flex me-4 d-none d-lg-flex">
-            <input class="form-control" type="search" placeholder="Search">
-            <span class="material-icons ms-2">search</span>
-          </form>
-  
-          <!-- Right-side Links -->
-          <ul class="navbar-nav">
             <!-- Cart Icon - Dropdown on Hover -->
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown ms-3">
               <a class="nav-link" href="#" @mouseover="openDropdown('cartDropdown')" @mouseleave="closeDropdown('cartDropdown')">
                 <span class="material-icons">shopping_cart</span>
               </a>
@@ -75,12 +79,12 @@
             </li>
   
             <!-- Login Button -->
-            <li class="nav-item">
-              <button class="btn btn-outline-dark me-2">Login</button>
+            <li class="nav-item ms-3">
+              <button class="btn btn-outline-dark">Login</button>
             </li>
   
             <!-- Signup Button -->
-            <li class="nav-item">
+            <li class="nav-item ms-3">
               <button class="btn btn-dark">Sign Up</button>
             </li>
   
@@ -120,6 +124,10 @@
   </script>
   
   <style scoped>
+  .logo{
+    /* width: 4em;
+    display: inline; */
+  }
   .navbar-nav .dropdown-menu {
     display: none;
   }
@@ -133,11 +141,16 @@
     background: none;
   }
   
+  .input-group-text {
+    background-color: transparent;
+    border: none;
+  }
+  
   @media (max-width: 991px) {
     .navbar-collapse {
       text-align: left;
     }
-    
+  
     .navbar-nav {
       width: 100%;
     }
