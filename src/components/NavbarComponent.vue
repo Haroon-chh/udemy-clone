@@ -1,56 +1,56 @@
 <template>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
       <div class="container-fluid">
-        <!-- Logo Space -->
+  
+        <!-- Logo (Visible in All Views) -->
         <a class="navbar-brand" href="#"><img class="logo" src="../assets/udemy-logo.png" alt="logo"></a>
   
-        <!-- Mobile View - Navbar Toggle & Cart Icon -->
-        <div class="d-lg-none d-flex">
+        <!-- Mobile View - Navbar Toggle & Icons -->
+        <div class="d-lg-none d-flex align-items-center justify-content-end w-100">
           <button class="navbar-toggler me-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
           </button>
-          <button class="btn p-0 me-3" type="button">
-            <span class="material-icons">search</span>
-          </button>
-          <button class="btn p-0" type="button">
-            <span class="material-icons">shopping_cart</span>
-          </button>
+          <div>
+            <button class="btn p-0 me-3" type="button">
+              <span class="material-icons">search</span>
+            </button>
+            <button class="btn p-0" type="button">
+              <span class="material-icons">shopping_cart</span>
+            </button>
+          </div>
         </div>
   
-        <!-- Desktop View - Navbar Links -->
+        <!-- Desktop & Tablet View - Navbar Links -->
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
-            <!-- Categories Link - Dropdown -->
             <!-- Categories Link - Dropdown on Hover -->
-            <li class="nav-item dropdown " @mouseover="openDropdown('categoriesDropdown')" @mouseleave="closeDropdown('categoriesDropdown')">
-            <a class="nav-link" href="#" id="categoriesDropdown" role="button">
+            <li class="nav-item dropdown" @mouseover="openDropdown('categoriesDropdown')" @mouseleave="closeDropdown('categoriesDropdown')">
+              <a class="nav-link" href="#" id="categoriesDropdown" role="button">
                 Categories
-            </a>
-            <ul class="dropdown-menu" :class="{ show: isOpen.categoriesDropdown }">
+              </a>
+              <ul class="dropdown-menu" :class="{ show: isOpen.categoriesDropdown }">
                 <li><a class="dropdown-item" href="#">Category 1</a></li>
                 <li><a class="dropdown-item" href="#">Category 2</a></li>
                 <li><a class="dropdown-item" href="#">Category 3</a></li>
-            </ul>
+              </ul>
             </li>
-
           </ul>
   
           <!-- Search Bar -->
           <form class="d-flex me-4 w-50 position-relative">
             <div class="input-group">
-                <input class="form-control  rounded-5 ps-5 border" type="search" placeholder="Search for anything" aria-label="Search">
-                <span class="input-group-text position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); background-color: transparent; border: none;">
+              <input class="form-control rounded-5 ps-5 border" type="search" placeholder="Search for anything" aria-label="Search">
+              <span class="input-group-text position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); background-color: transparent; border: none;">
                 <span class="material-icons">search</span>
-                </span>
+              </span>
             </div>
-            </form>
-
+          </form>
   
           <!-- Right-side Links -->
           <ul class="navbar-nav">
             <!-- Udemy Business Link - Dropdown on Hover -->
-            <li class="nav-item dropdown">
-              <a class="nav-link" href="#" @mouseover="openDropdown('businessDropdown')" @mouseleave="closeDropdown('businessDropdown')">
+            <li class="nav-item dropdown" @mouseover="openDropdown('businessDropdown')" @mouseleave="closeDropdown('businessDropdown')">
+              <a class="nav-link" href="#">
                 Udemy Business
               </a>
               <ul class="dropdown-menu" :class="{ show: isOpen.businessDropdown }">
@@ -60,8 +60,8 @@
             </li>
   
             <!-- Teach on Udemy Link - Dropdown on Hover -->
-            <li class="nav-item dropdown ms-3">
-              <a class="nav-link" href="#" @mouseover="openDropdown('teachDropdown')" @mouseleave="closeDropdown('teachDropdown')">
+            <li class="nav-item dropdown ms-3" @mouseover="openDropdown('teachDropdown')" @mouseleave="closeDropdown('teachDropdown')">
+              <a class="nav-link" href="#">
                 Teach on Udemy
               </a>
               <ul class="dropdown-menu" :class="{ show: isOpen.teachDropdown }">
@@ -71,8 +71,8 @@
             </li>
   
             <!-- Cart Icon - Dropdown on Hover -->
-            <li class="nav-item dropdown ms-3">
-              <a class="nav-link" href="#" @mouseover="openDropdown('cartDropdown')" @mouseleave="closeDropdown('cartDropdown')">
+            <li class="nav-item dropdown ms-3" @mouseover="openDropdown('cartDropdown')" @mouseleave="closeDropdown('cartDropdown')">
+              <a class="nav-link" href="#">
                 <span class="material-icons">shopping_cart</span>
               </a>
               <ul class="dropdown-menu" :class="{ show: isOpen.cartDropdown }">
@@ -83,17 +83,17 @@
   
             <!-- Login Button -->
             <li class="nav-item ms-3">
-              <button class="btn btn-outline-secondary rounded-0 fw-semibold ">Login</button>
+              <button class="btn btn-outline-secondary rounded-0 fw-semibold">Login</button>
             </li>
   
             <!-- Signup Button -->
-            <li class="nav-item ms-3 ">
+            <li class="nav-item ms-3">
               <button class="btn btn-dark rounded-0 fw-semibold">Sign Up</button>
             </li>
   
             <!-- World Icon Button - Dropdown on Hover -->
-            <li class="nav-item dropdown ms-3">
-              <button class="btn  rounded-0" @mouseover="openDropdown('worldDropdown')" @mouseleave="closeDropdown('worldDropdown')">
+            <li class="nav-item dropdown ms-3" @mouseover="openDropdown('worldDropdown')" @mouseleave="closeDropdown('worldDropdown')">
+              <button class="btn rounded-0">
                 <span class="material-icons">public</span>
               </button>
               <ul class="dropdown-menu" :class="{ show: isOpen.worldDropdown }">
@@ -111,6 +111,7 @@
   import { reactive } from 'vue';
   
   const isOpen = reactive({
+    categoriesDropdown: false,
     businessDropdown: false,
     teachDropdown: false,
     cartDropdown: false,
@@ -127,22 +128,19 @@
   </script>
   
   <style scoped>
-  .navbar{
+  .navbar {
     box-shadow: 0 5px 2px -2px rgba(57, 57, 57, 0.2);
     color: white;
-
   }
-  .nab-item{
-    vertical-align: baseline;
-    justify-items: center;
-  }
+  
   .logo {
     width: 5em;
     display: inline;
   }
-  .nav-link{
-    font-size:90%;
-    color:rgb(28, 28, 28);
+  
+  .nav-link {
+    font-size: 90%;
+    color: rgb(28, 28, 28);
   }
   
   .navbar-nav .dropdown-menu {
@@ -154,11 +152,10 @@
     position: absolute;
     margin-top: 13%;
     border-radius: 0%;
-    top:100%;
+    top: 100%;
     padding: 10%;
-    box-shadow: 2px 2px 2px  rgba(57, 57, 57, 0.2);
+    box-shadow: 2px 2px 2px rgba(57, 57, 57, 0.2);
     font-weight: bold;
-
   }
   
   .input-group-text {
@@ -168,7 +165,7 @@
   
   .input-group .form-control {
     border-color: black !important;
-    height:3em;
+    height: 3em;
   }
   
   .btn-outline-secondary {
