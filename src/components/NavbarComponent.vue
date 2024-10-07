@@ -38,7 +38,7 @@
           <!-- Search Bar -->
           <form class="d-flex me-4 w-50 position-relative">
             <div class="input-group">
-                <input class="form-control  rounded-5 ps-5" type="search" placeholder="Search for anything" aria-label="Search">
+                <input class="form-control  rounded-5 ps-5 border" type="search" placeholder="Search for anything" aria-label="Search">
                 <span class="input-group-text position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); background-color: transparent; border: none;">
                 <span class="material-icons">search</span>
                 </span>
@@ -83,12 +83,12 @@
   
             <!-- Login Button -->
             <li class="nav-item ms-3">
-              <button class="btn btn-outline-secondary rounded-0">Login</button>
+              <button class="btn btn-outline-secondary rounded-0 fw-semibold ">Login</button>
             </li>
   
             <!-- Signup Button -->
             <li class="nav-item ms-3 ">
-              <button class="btn btn-dark rounded-0">Sign Up</button>
+              <button class="btn btn-dark rounded-0 fw-semibold">Sign Up</button>
             </li>
   
             <!-- World Icon Button - Dropdown on Hover -->
@@ -132,6 +132,10 @@
     color: white;
 
   }
+  .nab-item{
+    vertical-align: baseline;
+    justify-items: center;
+  }
   .logo {
     width: 5em;
     display: inline;
@@ -147,6 +151,10 @@
   
   .navbar-nav .dropdown-menu.show {
     display: block;
+    position: absolute;
+    margin-top: 13%;
+    border-radius: 0%;
+    top:100%;
   }
   
   .input-group-text {
@@ -155,8 +163,8 @@
   }
   
   .input-group .form-control {
-    border-width: 2px !important;
     border-color: black !important;
+    height:3em;
   }
   
   .btn-outline-secondary {
