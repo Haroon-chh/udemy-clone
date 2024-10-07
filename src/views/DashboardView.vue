@@ -13,8 +13,4 @@
   </script>
   
   <style scoped>
-  .dashboard-view {
-    padding: 20px;
-  }
   </style>
-  
