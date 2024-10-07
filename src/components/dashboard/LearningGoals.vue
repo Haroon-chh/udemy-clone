@@ -7,8 +7,8 @@
         </div>
       </div>
   
-      <!-- Main Row for Goals and Image Sections -->
-      <div class="row">
+      <!-- Laptop View: Main Row for Goals and Image Sections -->
+      <div class="row d-none d-lg-flex">
         <!-- Left Column: List of Goals -->
         <div class="col-auto" style="width: 528px; margin-right: 50px;">
           <div
@@ -46,6 +46,38 @@
         <!-- Right Column: Display Selected Goal Image -->
         <div class="col">
           <img :src="goals[selectedGoalIndex].image" alt="goal image" class="goal-image" style="width: 530px; height: 630px;" />
+        </div>
+      </div>
+  
+      <!-- Mobile View: Only Image, Title, and Description -->
+      <div class="d-lg-none mobile-view">
+        <!-- Display only selected goal image -->
+        <div class="mb-4">
+          <img :src="goals[selectedGoalIndex].image" alt="goal image" class="goal-image-mobile" />
+        </div>
+        <!-- Display title and description for the selected goal aligned to the left -->
+        <div class="mobile-content">
+          <div class="d-flex align-items-center">
+            <h3 class="goal-title-mobile">{{ goals[selectedGoalIndex].title }}</h3>
+            <!-- Enterprise Plan Box Positioned to the Right of the Heading -->
+            <span v-if="selectedGoalIndex === 2 || selectedGoalIndex === 3" class="enterprise-plan-box-mobile ms-2">Enterprise Plan</span>
+          </div>
+          <p class="goal-description-mobile">{{ goals[selectedGoalIndex].description }}</p>
+        </div>
+        <!-- Show Find out more link for last two goals only -->
+        <div v-if="selectedGoalIndex === 2 || selectedGoalIndex === 3" class="mb-3">
+          <a href="#" class="find-out-more-mobile d-inline-block">
+            Find out more
+            <span class="arrow">→</span>
+          </a>
+        </div>
+        <!-- Indicators for goal navigation -->
+        <div class="indicator-container">
+          <span
+            v-for="(goal, index) in goals"
+            :key="index"
+            :class="['indicator', { 'active': index === selectedGoalIndex }]"
+          ></span>
         </div>
       </div>
     </div>
@@ -86,9 +118,19 @@
         ],
       };
     },
+    mounted() {
+      this.startAutoSlide();
+    },
     methods: {
       selectGoal(index) {
         this.selectedGoalIndex = index;
+      },
+      startAutoSlide() {
+        let index = 0;
+        setInterval(() => {
+          index = (index + 1) % this.goals.length;
+          this.selectedGoalIndex = index;
+        }, 4000); // Change slide every 4 seconds
       },
     },
   };
@@ -100,7 +142,7 @@
     padding: 20px;
   }
   
-  /* Goal Item Styling */
+  /* Laptop View Styles */
   .goal-item {
     border: 1px solid #d3d3d3;
     overflow: hidden; /* Prevent overflow */
@@ -138,7 +180,34 @@
     color: rgb(33, 37, 41);
   }
   
-  /* Enterprise Plan Box */
+  /* Mobile View Styles */
+  .mobile-view {
+    padding-left: 20px; /* Match the padding of the main heading */
+    padding-right: 20px;
+  }
+  
+  .goal-image-mobile {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+  
+  .goal-title-mobile {
+    font-size: 18px; /* Reduced font size for mobile */
+    line-height: 24px;
+    font-weight: 700;
+    margin-top: 20px;
+    color: rgb(33, 37, 41);
+  }
+  
+  .goal-description-mobile {
+    font-size: 14px; /* Reduced font size for mobile */
+    line-height: 20px;
+    font-weight: 400;
+    color: rgb(33, 37, 41);
+    margin: 15px 0;
+  }
+
   .enterprise-plan-box {
     display: inline-block;
     padding: 0px 8px;
@@ -151,26 +220,58 @@
     font-weight: 400;
   }
   
-  /* Find out more Link */
-  .find-out-more {
+  /* Enterprise Plan for Mobile */
+  .enterprise-plan-box-mobile {
+    display: inline-block;
+    padding: 1px 6px; /* Reduced padding for mobile */
+    background-color: #fff;
+    color: rgb(155, 81, 224);
+    border: 1px solid rgb(155, 81, 224);
+    border-radius: 4px;
+    font-size: 12px; /* Reduced font size for mobile */
+    line-height: 18px;
+    font-weight: 400;
+    white-space: nowrap; /* Prevent text from wrapping */
+  }
+
+    /* Find out more Link */
+    .find-out-more {
     font-weight: 400;
     color: #9b51e0;
     text-decoration: none;
   }
   
-  .find-out-more:hover {
+  /* Find out more Link for Mobile */
+  .find-out-more-mobile {
+    font-size: 14px; /* Reduced font size for mobile */
+    font-weight: 400;
+    color: #9b51e0;
+    text-decoration: none;
+  }
+  
+  .find-out-more-mobile:hover {
     color: black;
   }
   
-  /* Arrow Styling */
-  .find-out-more .arrow {
-    margin-left: 5px;
+  /* Indicator Styling */
+  .indicator-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 20px;
+    padding-left: 20px;
   }
   
-  /* Right Image Styling */
-  .goal-image {
-    display: block;
-    margin: 0; /* Remove any extra spacing */
+  .indicator {
+    width: 12px;
+    height: 12px;
+    background-color: #e0e0e0;
+    border-radius: 50%;
+    margin: 0 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .indicator.active {
+    background-color: #9b51e0; /* Active indicator color */
   }
   </style>
   
