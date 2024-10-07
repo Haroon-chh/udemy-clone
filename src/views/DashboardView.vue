@@ -1,12 +1,15 @@
 <!-- src/views/DashboardView.vue -->
 <template>
     <div class="dashboard-view">
-      <HelloWorldComponent  />
+      <HelloWorld />
+      <LearningGoals />
     </div>
   </template>
   
   <script setup>
-  import HelloWorldComponent from '@/components/dashboard/HelloWorldComponent.vue';
+  import HelloWorld from '../components/dashboard/HelloWorldComponent.vue';
+  import LearningGoals from '@/components/dashboard/LearningGoals.vue';
+
   </script>
   
   <style scoped>
