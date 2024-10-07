@@ -1,12 +1,12 @@
 <!-- src/views/DashboardView.vue -->
 <template>
     <div class="dashboard-view">
-      <Footer />
+      <HelloWorldComponent  />
     </div>
   </template>
   
   <script setup>
-  import Footer from '../components/Footer.vue';
+  import HelloWorldComponent from '@/components/dashboard/HelloWorldComponent.vue';
   </script>
   
   <style scoped>
