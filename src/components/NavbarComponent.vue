@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
       <div class="container-fluid">
         <!-- Logo Space -->
         <a class="navbar-brand" href="#"><img class="logo" src="../assets/udemy-logo.png" alt="logo"></a>
@@ -22,7 +22,7 @@
           <ul class="navbar-nav me-auto">
             <!-- Categories Link - Dropdown -->
             <!-- Categories Link - Dropdown on Hover -->
-            <li class="nav-item dropdown" @mouseover="openDropdown('categoriesDropdown')" @mouseleave="closeDropdown('categoriesDropdown')">
+            <li class="nav-item dropdown " @mouseover="openDropdown('categoriesDropdown')" @mouseleave="closeDropdown('categoriesDropdown')">
             <a class="nav-link" href="#" id="categoriesDropdown" role="button">
                 Categories
             </a>
@@ -36,14 +36,15 @@
           </ul>
   
           <!-- Search Bar -->
-          <form class="d-flex me-4 w-50">
+          <form class="d-flex me-4 w-50 position-relative">
             <div class="input-group">
-              <input class="form-control border border-2 border-dark" type="search" placeholder="Search" aria-label="Search">
-              <span class="input-group-text border border-2 border-dark">
+                <input class="form-control  rounded-5 ps-5" type="search" placeholder="Search for anything" aria-label="Search">
+                <span class="input-group-text position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); background-color: transparent; border: none;">
                 <span class="material-icons">search</span>
-              </span>
+                </span>
             </div>
-          </form>
+            </form>
+
   
           <!-- Right-side Links -->
           <ul class="navbar-nav">
@@ -82,17 +83,17 @@
   
             <!-- Login Button -->
             <li class="nav-item ms-3">
-              <button class="btn btn-outline-secondary">Login</button>
+              <button class="btn btn-outline-secondary rounded-0">Login</button>
             </li>
   
             <!-- Signup Button -->
-            <li class="nav-item ms-3">
-              <button class="btn btn-primary">Sign Up</button>
+            <li class="nav-item ms-3 ">
+              <button class="btn btn-dark rounded-0">Sign Up</button>
             </li>
   
             <!-- World Icon Button - Dropdown on Hover -->
             <li class="nav-item dropdown ms-3">
-              <button class="btn btn-outline-dark" @mouseover="openDropdown('worldDropdown')" @mouseleave="closeDropdown('worldDropdown')">
+              <button class="btn  rounded-0" @mouseover="openDropdown('worldDropdown')" @mouseleave="closeDropdown('worldDropdown')">
                 <span class="material-icons">public</span>
               </button>
               <ul class="dropdown-menu" :class="{ show: isOpen.worldDropdown }">
@@ -126,9 +127,18 @@
   </script>
   
   <style scoped>
+  .navbar{
+    box-shadow: 0 5px 2px -2px rgba(57, 57, 57, 0.2);
+    color: white;
+
+  }
   .logo {
-    width: 4em;
+    width: 5em;
     display: inline;
+  }
+  .nav-link{
+    font-size:90%;
+    color:rgb(28, 28, 28);
   }
   
   .navbar-nav .dropdown-menu {
