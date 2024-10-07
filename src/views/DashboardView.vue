@@ -1,17 +1,13 @@
 <!-- src/views/DashboardView.vue -->
 <template>
     <div class="dashboard-view">
-      <HelloWorld />
+      <Footer />
     </div>
   </template>
   
   <script setup>
-  import HelloWorld from '../components/dashboard/HelloWorldComponent.vue';
+  import Footer from '../components/Footer.vue';
   </script>
   
   <style scoped>
-  .dashboard-view {
-    padding: 20px;
-  }
   </style>
-  
