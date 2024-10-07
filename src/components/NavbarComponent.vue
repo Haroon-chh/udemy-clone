@@ -1,10 +1,10 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top mb-1">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
       <div class="container-fluid">
         <!-- Logo Space -->
-        <a class="navbar-brand" href=""><img class="logo" src="../assets/udemy-logo.png" alt="logo"></a>
+        <a class="navbar-brand" href="#"><img class="logo" src="../assets/udemy-logo.png" alt="logo"></a>
   
-        <!-- Mobile View - Search & Cart Icon -->
+        <!-- Mobile View - Navbar Toggle & Cart Icon -->
         <div class="d-lg-none d-flex">
           <button class="navbar-toggler me-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -21,23 +21,25 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
             <!-- Categories Link - Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
+            <!-- Categories Link - Dropdown on Hover -->
+            <li class="nav-item dropdown" @mouseover="openDropdown('categoriesDropdown')" @mouseleave="closeDropdown('categoriesDropdown')">
+            <a class="nav-link" href="#" id="categoriesDropdown" role="button">
                 Categories
-              </a>
-              <ul class="dropdown-menu">
+            </a>
+            <ul class="dropdown-menu" :class="{ show: isOpen.categoriesDropdown }">
                 <li><a class="dropdown-item" href="#">Category 1</a></li>
                 <li><a class="dropdown-item" href="#">Category 2</a></li>
                 <li><a class="dropdown-item" href="#">Category 3</a></li>
-              </ul>
+            </ul>
             </li>
+
           </ul>
   
           <!-- Search Bar -->
           <form class="d-flex me-4 w-50">
             <div class="input-group">
-              <input class="form-control" type="search" placeholder="Search" aria-label="Search">
-              <span class="input-group-text">
+              <input class="form-control border border-2 border-dark" type="search" placeholder="Search" aria-label="Search">
+              <span class="input-group-text border border-2 border-dark">
                 <span class="material-icons">search</span>
               </span>
             </div>
@@ -80,12 +82,12 @@
   
             <!-- Login Button -->
             <li class="nav-item ms-3">
-              <button class="btn btn-outline-dark">Login</button>
+              <button class="btn btn-outline-secondary">Login</button>
             </li>
   
             <!-- Signup Button -->
             <li class="nav-item ms-3">
-              <button class="btn btn-dark">Sign Up</button>
+              <button class="btn btn-primary">Sign Up</button>
             </li>
   
             <!-- World Icon Button - Dropdown on Hover -->
@@ -124,11 +126,11 @@
   </script>
   
   <style scoped>
- 
-  .logo{
+  .logo {
     width: 4em;
     display: inline;
   }
+  
   .navbar-nav .dropdown-menu {
     display: none;
   }
@@ -137,14 +139,33 @@
     display: block;
   }
   
-  .nav-item button {
-    border: none;
-    background: none;
-  }
-  
   .input-group-text {
     background-color: transparent;
     border: none;
+  }
+  
+  .input-group .form-control {
+    border-width: 2px !important;
+    border-color: black !important;
+  }
+  
+  .btn-outline-secondary {
+    color: #343a40;
+    border-color: #343a40;
+  }
+  
+  .btn-outline-secondary:hover {
+    background-color: #343a40;
+    color: #fff;
+  }
+  
+  .btn-primary {
+    background-color: #343a40;
+    border-color: #343a40;
+  }
+  
+  .btn-primary:hover {
+    background-color: #50575e;
   }
   
   @media (max-width: 991px) {
