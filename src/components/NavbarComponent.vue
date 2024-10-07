@@ -2,7 +2,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top mb-1">
       <div class="container-fluid">
         <!-- Logo Space -->
-        <a class="navbar-brand" href=""></a>
+        <a class="navbar-brand" href=""><img class="logo" src="../assets/udemy-logo.png" alt="logo"></a>
   
         <!-- Mobile View - Search & Cart Icon -->
         <div class="d-lg-none d-flex">
@@ -124,9 +124,10 @@
   </script>
   
   <style scoped>
+ 
   .logo{
-    /* width: 4em;
-    display: inline; */
+    width: 4em;
+    display: inline;
   }
   .navbar-nav .dropdown-menu {
     display: none;
