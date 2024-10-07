@@ -54,7 +54,7 @@
                 Udemy Business
               </a>
               <ul class="dropdown-menu" :class="{ show: isOpen.businessDropdown }">
-                <li><a class="dropdown-item" href="#">Business 1</a></li>
+                <p>Get your team access to over 27,000 top Udemy courses, anytime, anywhere.</p>
                 <li><a class="dropdown-item" href="#">Business 2</a></li>
               </ul>
             </li>
@@ -155,6 +155,10 @@
     margin-top: 13%;
     border-radius: 0%;
     top:100%;
+    padding: 10%;
+    box-shadow: 2px 2px 2px  rgba(57, 57, 57, 0.2);
+    font-weight: bold;
+
   }
   
   .input-group-text {
