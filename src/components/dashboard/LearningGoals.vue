@@ -8,9 +8,9 @@
       </div>
   
       <!-- Laptop View: Main Row for Goals and Image Sections -->
-      <div class="row d-none d-lg-flex">
+      <div class="row d-none d-lg-flex ms-5 px-5">
         <!-- Left Column: List of Goals -->
-        <div class="col-auto" style="width: 533px; margin-right: 50px;">
+        <div class="col-auto" style="width: 533px; margin-right: 80px;">
           <div
             v-for="(goal, index) in goals"
             :key="index"
@@ -45,7 +45,7 @@
   
         <!-- Right Column: Display Selected Goal Image -->
         <div class="col">
-          <img :src="goals[selectedGoalIndex].image" alt="goal image" class="goal-image" style="width: 630px; height: 650px;" />
+          <img :src="goals[selectedGoalIndex].image" alt="goal image" class="goal-image" style="width: 650px; height: 650px;" />
         </div>
       </div>
   
