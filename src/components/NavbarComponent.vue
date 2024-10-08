@@ -28,7 +28,7 @@
               <a class="nav-link" href="#" id="categoriesDropdown" role="button">
                 Categories
               </a>
-              <ul class="dropdown-menu" :class="{ show: isOpen.categoriesDropdown }">
+              <ul class="dropdown-menu mt-4" :class="{ show: isOpen.categoriesDropdown }">
                 <li><a class="dropdown-item" href="#">Category 1</a></li>
                 <li><a class="dropdown-item" href="#">Category 2</a></li>
                 <li><a class="dropdown-item" href="#">Category 3</a></li>
@@ -55,8 +55,8 @@
               </a>
               <ul class="dropdown-menu" :class="{ show: isOpen.businessDropdown }">
                 <p>Get your team access to over 27,000 top Udemy courses, anytime, anywhere.</p>
-                <li><a class="dropdown-item" href="#">Business 2</a></li>
-              </ul>
+                <button type="button" class="btn btn-dark rounded-0 fw-semibold" >Try udemy business</button>
+            </ul>
             </li>
   
             <!-- Teach on Udemy Link - Dropdown on Hover -->
@@ -65,8 +65,8 @@
                 Teach on Udemy
               </a>
               <ul class="dropdown-menu" :class="{ show: isOpen.teachDropdown }">
-                <li><a class="dropdown-item" href="#">Teach Option 1</a></li>
-                <li><a class="dropdown-item" href="#">Teach Option 2</a></li>
+                <p>Turn what you know into an opportunity and reach millions around the world.</p>
+                <button type="button" class="btn btn-dark rounded-0 fw-semibold" >Learn More</button>
               </ul>
             </li>
   
@@ -75,9 +75,9 @@
               <a class="nav-link" href="#">
                 <span class="material-icons">shopping_cart</span>
               </a>
-              <ul class="dropdown-menu" :class="{ show: isOpen.cartDropdown }">
-                <li><a class="dropdown-item" href="#">Item 1</a></li>
-                <li><a class="dropdown-item" href="#">Item 2</a></li>
+              <ul class="dropdown-menu mt-3 px-4 py-2" :class="{ show: isOpen.cartDropdown }">
+                <p>Your cart is empty</p>
+                <p class=""><a class="text-discovery text-decoration-none" href="#">Keep Shoping</a></p>
               </ul>
             </li>
   
