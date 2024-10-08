@@ -2,6 +2,7 @@
 <template>
     <div class="dashboard-view">
       <HelloWorld />
+      <CarouselComponent />
       <LearningGoals />
       <Testimonial />
       <CardsRow />
@@ -16,6 +17,7 @@
 
   import CardsRow from '../components/dashboard/CardsRow.vue';
   import SubscriptionCards from '../components/dashboard/SubscriptionCards.vue';
+  import CarouselComponent from '@/components/dashboard/CarouselComponent.vue';
   </script>
   
   <style scoped>
