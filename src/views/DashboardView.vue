@@ -6,6 +6,7 @@
       <Testimonial />
       <CardsRow />
       <SubscriptionCards />
+      <TrendingNow />
       <FullStory />
       <News />
     </div>
@@ -21,6 +22,7 @@
   import CarouselComponent from '../components/dashboard/CarouselComponent.vue';
 
   import News from '../components/dashboard/NewsComponent.vue';
+  import TrendingNow from '../components/dashboard/TrendingNow.vue';
   </script>
   
   <style scoped>
