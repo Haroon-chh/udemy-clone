@@ -6,6 +6,7 @@
       <Testimonial />
       <CardsRow />
       <SubscriptionCards />
+      <TrendingNow />
       <FullStory />
       <News />
       <TrustedCompanies />
@@ -26,6 +27,7 @@
 
   import News from '../components/dashboard/NewsComponent.vue';
   
+  import TrendingNow from '../components/dashboard/TrendingNow.vue';
   </script>
   
   <style scoped>
