@@ -10,7 +10,7 @@
       <!-- Laptop View: Main Row for Goals and Image Sections -->
       <div class="row d-none d-lg-flex">
         <!-- Left Column: List of Goals -->
-        <div class="col-auto" style="width: 528px; margin-right: 50px;">
+        <div class="col-auto" style="width: 533px; margin-right: 50px;">
           <div
             v-for="(goal, index) in goals"
             :key="index"
@@ -18,10 +18,10 @@
             :class="['goal-item', 'mb-3', 'p-3', { 'selected': selectedGoalIndex === index, 'hovered': hoveredGoalIndex === index }]"
             @mouseover="hoveredGoalIndex = index"
             @mouseleave="hoveredGoalIndex = null"
-            style="height: 154px; cursor: pointer; transition: all 0.3s ease; border-radius: 10px; position: relative;"
+            style="cursor: pointer; transition: all 0.3s ease; border-radius: 10px; position: relative; min-height: 154px; width: 533px;"
           >
             <div class="d-flex">
-              <!-- Icon Aligned on the Left Side of Heading and Text, starting 53px from the top of the card -->
+              <!-- Icon Aligned on the Left Side of Heading and Text -->
               <div class="goal-icon me-3" style="width: 100px; margin-top: 25px;">
                 <img :src="goal.icon" alt="goal icon" class="img-fluid" style="width: 53px; height: 53px;" />
               </div>
@@ -45,7 +45,7 @@
   
         <!-- Right Column: Display Selected Goal Image -->
         <div class="col">
-          <img :src="goals[selectedGoalIndex].image" alt="goal image" class="goal-image" style="width: 530px; height: 630px;" />
+          <img :src="goals[selectedGoalIndex].image" alt="goal image" class="goal-image" style="width: 630px; height: 650px;" />
         </div>
       </div>
   
@@ -90,6 +90,8 @@
       return {
         selectedGoalIndex: 0,
         hoveredGoalIndex: null,
+        isMobileView: false,
+        autoSlideInterval: null,
         goals: [
           {
             title: "Hands-on training",
@@ -119,15 +121,33 @@
       };
     },
     mounted() {
-      this.startAutoSlide();
+      this.checkMobileView();
+      window.addEventListener('resize', this.checkMobileView); // Check view on resize
+      if (this.isMobileView) {
+        this.startAutoSlide(); // Start auto-slide if in mobile view
+      }
+    },
+    beforeUnmount() {
+      window.removeEventListener('resize', this.checkMobileView); // Cleanup listener on unmount
+      clearInterval(this.autoSlideInterval); // Clear auto-slide interval on unmount
     },
     methods: {
       selectGoal(index) {
         this.selectedGoalIndex = index;
       },
+      checkMobileView() {
+        // Check if the current view is mobile based on screen width
+        this.isMobileView = window.innerWidth < 992; // Bootstrap breakpoint for lg
+        if (this.isMobileView) {
+          this.startAutoSlide(); // Start auto-slide if in mobile view
+        } else {
+          clearInterval(this.autoSlideInterval); // Clear auto-slide if in laptop view
+        }
+      },
       startAutoSlide() {
-        let index = 0;
-        setInterval(() => {
+        clearInterval(this.autoSlideInterval); // Clear any previous interval
+        let index = this.selectedGoalIndex;
+        this.autoSlideInterval = setInterval(() => {
           index = (index + 1) % this.goals.length;
           this.selectedGoalIndex = index;
         }, 4000); // Change slide every 4 seconds
@@ -140,12 +160,24 @@
   /* Main Container Styling */
   .learning-goals-container {
     padding: 20px;
+    background-color: rgb(248, 249, 251);
   }
+
+  h2 {
+  font-family: 'SuisseWorks', Georgia, Times, 'Times New Roman', serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-style: normal;
+  font-weight: 700;
+  color: rgb(45, 47, 49);
+  font-size: 32px;
+  line-height: 40px;
+}
+
   
   /* Laptop View Styles */
   .goal-item {
     border: 1px solid #d3d3d3;
     overflow: hidden; /* Prevent overflow */
+    background-color: #fff;
   }
   
   .goal-item.selected {
@@ -207,7 +239,8 @@
     color: rgb(33, 37, 41);
     margin: 15px 0;
   }
-
+  
+  /* Enterprise Plan Box for Laptop */
   .enterprise-plan-box {
     display: inline-block;
     padding: 0px 8px;
@@ -233,9 +266,9 @@
     font-weight: 400;
     white-space: nowrap; /* Prevent text from wrapping */
   }
-
-    /* Find out more Link */
-    .find-out-more {
+  
+  /* Find out more Link */
+  .find-out-more {
     font-weight: 400;
     color: #9b51e0;
     text-decoration: none;
@@ -245,12 +278,12 @@
   .find-out-more-mobile {
     font-size: 14px; /* Reduced font size for mobile */
     font-weight: 400;
-    color: #9b51e0;
+    color: #9b51e0 !important;
     text-decoration: none;
   }
   
-  .find-out-more-mobile:hover {
-    color: black;
+  .find-out-more-mobile:hover, .find-out-more:hover {
+    color: black !important;
   }
   
   /* Indicator Styling */
