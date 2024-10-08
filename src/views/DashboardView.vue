@@ -5,6 +5,7 @@
       <LearningGoals />
       <Testimonial />
       <CardsRow />
+      <News />
     </div>
   </template>
   
@@ -14,6 +15,8 @@
   import Testimonial from '../components/dashboard/TestimonialComponent.vue';
 
   import CardsRow from '../components/dashboard/CardsRow.vue';
+
+  import News from '../components/dashboard/NewsComponent.vue';
   </script>
   
   <style scoped>
