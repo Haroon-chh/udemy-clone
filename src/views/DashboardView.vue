@@ -1,7 +1,6 @@
 <!-- src/views/DashboardView.vue -->
 <template>
     <div class="dashboard-view">
-      <HelloWorld />
       <CarouselComponent />
       <LearningGoals />
       <Testimonial />
@@ -13,7 +12,6 @@
   </template>
   
   <script setup>
-  import HelloWorld from '../components/dashboard/HelloWorldComponent.vue';
   import LearningGoals from '@/components/dashboard/LearningGoals.vue';
   import Testimonial from '../components/dashboard/TestimonialComponent.vue';
   import FullStory from '@/components/dashboard/FullStory.vue';
