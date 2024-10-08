@@ -9,6 +9,7 @@
         <div class="col-12 col-md-6 col-lg-3 mb-4 d-flex">
           <div class="testimonial-card p-4 d-flex flex-column h-100 w-100">
             <blockquote class="mb-4 flex-grow-1">
+              <img src="@/assets/comma.png" alt="Quote Icon" class="quote-icon">
               <p>
                 <strong>Udemy</strong> was rated the <strong>most popular online course or certification program</strong> for learning how to code according to <br><strong class="change-color">StackOverflow’s 2023 Developer survey.</strong>
               </p>
@@ -17,7 +18,7 @@
               <img src="@/assets/ali.jpg" alt="Ali" class="rounded-circle me-3" width="60" height="60">
               <div>
                 <h5 class="mb-0">Ali Ahsan</h5>
-                <small>Owner at UCP</small>
+                <small>Technical Co-Founder, CTO at Dimension</small>
               </div>
             </div>
             <a href="#" class="mt-3 d-block text-left">View Web Development courses</a>
@@ -28,6 +29,7 @@
         <div class="col-12 col-md-6 col-lg-3 mb-4 d-flex">
           <div class="testimonial-card p-4 d-flex flex-column h-100 w-100">
             <blockquote class="mb-4 flex-grow-1">
+              <img src="@/assets/comma.png" alt="Quote Icon" class="quote-icon">
               <p>
                 Udemy was truly a <strong>game-changer and a great guide</strong> for me as we brought Dimensional to life.
               </p>
@@ -47,6 +49,7 @@
         <div class="col-12 col-md-6 col-lg-3 mb-4 d-flex">
           <div class="testimonial-card p-4 d-flex flex-column h-100 w-100">
             <blockquote class="mb-4 flex-grow-1">
+              <img src="@/assets/comma.png" alt="Quote Icon" class="quote-icon">
               <p>
                 Udemy gives you the ability to be persistent. I learned exactly what I needed to know in the real world. It helped me sell myself to <strong>get a new role</strong>.
               </p>
@@ -66,6 +69,7 @@
         <div class="col-12 col-md-6 col-lg-3 mb-4 d-flex">
           <div class="testimonial-card p-4 d-flex flex-column h-100 w-100">
             <blockquote class="mb-4 flex-grow-1">
+              <img src="@/assets/comma.png" alt="Quote Icon" class="quote-icon">
               <p>
                 With Udemy Business employees are able to marry the two together, technology and consultant soft skills, to help <strong>drive their careers forward</strong>.
               </p>
@@ -157,8 +161,16 @@ a:hover {
 .container-fluid {
   max-width: 1400px; /* Restrict overall width */
 }
+
 .change-color{
     color: #5022c3;
+}
+
+.quote-icon {
+  width: 20px; /* Adjust the size of the quote icon */
+  height: 20px;
+  margin-right: 10px;
+  vertical-align: top; /* Align icon to the top */
 }
 
 @media (max-width: 768px) {
