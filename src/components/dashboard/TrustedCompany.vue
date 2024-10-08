@@ -1,5 +1,5 @@
 <template>
-    <div class="trusted-section">
+    <div class="trusted-section my-3">
       <h3 class="trusted-text">
         Trusted by over 16,000 companies and millions of learners around the world
       </h3>
