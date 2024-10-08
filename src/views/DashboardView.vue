@@ -17,7 +17,7 @@
 
   import CardsRow from '../components/dashboard/CardsRow.vue';
   import SubscriptionCards from '../components/dashboard/SubscriptionCards.vue';
-  import CarouselComponent from '@/components/dashboard/CarouselComponent.vue';
+  import CarouselComponent from '../components/dashboard/CarouselComponent.vue';
   </script>
   
   <style scoped>
