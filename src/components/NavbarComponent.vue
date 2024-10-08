@@ -1,23 +1,21 @@
 <template>
     <nav class="navbar navbar-expand-lg fixed-top">
       <div class="container-fluid">
-        
-        <!-- Desktop Logo (Left side) -->
-        <a class="navbar-brand d-none d-lg-block" href="#">
-          <img class="logo" src="../assets/udemy-logo.png" alt="logo">
-        </a>
   
-        <!-- Mobile Logo (Centered) -->
-        <a class="navbar-brand d-lg-none mx-auto d-inline" href="#">
-          <img class="logo-mobile" src="../assets/udemy-logo.png" alt="logo">
-        </a>
-  
-        <!-- Mobile View - Navbar Toggle & Icons -->
-        <div class="d-lg-none d-flex align-items-center justify-content-end w-100">
+        <!-- Mobile View - Navbar Toggle, Logo, Icons -->
+        <div class="d-lg-none d-flex align-items-center justify-content-between w-100">
+          <!-- Navbar Toggle -->
           <button class="navbar-toggler me-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
           </button>
-          <div>
+  
+          <!-- Mobile Logo (Centered) -->
+          <a class="navbar-brand mx-auto" href="#">
+            <img class="logo-mobile" src="../assets/udemy-logo.png" alt="logo">
+          </a>
+  
+          <!-- Cart and Search Icons -->
+          <div class="d-flex">
             <button class="btn p-0 me-3" type="button">
               <span class="material-icons">search</span>
             </button>
@@ -26,6 +24,11 @@
             </button>
           </div>
         </div>
+  
+        <!-- Desktop Logo (Left side) -->
+        <a class="navbar-brand d-none d-lg-block" href="#">
+          <img class="logo" src="../assets/udemy-logo.png" alt="logo">
+        </a>
   
         <!-- Desktop & Tablet View - Navbar Links -->
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -93,36 +96,49 @@
               <button class="btn btn-outline-secondary rounded-0 fw-semibold">Login</button>
             </li>
   
-            <!-- Signup Button -->
             <li class="nav-item ms-3">
               <button class="btn btn-dark rounded-0 fw-semibold">Sign Up</button>
             </li>
   
-            <!-- World Icon Button - Dropdown on Hover -->
-            <li class="nav-item dropdown ms-3" @mouseover="openDropdown('worldDropdown')" @mouseleave="closeDropdown('worldDropdown')">
-              <button class="btn rounded-0">
+            <!-- World Icon Button -->
+            <li class="nav-item ms-3">
+              <button class="btn rounded-0" @click="openLanguageModal">
                 <span class="material-icons">public</span>
               </button>
-              <ul class="dropdown-menu wide-dropdown" :class="{ show: isOpen.worldDropdown }">
-                <li><a class="dropdown-item" href="#">Language 1</a></li>
-                <li><a class="dropdown-item" href="#">Language 2</a></li>
-              </ul>
             </li>
           </ul>
+        </div>
+      </div>
+  
+      <!-- Language Modal -->
+      <div v-if="isLanguageModalOpen" class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" @click="closeLanguageModal"></button>
+            </div>
+            <div class="modal-body text-center">
+              <h5>Select Language</h5>
+              <div class="row">
+                <div class="col">
+                  <p :class="{ 'text-primary fw-bold': selectedLanguage === 'English' }" @click="selectLanguage('English')">English</p>
+                </div>
+                <div class="col">
+                  <p :class="{ 'text-primary fw-bold': selectedLanguage === 'Other' }" @click="selectLanguage('Other')">Other</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </nav>
   </template>
   
   <script setup>
-  import { reactive } from 'vue';
+  import { reactive, ref } from 'vue';
   
   const isOpen = reactive({
     categoriesDropdown: false,
-    businessDropdown: false,
-    teachDropdown: false,
-    cartDropdown: false,
-    worldDropdown: false,
   });
   
   function openDropdown(dropdown) {
@@ -131,6 +147,21 @@
   
   function closeDropdown(dropdown) {
     isOpen[dropdown] = false;
+  }
+  
+  const isLanguageModalOpen = ref(false);
+  const selectedLanguage = ref('English');
+  
+  function openLanguageModal() {
+    isLanguageModalOpen.value = true;
+  }
+  
+  function closeLanguageModal() {
+    isLanguageModalOpen.value = false;
+  }
+  
+  function selectLanguage(language) {
+    selectedLanguage.value = language;
   }
   </script>
   
@@ -202,10 +233,6 @@
     background-color: #50575e;
   }
   
-  .nav-link:hover, .nav-link:focus, .dropdown-item:hover {
-    color: purple !important;
-  }
-  
   @media (max-width: 991px) {
     .navbar-collapse {
       text-align: left;
@@ -214,6 +241,18 @@
     .navbar-nav {
       width: 100%;
     }
+  }
+  
+  .modal-content {
+    padding: 2rem;
+  }
+  
+  .text-primary {
+    color: blue !important;
+  }
+  
+  .text-primary.fw-bold {
+    font-weight: bold;
   }
   </style>
   
