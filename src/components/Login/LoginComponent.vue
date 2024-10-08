@@ -1,0 +1,260 @@
+<template>
+  <div class="container-fluid d-flex align-items-center justify-content-center vh-100">
+    <div class="row w-75 shadow-lg">
+      
+      <!-- Left Side - Picture -->
+      <div class="col-md-6 p-0">
+        <img :src="require('@/assets/signup-pic.png')" alt="Login Image" class="img-fluid w-100 h-100" />
+      </div>
+      
+      <!-- Right Side - Login Form -->
+      <div class="col-md-6 bg-white p-5">
+        <h1 class="mb-4">Log in to your account</h1>
+        
+        <!-- Login Form -->
+        <form @submit.prevent="submitForm">
+          
+          <!-- Email -->
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" v-model="email" class="form-control" required />
+            <div v-if="emailError" class="text-danger">{{ emailError }}</div>
+          </div>
+          
+          <!-- Password -->
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" v-model="password" class="form-control" required minlength="8" />
+            <div v-if="passwordError" class="text-danger">{{ passwordError }}</div>
+          </div>
+          
+          <!-- Login Button -->
+          <button type="submit" class="btn login-btn w-100">Log In</button>
+        </form>
+
+        <!-- Other Log In Options -->
+        <div class="mt-4 text-center">
+          <div class="separator">Other log in options</div>
+          <div class="social-icons d-flex justify-content-center my-3">
+            <button class="btn btn-outline-secondary mx-2" @click="socialLogin('Google')">
+              <i class="fab fa-google"></i> <!-- Google Icon -->
+            </button>
+            <button class="btn btn-outline-secondary mx-2" @click="socialLogin('Facebook')">
+              <i class="fab fa-facebook-f"></i> <!-- Facebook Icon -->
+            </button>
+            <button class="btn btn-outline-secondary mx-2" @click="socialLogin('Apple')">
+              <i class="fab fa-apple"></i> <!-- Apple Icon -->
+            </button>
+          </div>
+        </div>
+
+        <!-- Don't Have an Account & Organization Login -->
+        <div class="mt-4 text-center">
+          Don't have an account? <a href="/signup">Sign up</a>
+        </div>
+        <div class="mt-2 text-center">
+          <a href="#" class="organization-login">Log in with your organization</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+
+const email = ref('');
+const password = ref('');
+const emailError = ref('');
+const passwordError = ref('');
+
+function validateEmail(email) {
+  const re = /\S+@\S+\.\S+/;
+  return re.test(email);
+}
+
+function submitForm() {
+  emailError.value = '';
+  passwordError.value = '';
+
+  if (!validateEmail(email.value)) {
+    emailError.value = 'Please enter a valid email address';
+  }
+
+  if (password.value.length < 8) {
+    passwordError.value = 'Password must be at least 8 characters';
+  }
+
+  if (!emailError.value && !passwordError.value) {
+    alert('Form submitted successfully');
+    // Further submission logic goes here
+  }
+}
+
+function socialLogin(provider) {
+  alert(`Log in with ${provider} clicked`);
+  // Logic for social login can be implemented here
+}
+</script>
+
+<style scoped>
+.login-btn {
+  background-color: #a436f1;
+  color: #fff;
+  border: none;
+}
+
+.login-btn:hover {
+  background-color: #50575e;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-size: 14px;
+  color: #888;
+  margin: 20px 0;
+}
+
+.separator::before,
+.separator::after {
+  content: '';
+  border-top: 1px solid #ddd;
+  width: 100px;
+  margin: 0 10px;
+}
+
+.social-icons i {
+  font-size: 24px;
+}
+
+.organization-login {
+  color: #6c63ff;
+  font-weight: 600;
+}
+
+.organization-login:hover {
+  text-decoration: underline;
+}
+
+.container-fluid {
+  background-color: #f9f9f9;
+}
+
+.text-center a {
+  color: #6c63ff;
+  font-weight: 600;
+}
+
+.text-center a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  /* Container adjustments to reduce free space */
+  .container-fluid {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align content at the start */
+    height: auto; /* Remove full height constraint */
+    padding: 20px; /* General padding */
+    box-sizing: border-box;
+  }
+
+  /* Ensure the row does not overflow and centers */
+  .row {
+    flex-direction: column;
+    align-items: center;
+    width: 100% !important;
+    margin: 0; /* Remove any default margins */
+    padding: 0; /* Remove any default paddings */
+  }
+
+  /* Hide the image container on mobile view */
+  .col-md-6.p-0 {
+    display: none; /* Hide the image on mobile screens */
+  }
+
+  /* Adjust login form section */
+  .col-md-6.bg-white.p-5 {
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+  }
+
+  /* Adjust heading text */
+  .col-md-6.bg-white.p-5 h1 {
+    font-size: 16px; /* Smaller font size for mobile */
+    margin-top: 10px;
+    line-height: 1.4;
+  }
+
+  /* Keep social icons in a single line */
+  .social-icons {
+    flex-direction: row !important;
+    justify-content: center;
+    flex-wrap: nowrap;
+  }
+
+  /* Adjust social button size and spacing */
+  .social-icons button {
+    width: auto;
+    margin: 0 8px;
+    font-size: 18px;
+    padding: 10px;
+  }
+
+  /* Adjust form fields and buttons */
+  .form-control {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  /* Adjust button styling */
+  .btn {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  /* Adjust separator width */
+  .separator {
+    width: 100% !important;
+  }
+
+  /* Adjust text alignment and spacing */
+  .text-center h1 {
+    font-size: 16px;
+    margin-top: 10px;
+    color: #333;
+  }
+
+  /* Adjust anchor link styles */
+  .text-center a {
+    display: block;
+    margin: 5px 0;
+    font-size: 14px;
+  }
+
+  /* Adjust organization login link */
+  .organization-login {
+    font-size: 14px;
+  }
+
+  /* Adjust text center alignment */
+  .text-center {
+    font-size: 14px;
+  }
+
+  /* Ensure footer is at the bottom without extra margin */
+  footer {
+    width: 100%;
+    padding: 10px;
+    background-color: #f9f9f9;
+    text-align: center;
+    box-sizing: border-box;
+    position: relative; /* Ensure footer stays below content */
+  }
+}
+</style>
