@@ -4,7 +4,7 @@
         
         <!-- Left Side - Picture -->
         <div class="col-md-6 p-0">
-          <img src="/src/assets/signup-pic.png" alt="Signup Image" class="img-fluid w-100 h-100" />
+          <img :src="require('@/assets/signup-pic.png')"  alt="Signup Image" class="img-fluid w-100 h-100" />
         </div>
         
         <!-- Right Side - Signup Form -->
