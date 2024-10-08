@@ -150,7 +150,7 @@
   
   .slider {
     display: flex;
-    transition: transform 0.5s ease-in-out;
+    transition: transform 0.8s ease-in-out;
   }
   
   .slide {
