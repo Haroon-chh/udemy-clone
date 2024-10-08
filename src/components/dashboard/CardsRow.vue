@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid mt-4">
+  <div class="container-fluid mt-4 mb-3">
     <h2>Learners are viewing</h2>
     <div class="row d-none d-lg-flex row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
       <!-- Display 4 cards in a row on large screens -->
