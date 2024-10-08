@@ -52,11 +52,11 @@
       <!-- Mobile View: Only Image, Title, and Description -->
       <div class="d-lg-none mobile-view">
         <!-- Display only selected goal image -->
-        <div class="mb-4">
+        <div class="slide-content mb-4">
           <img :src="goals[selectedGoalIndex].image" alt="goal image" class="goal-image-mobile" />
         </div>
         <!-- Display title and description for the selected goal aligned to the left -->
-        <div class="mobile-content">
+        <div class="slide-content mobile-content">
           <div class="d-flex align-items-center">
             <h3 class="goal-title-mobile">{{ goals[selectedGoalIndex].title }}</h3>
             <!-- Enterprise Plan Box Positioned to the Right of the Heading -->
@@ -65,7 +65,7 @@
           <p class="goal-description-mobile">{{ goals[selectedGoalIndex].description }}</p>
         </div>
         <!-- Show Find out more link for last two goals only -->
-        <div v-if="selectedGoalIndex === 2 || selectedGoalIndex === 3" class="mb-3">
+        <div class="slide-content" v-if="selectedGoalIndex === 2 || selectedGoalIndex === 3">
           <a href="#" class="find-out-more-mobile d-inline-block">
             Find out more
             <span class="arrow">→</span>
@@ -162,16 +162,15 @@
     padding: 20px;
     background-color: rgb(248, 249, 251);
   }
-
+  
   h2 {
-  font-family: 'SuisseWorks', Georgia, Times, 'Times New Roman', serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-  font-style: normal;
-  font-weight: 700;
-  color: rgb(45, 47, 49);
-  font-size: 32px;
-  line-height: 40px;
-}
-
+    font-family: 'SuisseWorks', Georgia, Times, 'Times New Roman', serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+    font-style: normal;
+    font-weight: 700;
+    color: rgb(45, 47, 49);
+    font-size: 32px;
+    line-height: 40px;
+  }
   
   /* Laptop View Styles */
   .goal-item {
@@ -215,6 +214,11 @@
   /* Mobile View Styles */
   .mobile-view {
     padding-left: 20px; /* Match the padding of the main heading */
+    padding-right: 20px;
+  }
+  
+  .slide-content {
+    padding-left: 20px;
     padding-right: 20px;
   }
   
@@ -282,7 +286,8 @@
     text-decoration: none;
   }
   
-  .find-out-more-mobile:hover, .find-out-more:hover {
+  .find-out-more-mobile:hover,
+  .find-out-more:hover {
     color: black !important;
   }
   
