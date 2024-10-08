@@ -1,9 +1,16 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <nav class="navbar navbar-expand-lg fixed-top">
       <div class="container-fluid">
+        
+        <!-- Desktop Logo (Left side) -->
+        <a class="navbar-brand d-none d-lg-block" href="#">
+          <img class="logo" src="../assets/udemy-logo.png" alt="logo">
+        </a>
   
-        <!-- Logo (Visible in All Views) -->
-        <a class="navbar-brand" href="#"><img class="logo" src="../assets/udemy-logo.png" alt="logo"></a>
+        <!-- Mobile Logo (Centered) -->
+        <a class="navbar-brand d-lg-none mx-auto d-inline" href="#">
+          <img class="logo-mobile" src="../assets/udemy-logo.png" alt="logo">
+        </a>
   
         <!-- Mobile View - Navbar Toggle & Icons -->
         <div class="d-lg-none d-flex align-items-center justify-content-end w-100">
@@ -53,10 +60,10 @@
               <a class="nav-link" href="#">
                 Udemy Business
               </a>
-              <ul class="dropdown-menu" :class="{ show: isOpen.businessDropdown }">
+              <ul class="dropdown-menu wide-dropdown" :class="{ show: isOpen.businessDropdown }">
                 <p>Get your team access to over 27,000 top Udemy courses, anytime, anywhere.</p>
-                <button type="button" class="btn btn-dark rounded-0 fw-semibold" >Try udemy business</button>
-            </ul>
+                <button type="button" class="btn btn-dark rounded-0 fw-semibold">Try Udemy Business</button>
+              </ul>
             </li>
   
             <!-- Teach on Udemy Link - Dropdown on Hover -->
@@ -64,9 +71,9 @@
               <a class="nav-link" href="#">
                 Teach on Udemy
               </a>
-              <ul class="dropdown-menu" :class="{ show: isOpen.teachDropdown }">
+              <ul class="dropdown-menu wide-dropdown" :class="{ show: isOpen.teachDropdown }">
                 <p>Turn what you know into an opportunity and reach millions around the world.</p>
-                <button type="button" class="btn btn-dark rounded-0 fw-semibold" >Learn More</button>
+                <button type="button" class="btn btn-dark rounded-0 fw-semibold">Learn More</button>
               </ul>
             </li>
   
@@ -75,9 +82,9 @@
               <a class="nav-link" href="#">
                 <span class="material-icons">shopping_cart</span>
               </a>
-              <ul class="dropdown-menu mt-3 px-4 py-2" :class="{ show: isOpen.cartDropdown }">
+              <ul class="dropdown-menu mt-3 px-4 py-2 wide-dropdown" :class="{ show: isOpen.cartDropdown }">
                 <p>Your cart is empty</p>
-                <p class=""><a class="text-discovery text-decoration-none" href="#">Keep Shoping</a></p>
+                <p class=""><a class="text-decoration-none" style="font-size:small; color: purple;" href="#">Keep Shopping</a></p>
               </ul>
             </li>
   
@@ -96,7 +103,7 @@
               <button class="btn rounded-0">
                 <span class="material-icons">public</span>
               </button>
-              <ul class="dropdown-menu" :class="{ show: isOpen.worldDropdown }">
+              <ul class="dropdown-menu wide-dropdown" :class="{ show: isOpen.worldDropdown }">
                 <li><a class="dropdown-item" href="#">Language 1</a></li>
                 <li><a class="dropdown-item" href="#">Language 2</a></li>
               </ul>
@@ -130,12 +137,15 @@
   <style scoped>
   .navbar {
     box-shadow: 0 5px 2px -2px rgba(57, 57, 57, 0.2);
-    color: white;
+    background-color: white;
   }
   
   .logo {
     width: 5em;
-    display: inline;
+  }
+  
+  .logo-mobile {
+    width: 4em;
   }
   
   .nav-link {
@@ -156,6 +166,11 @@
     padding: 10%;
     box-shadow: 2px 2px 2px rgba(57, 57, 57, 0.2);
     font-weight: bold;
+  }
+  
+  .navbar-nav .dropdown-menu.wide-dropdown {
+    width: 250px;
+    padding: auto;
   }
   
   .input-group-text {
@@ -185,6 +200,10 @@
   
   .btn-primary:hover {
     background-color: #50575e;
+  }
+  
+  .nav-link:hover, .nav-link:focus, .dropdown-item:hover {
+    color: purple !important;
   }
   
   @media (max-width: 991px) {
