@@ -7,6 +7,7 @@
       <Testimonial />
       <CardsRow />
       <SubscriptionCards />
+      <FullStory />
     </div>
   </template>
   
@@ -14,6 +15,7 @@
   import HelloWorld from '../components/dashboard/HelloWorldComponent.vue';
   import LearningGoals from '@/components/dashboard/LearningGoals.vue';
   import Testimonial from '../components/dashboard/TestimonialComponent.vue';
+  import FullStory from '@/components/dashboard/FullStory.vue';
 
   import CardsRow from '../components/dashboard/CardsRow.vue';
   import SubscriptionCards from '../components/dashboard/SubscriptionCards.vue';
