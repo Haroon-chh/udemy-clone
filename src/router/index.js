@@ -1,25 +1,52 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import DashboardView from '../views/DashboardView.vue';
+import SignupView from '@/views/SignupView.vue';
+import AboutUsView from '@/views/AboutUsView.vue';
+import LoginView from '@/views/LoginView.vue';
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    redirect: '/dashboard',
+    
+  },
+  {
+    path: '/dashboard',
+    name: 'dashboard',
+    component: DashboardView,
+    meta: { title: 'Dashboard'},
+
+  },
+  {
+    path: '/signup',
+    name: 'signup',
+    component: SignupView,
+    meta: { title: 'SignUp'},
+
   },
   {
     path: '/about',
     name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
-]
+    component: AboutUsView,
+    meta: { title: 'About Us'},
+
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginView, // Add the Login route
+    meta: { title: 'Login'},
+
+  },
+];
 
 const router = createRouter({
-  history: createWebHashHistory(),
-  routes
-})
+  history: createWebHistory(),
+  routes,
+});
+router.beforeEach((to, from, next) => {
+  document.title = to.meta.title || 'Udemy Clone';
+  next();
+});
 
-export default router
+export default router;
