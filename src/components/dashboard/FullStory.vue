@@ -146,6 +146,7 @@
     width: 100%;
     overflow: hidden;
     position: relative;
+    background-color: rgb(248, 249, 251);
   }
   
   .slider {
