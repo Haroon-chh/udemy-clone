@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar navbar-expand-lg fixed-top">
+    <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
   
         <!-- Mobile View - Navbar Toggle, Logo, Icons -->
@@ -169,6 +169,7 @@
   .navbar {
     box-shadow: 0 5px 2px -2px rgba(57, 57, 57, 0.2);
     background-color: white;
+    width: 100vw;
   }
   
   .logo {

@@ -24,7 +24,7 @@ import Footer from '../src/components/Footer.vue';// Import the Footer Component
 
 <style scoped>
 .navbar {
-  margin-bottom: 2%;
+  margin: 0%;
 }
 
 #app {
