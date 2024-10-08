@@ -8,6 +8,8 @@
       <SubscriptionCards />
       <FullStory />
       <News />
+      <TrustedCompanies />
+      <!-- <TrustedCompany /> -->
     </div>
   </template>
   
@@ -19,8 +21,11 @@
   import CardsRow from '../components/dashboard/CardsRow.vue';
   import SubscriptionCards from '../components/dashboard/SubscriptionCards.vue';
   import CarouselComponent from '../components/dashboard/CarouselComponent.vue';
+  // import TrustedCompany from '../components/dashboard/TrustedCompany.vue';
+  import TrustedCompanies from '../components/dashboard/TrustedCompany.vue'
 
   import News from '../components/dashboard/NewsComponent.vue';
+  
   </script>
   
   <style scoped>
