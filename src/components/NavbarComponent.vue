@@ -1,16 +1,21 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
   
-        <!-- Logo (Visible in All Views) -->
-        <a class="navbar-brand" href="#"><img class="logo" src="../assets/udemy-logo.png" alt="logo"></a>
-  
-        <!-- Mobile View - Navbar Toggle & Icons -->
-        <div class="d-lg-none d-flex align-items-center justify-content-end w-100">
+        <!-- Mobile View - Navbar Toggle, Logo, Icons -->
+        <div class="d-lg-none d-flex align-items-center justify-content-between w-100">
+          <!-- Navbar Toggle -->
           <button class="navbar-toggler me-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
           </button>
-          <div>
+  
+          <!-- Mobile Logo (Centered) -->
+          <a class="navbar-brand mx-auto" href="#">
+            <img class="logo-mobile" src="../assets/udemy-logo.png" alt="logo">
+          </a>
+  
+          <!-- Cart and Search Icons -->
+          <div class="d-flex">
             <button class="btn p-0 me-3" type="button">
               <span class="material-icons">search</span>
             </button>
@@ -20,6 +25,11 @@
           </div>
         </div>
   
+        <!-- Desktop Logo (Left side) -->
+        <a class="navbar-brand d-none d-lg-block" href="#">
+          <img class="logo" src="../assets/udemy-logo.png" alt="logo">
+        </a>
+  
         <!-- Desktop & Tablet View - Navbar Links -->
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
@@ -28,7 +38,7 @@
               <a class="nav-link" href="#" id="categoriesDropdown" role="button">
                 Categories
               </a>
-              <ul class="dropdown-menu" :class="{ show: isOpen.categoriesDropdown }">
+              <ul class="dropdown-menu mt-4" :class="{ show: isOpen.categoriesDropdown }">
                 <li><a class="dropdown-item" href="#">Category 1</a></li>
                 <li><a class="dropdown-item" href="#">Category 2</a></li>
                 <li><a class="dropdown-item" href="#">Category 3</a></li>
@@ -53,9 +63,9 @@
               <a class="nav-link" href="#">
                 Udemy Business
               </a>
-              <ul class="dropdown-menu" :class="{ show: isOpen.businessDropdown }">
+              <ul class="dropdown-menu wide-dropdown" :class="{ show: isOpen.businessDropdown }">
                 <p>Get your team access to over 27,000 top Udemy courses, anytime, anywhere.</p>
-                <li><a class="dropdown-item" href="#">Business 2</a></li>
+                <button type="button" class="btn btn-dark rounded-0 fw-semibold">Try Udemy Business</button>
               </ul>
             </li>
   
@@ -64,9 +74,9 @@
               <a class="nav-link" href="#">
                 Teach on Udemy
               </a>
-              <ul class="dropdown-menu" :class="{ show: isOpen.teachDropdown }">
-                <li><a class="dropdown-item" href="#">Teach Option 1</a></li>
-                <li><a class="dropdown-item" href="#">Teach Option 2</a></li>
+              <ul class="dropdown-menu wide-dropdown" :class="{ show: isOpen.teachDropdown }">
+                <p>Turn what you know into an opportunity and reach millions around the world.</p>
+                <button type="button" class="btn btn-dark rounded-0 fw-semibold">Learn More</button>
               </ul>
             </li>
   
@@ -75,9 +85,9 @@
               <a class="nav-link" href="#">
                 <span class="material-icons">shopping_cart</span>
               </a>
-              <ul class="dropdown-menu" :class="{ show: isOpen.cartDropdown }">
-                <li><a class="dropdown-item" href="#">Item 1</a></li>
-                <li><a class="dropdown-item" href="#">Item 2</a></li>
+              <ul class="dropdown-menu mt-3 px-4 py-2 wide-dropdown" :class="{ show: isOpen.cartDropdown }">
+                <p>Your cart is empty</p>
+                <p class=""><a class="text-decoration-none" style="font-size:small; color: purple;" href="#">Keep Shopping</a></p>
               </ul>
             </li>
   
@@ -86,36 +96,49 @@
               <button class="btn btn-outline-secondary rounded-0 fw-semibold">Login</button>
             </li>
   
-            <!-- Signup Button -->
             <li class="nav-item ms-3">
               <button class="btn btn-dark rounded-0 fw-semibold">Sign Up</button>
             </li>
   
-            <!-- World Icon Button - Dropdown on Hover -->
-            <li class="nav-item dropdown ms-3" @mouseover="openDropdown('worldDropdown')" @mouseleave="closeDropdown('worldDropdown')">
-              <button class="btn rounded-0">
+            <!-- World Icon Button -->
+            <li class="nav-item ms-3">
+              <button class="btn rounded-0" @click="openLanguageModal">
                 <span class="material-icons">public</span>
               </button>
-              <ul class="dropdown-menu" :class="{ show: isOpen.worldDropdown }">
-                <li><a class="dropdown-item" href="#">Language 1</a></li>
-                <li><a class="dropdown-item" href="#">Language 2</a></li>
-              </ul>
             </li>
           </ul>
+        </div>
+      </div>
+  
+      <!-- Language Modal -->
+      <div v-if="isLanguageModalOpen" class="modal fade show d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" @click="closeLanguageModal"></button>
+            </div>
+            <div class="modal-body text-center">
+              <h5>Select Language</h5>
+              <div class="row">
+                <div class="col">
+                  <p :class="{ 'text-primary fw-bold': selectedLanguage === 'English' }" @click="selectLanguage('English')">English</p>
+                </div>
+                <div class="col">
+                  <p :class="{ 'text-primary fw-bold': selectedLanguage === 'Other' }" @click="selectLanguage('Other')">Other</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </nav>
   </template>
   
   <script setup>
-  import { reactive } from 'vue';
+  import { reactive, ref } from 'vue';
   
   const isOpen = reactive({
     categoriesDropdown: false,
-    businessDropdown: false,
-    teachDropdown: false,
-    cartDropdown: false,
-    worldDropdown: false,
   });
   
   function openDropdown(dropdown) {
@@ -125,17 +148,36 @@
   function closeDropdown(dropdown) {
     isOpen[dropdown] = false;
   }
+  
+  const isLanguageModalOpen = ref(false);
+  const selectedLanguage = ref('English');
+  
+  function openLanguageModal() {
+    isLanguageModalOpen.value = true;
+  }
+  
+  function closeLanguageModal() {
+    isLanguageModalOpen.value = false;
+  }
+  
+  function selectLanguage(language) {
+    selectedLanguage.value = language;
+  }
   </script>
   
   <style scoped>
   .navbar {
     box-shadow: 0 5px 2px -2px rgba(57, 57, 57, 0.2);
-    color: white;
+    background-color: white;
+    width: 100vw;
   }
   
   .logo {
     width: 5em;
-    display: inline;
+  }
+  
+  .logo-mobile {
+    width: 4em;
   }
   
   .nav-link {
@@ -156,6 +198,11 @@
     padding: 10%;
     box-shadow: 2px 2px 2px rgba(57, 57, 57, 0.2);
     font-weight: bold;
+  }
+  
+  .navbar-nav .dropdown-menu.wide-dropdown {
+    width: 250px;
+    padding: auto;
   }
   
   .input-group-text {
@@ -195,6 +242,18 @@
     .navbar-nav {
       width: 100%;
     }
+  }
+  
+  .modal-content {
+    padding: 2rem;
+  }
+  
+  .text-primary {
+    color: blue !important;
+  }
+  
+  .text-primary.fw-bold {
+    font-weight: bold;
   }
   </style>
   
