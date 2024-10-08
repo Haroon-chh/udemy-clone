@@ -1,13 +1,14 @@
 <!-- src/views/DashboardView.vue -->
 <template>
   <div class="dashboard-view">
-    <HelloWorld />
+    <HelloWorldComponent />
     <CarouselComponent/>
   </div>
 </template>
 
 <script setup>
-import HelloWorld from '../components/dashboard/HelloWorldComponent.vue';
+
+import HelloWorldComponent from '../components/dashboard/HelloWorldComponent.vue';
 import CarouselComponent from '../components/dashboard/CarouselComponent.vue';
 </script>
 

@@ -2,10 +2,11 @@
   <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
       <div class="carousel-item" :class="{ active: index === 0 }" v-for="(image, index) in images" :key="index">
-        <img :src="getImageUrl(image)" class="d-block w-100" alt="slide image">
+        <!-- Add responsive class for smaller screens -->
+        <img :src="getImageUrl(image)" class="d-block w-100 carousel-image" alt="slide image">
 
         <!-- First Image's Card (Fixed) -->
-        <div class="card custom-card" v-if="index === 0">
+        <div class="card custom-card d-flex flex-column" v-if="index === 0">
           <div class="card-body">
             <h2 class="card-title">Learning that gets you</h2>
             <p class="card-text">Skills for your present (and your future). Get started with us.</p>
@@ -13,13 +14,13 @@
         </div>
 
         <!-- Second Image's Card (Matches Attached Image) -->
-        <div class="card custom-card" v-else>
+        <div class="card custom-card d-flex flex-column" v-else>
           <div class="card-body">
             <h2 class="card-title">Skills that drive you forward</h2>
             <p class="card-text">Technology and the world of work change fast — with us, you’re faster. Get the skills to achieve goals and stay competitive.</p>
-            <div class="button-group d-flex justify-content-start">
+            <div class="button-group d-flex justify-content-start flex-column flex-md-row">
               <button class="btn btn-dark custom-btn">Plan for individuals</button>
-              <button class="btn btn-outline-dark custom-btn">Plan for organizations</button>
+              <button class="btn btn-outline-dark custom-btn btn2">Plan for organizations</button>
             </div>
           </div>
         </div>
@@ -73,6 +74,28 @@ export default {
   z-index: 10;
   padding: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 768px) {
+  .custom-card {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .button-group {
+    flex-direction: column;
+    margin-left: 5%;
+    margin-right: 3%;
+  }
+
+  .carousel-image {
+    height: auto;
+  }
 }
 
 .card-text {
