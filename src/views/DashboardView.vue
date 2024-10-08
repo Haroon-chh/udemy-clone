@@ -4,6 +4,7 @@
       <HelloWorld />
       <LearningGoals />
       <Testimonial />
+      <CardsRow />
     </div>
   </template>
   
@@ -12,6 +13,7 @@
   import LearningGoals from '@/components/dashboard/LearningGoals.vue';
   import Testimonial from '../components/dashboard/TestimonialComponent.vue';
 
+  import CardsRow from '../components/dashboard/CardsRow.vue';
   </script>
   
   <style scoped>
