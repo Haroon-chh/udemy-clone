@@ -5,6 +5,7 @@
       <LearningGoals />
       <Testimonial />
       <CardsRow />
+      <SubscriptionCards />
     </div>
   </template>
   
@@ -14,6 +15,7 @@
   import Testimonial from '../components/dashboard/TestimonialComponent.vue';
 
   import CardsRow from '../components/dashboard/CardsRow.vue';
+  import SubscriptionCards from '../components/dashboard/SubscriptionCards.vue';
   </script>
   
   <style scoped>
