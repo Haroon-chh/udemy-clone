@@ -58,6 +58,8 @@
 
 <script setup>
 import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
 
 const fullName = ref('');
 const email = ref('');
@@ -65,29 +67,62 @@ const password = ref('');
 const acceptedTerms = ref(false);
 const emailError = ref('');
 const passwordError = ref('');
+const router = useRouter();
+
+// API base URL - update it as needed
+const baseURL = 'http://192.168.15.96:8000/api';
 
 function validateEmail(email) {
   const re = /\S+@\S+\.\S+/;
   return re.test(email);
 }
 
-function submitForm() {
+async function submitForm() {
   emailError.value = '';
   passwordError.value = '';
 
   if (!validateEmail(email.value)) {
     emailError.value = 'Please enter a valid email address';
+    return;
   }
 
   if (password.value.length < 8) {
     passwordError.value = 'Password must be at least 8 characters';
+    return;
   }
 
-  if (!emailError.value && !passwordError.value && acceptedTerms.value) {
-    alert('Form submitted successfully');
-    // Further submission logic goes here
+  if (!acceptedTerms.value) {
+    alert('You must accept the terms to continue');
+    return;
+  }
+
+  try {
+    // Send the register API request
+    const response = await axios.post(`${baseURL}/register`, {
+      name: fullName.value,
+      email: email.value,
+      password: password.value,
+      password_confirmation: password.value // Same password for confirmation
+    });
+
+    // Check if response status is 200 (successful registration)
+    if (response.status === 200) {
+      alert(response.data.message); // Show the success message from the backend
+      router.push('/login'); // Redirect to login page on success
+    } else {
+      // If the response status is not 200, show the message from the backend
+      alert(response.data.message);
+    }
+  } catch (error) {
+    if (error.response) {
+      alert(error.response.message); 
+    } else {
+      console.error(error);
+      alert('An unknown error occurred during registration.');
+    }
   }
 }
+
 </script>
 
 <style scoped>
