@@ -11,25 +11,29 @@
       <div class="col-md-6 bg-white p-5">
         <h1 class="mb-4">Log in to your account</h1>
         
+        <!-- Success and Error Popup Components -->
+        <SuccessPopupComponent :show="showSuccess" :message="successMessage" />
+        <ErrorPopupComponent :show="showError" :message="errorMessage" />
+        
         <!-- Login Form -->
         <form @submit.prevent="submitForm">
           
           <!-- Email -->
-          <div class="mb-3">
+          <div class="mb-3 inputs position-relative">
+            <input type="email" id="email" v-model="email" class="form-control border-0" required placeholder="" />
             <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" v-model="email" class="form-control" required />
             <div v-if="emailError" class="text-danger">{{ emailError }}</div>
           </div>
           
           <!-- Password -->
-          <div class="mb-3">
+          <div class="mb-3 inputs position-relative">
+            <input type="password" id="password" v-model="password" class="form-control border-0" required minlength="8" placeholder="" />
             <label for="password" class="form-label">Password</label>
-            <input type="password" id="password" v-model="password" class="form-control" required minlength="8" />
             <div v-if="passwordError" class="text-danger">{{ passwordError }}</div>
           </div>
           
           <!-- Login Button -->
-          <button type="submit" class="btn login-btn w-100">Log In</button>
+          <button type="submit" class="btn login-btn w-100 rounded-0">Log In</button>
         </form>
 
         <!-- Other Log In Options -->
@@ -61,35 +65,90 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex'; 
+import ApiServices from '@/services/ApiServices'; // Adjust the path as necessary
+import SuccessPopup from '../SuccessPopup.vue'; // Adjust the path as necessary
+import ErrorPopup from '../ErrorPopup.vue'; // Adjust the path as necessary
+
+const SuccessPopupComponent = defineComponent(SuccessPopup);
+const ErrorPopupComponent = defineComponent(ErrorPopup);
 
 const email = ref('');
 const password = ref('');
 const emailError = ref('');
 const passwordError = ref('');
+const router = useRouter();
+const store = useStore(); 
 
-function validateEmail(email) {
+const showSuccess = ref(false);
+const showError = ref(false);
+const successMessage = ref('');
+const errorMessage = ref('');
+
+const validateEmail = (email) => {
   const re = /\S+@\S+\.\S+/;
   return re.test(email);
-}
+};
 
-function submitForm() {
+const submitForm = async () => {
   emailError.value = '';
   passwordError.value = '';
 
   if (!validateEmail(email.value)) {
     emailError.value = 'Please enter a valid email address';
+    return;
   }
 
   if (password.value.length < 8) {
     passwordError.value = 'Password must be at least 8 characters';
+    return;
   }
 
-  if (!emailError.value && !passwordError.value) {
-    alert('Form submitted successfully');
-    // Further submission logic goes here
+  try {
+    const response = await ApiServices.PostRequest('/login', {
+      email: email.value,
+      password: password.value
+    });
+
+    // Log the full response for debugging
+    console.log('Login response:', response);
+
+    if (response && response.message === "success" && response.data) {
+      // Dispatch the entire userData instead of individual properties
+      await store.dispatch('loginUser', response); // Pass the whole response object
+
+      // Show success message
+      successMessage.value = 'Login successful! Redirecting...'; // Set a custom success message
+      showSuccess.value = true; // Show success popup
+
+      // Set a timeout to hide the success popup after 2 seconds
+      setTimeout(() => {
+        showSuccess.value = false;
+        router.push('/dashboard');
+        // Hide success popup
+      }, 2000); // 2000 milliseconds = 2 seconds
+
+      // Redirect to the dashboard
+    } else {
+      throw new Error('Unexpected response format');
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+    if (error.response && error.response.status === 401) {
+      errorMessage.value = error.response.data.message || 'Invalid credentials';
+    } else {
+      errorMessage.value = 'An error occurred. Please try again later.';
+    }
+    showError.value = true; // Show error popup
+
+    // Set a timeout to hide the error popup after 5 seconds
+    setTimeout(() => {
+      showError.value = false; // Hide error popup
+    }, 5000); // 5000 milliseconds = 5 seconds
   }
-}
+};
 
 function socialLogin(provider) {
   alert(`Log in with ${provider} clicked`);
@@ -150,6 +209,54 @@ function socialLogin(provider) {
 
 .text-center a:hover {
   text-decoration: underline;
+}
+
+.inputs {
+  position: relative;
+  border: 1px solid black;
+  height: 70px; /* Increased height for inputs */
+  padding-top: 1.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 20px;
+}
+
+.form-label {
+    position: absolute;
+    top: 1.3rem;
+    left: 0.75rem;
+    font-size: 14px;
+    color: #000000;
+    font-weight: bold;
+    transition: all 0.2s ease-in-out;
+    pointer-events: none;
+  }
+
+input:focus + .form-label,
+  input:not(:placeholder-shown) + .form-label {
+    top: -0rem;
+    left: 0.75rem;
+    font-size: 0.75rem;
+    margin-bottom: 0%;
+
+  }
+
+input {
+  background-color: transparent;
+  outline: none;
+  box-shadow: none;
+  height: 30px;
+  font-size: 16px; /* Font size for input text */
+  padding: 0 12px; /* Padding inside input */
+}
+
+input:focus {
+  border: none;
+  box-shadow: none;
+}
+
+input:not(:placeholder-shown) {
+  border: none;
+  box-shadow: none;
 }
 
 @media (max-width: 768px) {
