@@ -76,14 +76,54 @@
       </div>
     </div>
   </div>
+     <div class="offices">
+    <h1>Our offices</h1>
+    <div class="office-list">
+      <div class="office" v-for="office in offices" :key="office.location">
+        <img :src="office.image" :alt="office.location" />
+        <h3>{{ office.location }}</h3>
+      </div>
+    </div>
+  </div>
   </div>
 </template>
 
-<script>
+<script scoped>
 export default {
   name: "AboutUs",
+  data() {
+    return {
+      offices: [
+        {
+          location: 'San Francisco, CA',
+          image: 'https://about.udemy.com/wp-content/uploads/2021/07/dublin-1-460x350.jpeg',
+        },
+        {
+          location: 'Denver, CO',
+          image: 'https://about.udemy.com/wp-content/uploads/2021/07/denver-460x350.jpeg',
+        },
+        {
+          location: 'Dublin, Ireland',
+          image: 'https://about.udemy.com/wp-content/uploads/2021/07/san-francisco-460x350.jpeg',
+        },
+        {
+          location: 'Dublin, Ireland',
+          image: 'https://about.udemy.com/wp-content/uploads/2021/07/san-francisco-460x350.jpeg',
+        },
+        {
+          location: 'Dublin, Ireland',
+          image: 'https://about.udemy.com/wp-content/uploads/2021/07/san-francisco-460x350.jpeg',
+        },
+        {
+          location: 'Dublin, Ireland',
+          image: 'https://about.udemy.com/wp-content/uploads/2021/07/san-francisco-460x350.jpeg',
+        },
+      ],
+    };
+  },
 };
 </script>
+
 
 <style scoped>
 /* Origins Section Styling */
@@ -234,6 +274,57 @@ a:hover {
   .grid-container {
     grid-template-columns: repeat(3, 1fr); /* Three columns for large screens */
   }
+}
+.offices {
+  text-align: center;
+  margin: 20px;
+}
+
+.office-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+.office {
+  flex: 1 1 400px;
+  max-width: 400px;
+  text-align: center;
+  border: 1px solid #ddd;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.office:hover {
+  transform: scale(1.05);
+}
+
+.office img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.office h3 {
+  font-size: 1.2rem;
+  margin: 15px 0;
+  padding: 0 10px;
+}
+  
+/* Responsive Design */
+@media (max-width: 768px) {
+  .office-list {
+    flex-direction: column;
+  }
+
+  .office {
+    max-width: 100%;
+  }
+}
+h3{
+  font-weight: bold;
 }
 </style>
 
