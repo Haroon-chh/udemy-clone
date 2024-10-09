@@ -33,7 +33,7 @@
           </div>
           
           <!-- Login Button -->
-          <button type="submit" class="btn login-btn w-100">Log In</button>
+          <button type="submit" class="btn login-btn w-100 rounded-0">Log In</button>
         </form>
 
         <!-- Other Log In Options -->
@@ -119,24 +119,25 @@ const submitForm = async () => {
       // Dispatch the entire userData instead of individual properties
       await store.dispatch('loginUser', response); // Pass the whole response object
 
-      // Show success message from response.data.message
-      successMessage.value = response.data.message || 'Login successful! Redirecting...';
+      // Show success message
+      successMessage.value = 'Login successful! Redirecting...'; // Set a custom success message
       showSuccess.value = true; // Show success popup
 
       // Set a timeout to hide the success popup after 2 seconds
       setTimeout(() => {
-        showSuccess.value = false; // Hide success popup
+        showSuccess.value = false;
+        router.push('/dashboard');
+        // Hide success popup
       }, 2000); // 2000 milliseconds = 2 seconds
 
       // Redirect to the dashboard
-      router.push('/dashboard');
     } else {
       throw new Error('Unexpected response format');
     }
   } catch (error) {
     console.error('Error during login:', error);
     if (error.response && error.response.status === 401) {
-      errorMessage.value = error.response.data.error || 'Invalid credentials';
+      errorMessage.value = error.response.data.message || 'Invalid credentials';
     } else {
       errorMessage.value = 'An error occurred. Please try again later.';
     }
