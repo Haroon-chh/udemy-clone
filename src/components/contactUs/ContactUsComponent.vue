@@ -25,6 +25,57 @@
         education <br> accessible to all.
       </p>
     </div>
+    <div class="contact-container">
+    <h1>Contact us</h1>
+    <p>The quickest way to get in touch with us is by using the contact information below.</p>
+    <div class="grid-container">
+      <div class="grid-item">
+        <h2>Learners</h2>
+        <a href="#">Visit our Help Center</a><br />
+        <a href="#">How to reach our support team</a>
+      </div>
+      <div class="grid-item">
+        <h2>Udemy Business</h2>
+        <a href="#">Visit our Help Center</a><br />
+        <a href="#">Enterprise New Customer Inquiry</a>
+      </div>
+      <div class="grid-item">
+        <h2>Instructors</h2>
+        <a href="#">Visit our Help Center</a><br />
+        <a href="#">Explore our Teaching Center</a>
+      </div>
+      <div class="grid-item">
+        <h2>Partners, Resellers & Affiliates</h2>
+        <a href="#">Visit our Help Center</a>
+      </div>
+      <div class="grid-item">
+        <h2>Investors</h2>
+        <a href="#">Learn more here</a><br />
+        <a href="#">Contact our Investor Relations team</a>
+      </div>
+      <div class="grid-item">
+        <h2>Press</h2>
+        <a href="#">View general information</a><br />
+        <a href="mailto:press@udemy.com">Email press@udemy.com</a>
+      </div>
+      <div class="grid-item">
+        <h2>Privacy</h2>
+        <a href="#">View privacy policy</a><br />
+        <a href="mailto:privacy@udemy.com">Email privacy@udemy.com</a><br />
+        <p>Mail:</p>
+        <p>Udemy, Inc.<br />
+          Attn: Legal<br />
+          600 Harrison Street, 3rd Floor<br />
+          San Francisco, CA 94107</p>
+      </div>
+      <div class="grid-item">
+        <h2>European Union Authorities & Trusted Flaggers</h2>
+        <a href="#">View Digital Services Act Information</a><br />
+        <a href="#">Report Illegal Content Form</a><br />
+        <a href="mailto:dsacompliance@udemy.com">Email dsacompliance@udemy.com</a>
+      </div>
+    </div>
+  </div>
   </div>
 </template>
 
@@ -66,12 +117,19 @@ export default {
 }
 
 /* Text Styling */
-.text-section h1 {
+h1 {
   font-family: 'Suisse Works', serif;
   font-size: 3rem;
   font-weight: 600;
   line-height: 1.2;
   margin: 0;
+}
+h2, a, p{
+  font-family: 'Suisse Works', serif;
+  font-size: 22px;
+}
+p{
+  font-size: 22px;
 }
 
 /* Image Styling */
@@ -115,6 +173,9 @@ export default {
     font-size: 5rem;
   }
 
+
+
+
   .image-section img {
     max-width: 700px;
   }
@@ -129,6 +190,50 @@ export default {
 }
 p{
   text-align: center;
+}
+.contact-container {
+  text-align: center;
+  margin: 20px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr); /* Default to a single column */
+  gap: 30px;
+  padding: 20px;
+}
+
+/* .grid-item {
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+} */
+
+h2 {
+  font-size: 1.2em;
+}
+
+a {
+  color: #5624d0;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #351486;
+}
+
+/* Media Queries for responsiveness */
+@media (min-width: 600px) {
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr); /* Two columns for medium screens */
+  }
+}
+
+@media (min-width: 900px) {
+  .grid-container {
+    grid-template-columns: repeat(3, 1fr); /* Three columns for large screens */
+  }
 }
 </style>
 
