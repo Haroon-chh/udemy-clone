@@ -11,35 +11,38 @@
       <div class="col-md-5 bg-white p-5">
         <h1 class="mb-4 fs-3 fw-bold">Sign up and start learning</h1>
         
+        <!-- Success and Error Popup Components -->
+        <SuccessPopupComponent :show="showSuccess" :message="successMessage" />
+        <ErrorPopupComponent :show="showError" :message="errorMessage" />
+
         <!-- Signup Form -->
         <form @submit.prevent="submitForm">
-          
           <!-- Full Name -->
           <div class="mb-3 inputs position-relative">
             <input type="text" id="fullName" v-model="fullName" class="form-control border-0" required placeholder=" " />
             <label for="fullName" class="form-label">Full Name</label>
           </div>
-          
+
           <!-- Email -->
           <div class="mb-3 inputs position-relative">
             <input type="email" id="email" v-model="email" class="form-control border-0" required placeholder=" " />
             <label for="email" class="form-label">Email</label>
             <div v-if="emailError" class="text-danger">{{ emailError }}</div>
           </div>
-          
+
           <!-- Password -->
           <div class="mb-3 inputs position-relative">
             <input type="password" id="password" v-model="password" class="form-control border-0" required minlength="8" placeholder=" " />
             <label for="password" class="form-label">Password</label>
             <div v-if="passwordError" class="text-danger">{{ passwordError }}</div>
           </div>
-          
+
           <!-- Terms Checkbox -->
           <div class="mb-3 form-check">
             <input type="checkbox" id="terms" v-model="acceptedTerms" class="form-check-input" required />
             <label class="form-check-label" for="terms">Send me special offers, personalized recommendations, and learning tips.</label>
           </div>
-          
+
           <!-- Signup Button -->
           <button type="submit" class="btn signup-btn w-100 rounded-0 fw-bold">Sign Up</button>
         </form>
@@ -57,9 +60,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import axios from 'axios';
+import { ref, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
+import SuccessPopup from '../SuccessPopup.vue'; // Adjust path as necessary
+import ErrorPopup from '../ErrorPopup.vue'; // Adjust path as necessary
+
+const SuccessPopupComponent = defineComponent(SuccessPopup);
+const ErrorPopupComponent = defineComponent(ErrorPopup);
 
 const fullName = ref('');
 const email = ref('');
@@ -67,9 +75,12 @@ const password = ref('');
 const acceptedTerms = ref(false);
 const emailError = ref('');
 const passwordError = ref('');
+const showSuccess = ref(false);
+const showError = ref(false);
+const successMessage = ref('');
+const errorMessage = ref('');
 const router = useRouter();
 
-// API base URL - update it as needed
 const baseURL = 'http://192.168.15.96:8000/api';
 
 function validateEmail(email) {
@@ -97,7 +108,6 @@ async function submitForm() {
   }
 
   try {
-    // Send the register API request
     const response = await axios.post(`${baseURL}/register`, {
       name: fullName.value,
       email: email.value,
@@ -105,24 +115,30 @@ async function submitForm() {
       password_confirmation: password.value // Same password for confirmation
     });
 
-    // Check if response status is 200 (successful registration)
     if (response.status === 200) {
-      alert(response.data.message); // Show the success message from the backend
-      router.push('/login'); // Redirect to login page on success
+      // Set success message and show the popup
+      successMessage.value = 'Registration successful! Redirecting to login...';
+      showSuccess.value = true;
+
+      // Hide success popup after 2 seconds and redirect to login page
+      setTimeout(() => {
+        showSuccess.value = false;
+        router.push('/login');
+      }, 2000);
     } else {
-      // If the response status is not 200, show the message from the backend
-      alert(response.data.message);
+      throw new Error('Unexpected response');
     }
   } catch (error) {
-    if (error.response) {
-      alert(error.response.message); 
-    } else {
-      console.error(error);
-      alert('An unknown error occurred during registration.');
-    }
+    // Show error message popup
+    errorMessage.value = error.response?.data?.error || 'An error occurred. Please try again later.';
+    showError.value = true;
+
+    // Hide error popup after 5 seconds
+    setTimeout(() => {
+      showError.value = false;
+    }, 5000);
   }
 }
-
 </script>
 
 <style scoped>
