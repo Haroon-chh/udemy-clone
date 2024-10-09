@@ -3,6 +3,7 @@ import DashboardView from '../views/DashboardView.vue';
 import SignupView from '@/views/SignupView.vue';
 import AboutUsView from '@/views/AboutUsView.vue';
 import LoginView from '@/views/LoginView.vue';
+import TeachUdemyView from '@/views/TeachUdemyView.vue';
 
 const routes = [
   {
@@ -36,7 +37,12 @@ const routes = [
     name: 'login',
     component: LoginView, // Add the Login route
     meta: { title: 'Login'},
-
+  },
+  {
+    path: '/teaching',
+    name: 'teachUdemy',
+    component: TeachUdemyView, // Add the Login route
+    meta: { title: 'Teaching'},
   },
 ];
 
