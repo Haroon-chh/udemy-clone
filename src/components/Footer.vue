@@ -20,7 +20,7 @@
             <li>Teach on Udemy</li>
             <li>Get the app</li>
             <li>About us</li>
-            <li>Contact us</li>
+            <li><a href="/contactUs"> Contact us </a></li>
           </ul>
         </div>
         <div class="col-12 col-md-3 mb-3">
@@ -95,6 +95,8 @@ body {
   padding: 15px;
 }
 
+
+
 /* Responsive Text and Logo */
 .responsive-text {
   font-size: 1.2rem;
@@ -142,6 +144,13 @@ ul li:hover {
   color: #fff;
   cursor: pointer;
   text-decoration: underline;
+}
+a{
+  text-decoration: none;
+  color: #ccc;
+}
+a:hover{
+  color: #ccc;
 }
 
 button {

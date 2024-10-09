@@ -11,6 +11,10 @@
       <div class="col-md-6 bg-white p-5">
         <h1 class="mb-4">Log in to your account</h1>
         
+        <!-- Success and Error Popup Components -->
+        <SuccessPopupComponent :show="showSuccess" :message="successMessage" />
+        <ErrorPopupComponent :show="showError" :message="errorMessage" />
+        
         <!-- Login Form -->
         <form @submit.prevent="submitForm">
           
@@ -29,7 +33,7 @@
           </div>
           
           <!-- Login Button -->
-          <button type="submit" class="btn login-btn w-100">Log In</button>
+          <button type="submit" class="btn login-btn w-100 rounded-0">Log In</button>
         </form>
 
         <!-- Other Log In Options -->
@@ -61,27 +65,34 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useStore } from 'vuex';
-import axios from 'axios';
+import { ref, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex'; 
+import ApiServices from '@/services/ApiServices'; // Adjust the path as necessary
+import SuccessPopup from '../SuccessPopup.vue'; // Adjust the path as necessary
+import ErrorPopup from '../ErrorPopup.vue'; // Adjust the path as necessary
+
+const SuccessPopupComponent = defineComponent(SuccessPopup);
+const ErrorPopupComponent = defineComponent(ErrorPopup);
 
 const email = ref('');
 const password = ref('');
 const emailError = ref('');
 const passwordError = ref('');
-const store = useStore();
 const router = useRouter();
+const store = useStore(); 
 
-// Accessing the API base URL using Vue CLI convention
-const baseURL = process.env.VUE_APP_API_URL; // Ensure this is defined in your .env file
+const showSuccess = ref(false);
+const showError = ref(false);
+const successMessage = ref('');
+const errorMessage = ref('');
 
-function validateEmail(email) {
+const validateEmail = (email) => {
   const re = /\S+@\S+\.\S+/;
   return re.test(email);
-}
+};
 
-async function submitForm() {
+const submitForm = async () => {
   emailError.value = '';
   passwordError.value = '';
 
@@ -96,23 +107,48 @@ async function submitForm() {
   }
 
   try {
-    const response = await axios.post(`${baseURL}/login`, {
+    const response = await ApiServices.PostRequest('/login', {
       email: email.value,
       password: password.value
     });
 
-    if (response.data.message === 'success') {
-      store.dispatch('loginUser', response.data);
-      router.push('/dashboard'); // Redirect to dashboard on success
+    // Log the full response for debugging
+    console.log('Login response:', response);
+
+    if (response && response.message === "success" && response.data) {
+      // Dispatch the entire userData instead of individual properties
+      await store.dispatch('loginUser', response); // Pass the whole response object
+
+      // Show success message
+      successMessage.value = 'Login successful! Redirecting...'; // Set a custom success message
+      showSuccess.value = true; // Show success popup
+
+      // Set a timeout to hide the success popup after 2 seconds
+      setTimeout(() => {
+        showSuccess.value = false;
+        router.push('/dashboard');
+        // Hide success popup
+      }, 2000); // 2000 milliseconds = 2 seconds
+
+      // Redirect to the dashboard
     } else {
-      // Handle API error response
-      alert('Login failed: ' + response.data.message);
+      throw new Error('Unexpected response format');
     }
   } catch (error) {
-    console.error(error);
-    alert('An error occurred during login.');
+    console.error('Error during login:', error);
+    if (error.response && error.response.status === 401) {
+      errorMessage.value = error.response.data.message || 'Invalid credentials';
+    } else {
+      errorMessage.value = 'An error occurred. Please try again later.';
+    }
+    showError.value = true; // Show error popup
+
+    // Set a timeout to hide the error popup after 5 seconds
+    setTimeout(() => {
+      showError.value = false; // Hide error popup
+    }, 5000); // 5000 milliseconds = 5 seconds
   }
-}
+};
 
 function socialLogin(provider) {
   alert(`Log in with ${provider} clicked`);
