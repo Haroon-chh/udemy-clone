@@ -50,7 +50,7 @@
       <!-- Logo and Copyright Section Below the Links -->
       <div class="row text-center justify-content-center mt-4">
         <div class="col-12 d-flex flex-column align-items-center">
-          <img src="../assets/udemy-logo.png" alt="Udemy Logo" class="udemy-logo mb-3" id="logo-udemy">
+          <img src="../assets/udemylogo2.png" alt="Udemy Logo" class="udemy-logo mb-3" id="logo-udemy">
           <small>&copy; 2024 Udemy, Inc.</small>
         </div>
       </div>
