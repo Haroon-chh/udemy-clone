@@ -15,16 +15,16 @@
         <form @submit.prevent="submitForm">
           
           <!-- Email -->
-          <div class="mb-3">
+          <div class="mb-3 inputs position-relative">
+            <input type="email" id="email" v-model="email" class="form-control border-0" required placeholder="" />
             <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" v-model="email" class="form-control" required />
             <div v-if="emailError" class="text-danger">{{ emailError }}</div>
           </div>
           
           <!-- Password -->
-          <div class="mb-3">
+          <div class="mb-3 inputs position-relative">
+            <input type="password" id="password" v-model="password" class="form-control border-0" required minlength="8" placeholder="" />
             <label for="password" class="form-label">Password</label>
-            <input type="password" id="password" v-model="password" class="form-control" required minlength="8" />
             <div v-if="passwordError" class="text-danger">{{ passwordError }}</div>
           </div>
           
@@ -150,6 +150,54 @@ function socialLogin(provider) {
 
 .text-center a:hover {
   text-decoration: underline;
+}
+
+.inputs {
+  position: relative;
+  border: 1px solid black;
+  height: 70px; /* Increased height for inputs */
+  padding-top: 1.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 20px;
+}
+
+.form-label {
+    position: absolute;
+    top: 1.3rem;
+    left: 0.75rem;
+    font-size: 14px;
+    color: #000000;
+    font-weight: bold;
+    transition: all 0.2s ease-in-out;
+    pointer-events: none;
+  }
+
+input:focus + .form-label,
+  input:not(:placeholder-shown) + .form-label {
+    top: -0rem;
+    left: 0.75rem;
+    font-size: 0.75rem;
+    margin-bottom: 0%;
+
+  }
+
+input {
+  background-color: transparent;
+  outline: none;
+  box-shadow: none;
+  height: 30px;
+  font-size: 16px; /* Font size for input text */
+  padding: 0 12px; /* Padding inside input */
+}
+
+input:focus {
+  border: none;
+  box-shadow: none;
+}
+
+input:not(:placeholder-shown) {
+  border: none;
+  box-shadow: none;
 }
 
 @media (max-width: 768px) {
