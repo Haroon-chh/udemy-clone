@@ -62,32 +62,55 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useStore } from 'vuex';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
 
 const email = ref('');
 const password = ref('');
 const emailError = ref('');
 const passwordError = ref('');
+const store = useStore();
+const router = useRouter();
+
+// Accessing the API base URL using Vue CLI convention
+const baseURL = process.env.VUE_APP_API_URL; // Ensure this is defined in your .env file
 
 function validateEmail(email) {
   const re = /\S+@\S+\.\S+/;
   return re.test(email);
 }
 
-function submitForm() {
+async function submitForm() {
   emailError.value = '';
   passwordError.value = '';
 
   if (!validateEmail(email.value)) {
     emailError.value = 'Please enter a valid email address';
+    return;
   }
 
   if (password.value.length < 8) {
     passwordError.value = 'Password must be at least 8 characters';
+    return;
   }
 
-  if (!emailError.value && !passwordError.value) {
-    alert('Form submitted successfully');
-    // Further submission logic goes here
+  try {
+    const response = await axios.post(`${baseURL}/login`, {
+      email: email.value,
+      password: password.value
+    });
+
+    if (response.data.message === 'success') {
+      store.dispatch('loginUser', response.data);
+      router.push('/dashboard'); // Redirect to dashboard on success
+    } else {
+      // Handle API error response
+      alert('Login failed: ' + response.data.message);
+    }
+  } catch (error) {
+    console.error(error);
+    alert('An error occurred during login.');
   }
 }
 
