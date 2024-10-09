@@ -85,6 +85,9 @@
       </div>
     </div>
   </div>
+  <div>
+    <p>Check out our <a href="#">Help and Support </a>center to find quick answers to your questions.</p>
+  </div>
   </div>
 </template>
 
@@ -107,16 +110,16 @@ export default {
           image: 'https://about.udemy.com/wp-content/uploads/2021/07/san-francisco-460x350.jpeg',
         },
         {
-          location: 'Dublin, Ireland',
-          image: 'https://about.udemy.com/wp-content/uploads/2021/07/san-francisco-460x350.jpeg',
+          location: 'Ankara, Türkiye',
+          image: 'https://about.udemy.com/wp-content/uploads/2021/07/ankara-1-450x350.jpeg',
         },
         {
-          location: 'Dublin, Ireland',
-          image: 'https://about.udemy.com/wp-content/uploads/2021/07/san-francisco-460x350.jpeg',
+          location: 'Austin, TX',
+          image: 'https://about.udemy.com/wp-content/uploads/2023/04/Austin-480x350.png',
         },
         {
-          location: 'Dublin, Ireland',
-          image: 'https://about.udemy.com/wp-content/uploads/2021/07/san-francisco-460x350.jpeg',
+          location: 'Melbourne, Australia',
+          image: 'https://about.udemy.com/wp-content/uploads/2023/04/Melbourne-480x350.png',
         },
       ],
     };
