@@ -11,6 +11,10 @@
       <div class="col-md-6 bg-white p-5">
         <h1 class="mb-4">Log in to your account</h1>
         
+        <!-- Success and Error Popup Components -->
+        <SuccessPopupComponent :show="showSuccess" :message="successMessage" />
+        <ErrorPopupComponent :show="showError" :message="errorMessage" />
+        
         <!-- Login Form -->
         <form @submit.prevent="submitForm">
           
@@ -29,7 +33,7 @@
           </div>
           
           <!-- Login Button -->
-          <button type="submit" class="btn login-btn w-100">Log In</button>
+          <button type="submit" class="btn login-btn w-100 rounded-0">Log In</button>
         </form>
 
         <!-- Other Log In Options -->
@@ -61,35 +65,90 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex'; 
+import ApiServices from '@/services/ApiServices'; // Adjust the path as necessary
+import SuccessPopup from '../SuccessPopup.vue'; // Adjust the path as necessary
+import ErrorPopup from '../ErrorPopup.vue'; // Adjust the path as necessary
+
+const SuccessPopupComponent = defineComponent(SuccessPopup);
+const ErrorPopupComponent = defineComponent(ErrorPopup);
 
 const email = ref('');
 const password = ref('');
 const emailError = ref('');
 const passwordError = ref('');
+const router = useRouter();
+const store = useStore(); 
 
-function validateEmail(email) {
+const showSuccess = ref(false);
+const showError = ref(false);
+const successMessage = ref('');
+const errorMessage = ref('');
+
+const validateEmail = (email) => {
   const re = /\S+@\S+\.\S+/;
   return re.test(email);
-}
+};
 
-function submitForm() {
+const submitForm = async () => {
   emailError.value = '';
   passwordError.value = '';
 
   if (!validateEmail(email.value)) {
     emailError.value = 'Please enter a valid email address';
+    return;
   }
 
   if (password.value.length < 8) {
     passwordError.value = 'Password must be at least 8 characters';
+    return;
   }
 
-  if (!emailError.value && !passwordError.value) {
-    alert('Form submitted successfully');
-    // Further submission logic goes here
+  try {
+    const response = await ApiServices.PostRequest('/login', {
+      email: email.value,
+      password: password.value
+    });
+
+    // Log the full response for debugging
+    console.log('Login response:', response);
+
+    if (response && response.message === "success" && response.data) {
+      // Dispatch the entire userData instead of individual properties
+      await store.dispatch('loginUser', response); // Pass the whole response object
+
+      // Show success message
+      successMessage.value = 'Login successful! Redirecting...'; // Set a custom success message
+      showSuccess.value = true; // Show success popup
+
+      // Set a timeout to hide the success popup after 2 seconds
+      setTimeout(() => {
+        showSuccess.value = false;
+        router.push('/dashboard');
+        // Hide success popup
+      }, 2000); // 2000 milliseconds = 2 seconds
+
+      // Redirect to the dashboard
+    } else {
+      throw new Error('Unexpected response format');
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+    if (error.response && error.response.status === 401) {
+      errorMessage.value = error.response.data.message || 'Invalid credentials';
+    } else {
+      errorMessage.value = 'An error occurred. Please try again later.';
+    }
+    showError.value = true; // Show error popup
+
+    // Set a timeout to hide the error popup after 5 seconds
+    setTimeout(() => {
+      showError.value = false; // Hide error popup
+    }, 5000); // 5000 milliseconds = 5 seconds
   }
-}
+};
 
 function socialLogin(provider) {
   alert(`Log in with ${provider} clicked`);
