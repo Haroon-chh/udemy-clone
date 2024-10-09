@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <!-- Image Section (Contact Us) -->
     <div class="banner-container">
       <div class="text-section">
