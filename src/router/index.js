@@ -4,6 +4,7 @@ import SignupView from '@/views/SignupView.vue';
 import AboutUsView from '@/views/AboutUsView.vue';
 import LoginView from '@/views/LoginView.vue';
 import ContactUsView from '@/views/ContactUsView.vue';
+import CartView from '@/views/CartView.vue';
 
 const routes = [
   {
@@ -44,6 +45,13 @@ const routes = [
     name: 'ContactUs',
     component: ContactUsView, // Add the Login route
     meta: { title: 'ContactUs'},
+
+  },
+  {
+    path: '/cart',
+    name: 'cart',
+    component: CartView, // Add the Cart route
+    meta: { title: 'Cart'},
 
   },
 ];
