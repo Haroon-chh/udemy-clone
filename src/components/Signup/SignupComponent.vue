@@ -60,14 +60,14 @@
 </template>
 
 <script setup>
-import { ref, defineComponent } from 'vue';
+import { ref , defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
-import SuccessPopup from '../SuccessPopup.vue'; // Adjust path as necessary
-import ErrorPopup from '../ErrorPopup.vue'; // Adjust path as necessary
-
+import ApiServices from '@/services/ApiServices'; // Adjust the path as necessary
+import SuccessPopup from '../SuccessPopup.vue'; // Adjust the path as necessary
+import ErrorPopup from '../ErrorPopup.vue'; // Adjust the path as necessary
 const SuccessPopupComponent = defineComponent(SuccessPopup);
 const ErrorPopupComponent = defineComponent(ErrorPopup);
+const router = useRouter();
 
 const fullName = ref('');
 const email = ref('');
@@ -79,9 +79,7 @@ const showSuccess = ref(false);
 const showError = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
-const router = useRouter();
 
-const baseURL = 'http://192.168.15.96:8000/api';
 
 function validateEmail(email) {
   const re = /\S+@\S+\.\S+/;
@@ -103,19 +101,23 @@ async function submitForm() {
   }
 
   if (!acceptedTerms.value) {
-    alert('You must accept the terms to continue');
+    errorMessage.value = 'You must accept the terms to continue';
+    showError.value = true;
     return;
   }
 
   try {
-    const response = await axios.post(`${baseURL}/register`, {
+    const response = await ApiServices.PostRequest('/register', {
       name: fullName.value,
       email: email.value,
       password: password.value,
       password_confirmation: password.value // Same password for confirmation
     });
 
-    if (response.status === 200) {
+    // Log the full response for debugging
+    console.log('Registration response:', response);
+
+    if (response && response.message === "success" && response.data) {
       // Set success message and show the popup
       successMessage.value = 'Registration successful! Redirecting to login...';
       showSuccess.value = true;
@@ -124,7 +126,7 @@ async function submitForm() {
       setTimeout(() => {
         showSuccess.value = false;
         router.push('/login');
-      }, 2000);
+      }, 2000); // 2000 milliseconds = 2 seconds
     } else {
       throw new Error('Unexpected response');
     }
@@ -135,8 +137,8 @@ async function submitForm() {
 
     // Hide error popup after 5 seconds
     setTimeout(() => {
-      showError.value = false;
-    }, 5000);
+      showError.value = false; // Hide error popup
+    }, 5000); // 5000 milliseconds = 5 seconds
   }
 }
 </script>
