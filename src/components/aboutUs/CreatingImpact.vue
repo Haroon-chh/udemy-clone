@@ -1,11 +1,11 @@
 <template>
     <div class="container-fluid text-center text-white py-5" style="background-color: #5A2EE3;">
       <h1 class="mb-4 ">Creating impact around the world</h1>
-      <p class="mb-5">
+      <p class="mb-5 text-center">
         With our global catalog spanning the latest skills and topics, people and organizations <br>
         everywhere are able to adapt to change and thrive.
       </p>
-      <div class="row justify-content-center">
+      <div class="row justify-content-center values">
         <div class="col-md-2 mb-4">
           <h3>73M+</h3>
           <p>Learners</p>
@@ -52,6 +52,9 @@
     font-size: 1rem;
     margin-bottom: 0;
     font-weight: 100;
+  }
+  .values p, h3{
+    text-align: center;
   }
   </style>
   
