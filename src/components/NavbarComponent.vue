@@ -140,19 +140,22 @@
             </ul>
           </li>
 
-          <!-- Login Button -->
-          <li class="nav-item ms-3">
-          <router-link to="/login" class="btn btn-outline-secondary rounded-0 fw-semibold">
-            Login
-          </router-link>
+           <!-- Check for authUser in localStorage -->
+           <li v-if="authUser" class="nav-item ms-3">
+            <ProfileComponent />
+          </li>
+          <li v-else class="nav-item ms-3">
+            <router-link to="/login" class="btn btn-outline-secondary rounded-0 fw-semibold">
+              Login
+            </router-link>
           </li>
 
-
-          <li class="nav-item ms-3">
-          <router-link to="/signup" class="btn btn-dark rounded-0 fw-semibold">
-          Sign Up
-          </router-link>
+          <li v-if="!authUser" class="nav-item ms-3">
+            <router-link to="/signup" class="btn btn-dark rounded-0 fw-semibold">
+              Sign Up
+            </router-link>
           </li>
+
 
 
           <!-- World Icon Button -->
@@ -189,11 +192,19 @@
 </template>
 
 
+
+
   
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import ProfileComponent from '../components/ProfileComponent.vue';
+
 
 export default {
+  name: 'NavbarComponent',
+  components: {
+    ProfileComponent,
+  },
   computed: {
     // Use a function to dynamically access the dropdown state
     isOpen() {
@@ -202,6 +213,9 @@ export default {
     ...mapGetters({
       isLanguageModalOpen: 'getLanguageModalState',
     }),
+    authUser() {
+      return localStorage.getItem('authUser');
+    }
   },
   methods: {
     ...mapActions(['openDropdown', 'closeDropdown', 'openLanguageModal', 'closeLanguageModal']),
