@@ -11,7 +11,6 @@
     <FullStory v-if="!isAdmin" />
     <News v-if="!isAdmin" />
     <TrustedCompanies v-if="!isAdmin" />
-    <TrustedCompanies v-if="!isAdmin" />
 
 
     <!-- Admin-specific components -->
