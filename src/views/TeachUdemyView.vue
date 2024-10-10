@@ -5,6 +5,7 @@
       <rewardSection />
       <achievementSection />
       <howtoBegin /> 
+      <teachingCarousel />
     </div>
   </template>
   
@@ -13,6 +14,8 @@
   import teachBanner from '../components/teachUdemy/teachBanner.vue';
   import achievementSection from '../components/teachUdemy/achievementSection.vue';
   import howtoBegin from '../components/teachUdemy/howToBeginSection.vue';
+  import teachingCarousel from '../components/teachUdemy/teachingPageCarousel.vue';
+
   
 
  
