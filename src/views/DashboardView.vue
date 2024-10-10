@@ -11,8 +11,12 @@
     <FullStory v-if="!isAdmin" />
     <News v-if="!isAdmin" />
     <TrustedCompanies v-if="!isAdmin" />
+    <TrustedCompanies v-if="!isAdmin" />
+
 
     <!-- Admin-specific components -->
+    <CardContainer v-if ="isAdmin"/>
+    <QuillEditor v-if ="isAdmin"/>
 
    
   </div>
@@ -33,8 +37,9 @@ import TrustedCompanies from '../components/dashboard/TrustedCompany.vue';
 import News from '../components/dashboard/NewsComponent.vue';
 import TrendingNow from '../components/dashboard/TrendingNow.vue';
 
-// Admin-specific components
 
+// Admin-specific components
+import CardContainer from '@/components/dashboard/Admin/CardEditor.vue';
 
 // Get the store and determine if the user is an admin
 const store = useStore();
