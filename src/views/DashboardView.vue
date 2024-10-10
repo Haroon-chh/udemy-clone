@@ -12,10 +12,10 @@
     <News v-if="!isAdmin" />
     <TrustedCompanies v-if="!isAdmin" />
 
-
     <!-- Admin-specific components -->
-    <CardContainer v-if ="isAdmin"/>
-    <QuillEditor v-if ="isAdmin"/>
+    <QuillEditor v-if="isAdmin"/>
+    <!-- <QuillPlayground v-if="isAdmin"/> -->
+    
 
    
   </div>
@@ -35,10 +35,10 @@ import CarouselComponent from '../components/dashboard/CarouselComponent.vue';
 import TrustedCompanies from '../components/dashboard/TrustedCompany.vue';
 import News from '../components/dashboard/NewsComponent.vue';
 import TrendingNow from '../components/dashboard/TrendingNow.vue';
-
+import QuillEditor from '../components/dashboard/Admin/QuillEditor.vue';
+// import QuillPlayground from '../components/dashboard/Admin/QuillPlayground.vue';
 
 // Admin-specific components
-import CardContainer from '../components/dashboard/Admin/CardEditor.vue';
 
 // Get the store and determine if the user is an admin
 const store = useStore();
