@@ -10,9 +10,9 @@
     <TrendingNow v-if="!isAdmin" />
     <FullStory v-if="!isAdmin" />
     <News v-if="!isAdmin" />
+    <TrustedCompanies v-if="!isAdmin" />
 
     <!-- Admin-specific components -->
-    <TrustedCompanies v-if="isAdmin" />
 
    
   </div>
