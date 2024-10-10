@@ -1,6 +1,6 @@
 <template>
     <div class="container text-center py-5">
-      <p class="mb-4" >
+      <p class="mb-4 text-center" >
         We help organizations of all types and sizes prepare for the path ahead — wherever it leads.<br>
         Our curated collection of business and technical courses help companies, governments, and<br>
         nonprofits go further by placing learning at the center of their strategies.
