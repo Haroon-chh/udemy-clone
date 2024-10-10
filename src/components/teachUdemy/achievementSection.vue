@@ -1,6 +1,6 @@
 <template>
     <div class="container-fluid text-center text-white py-1 " style="background-color: #5C2CCB; ">
-      <div class="row g-4 mx-3"> <!-- Use Bootstrap's gap utility class -->
+      <div class="row g-4 mx-3 my-2"> <!-- Use Bootstrap's gap utility class -->
         <!-- First Stat -->
         <div class="col-12 col-md mb-4">
           <h2 class="fw-bold">73M</h2>

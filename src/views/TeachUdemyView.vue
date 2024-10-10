@@ -3,7 +3,8 @@
     <div class="signup-view">
       <teachBanner />
       <rewardSection />
-      <achievementSection /> 
+      <achievementSection />
+      <howtoBegin /> 
     </div>
   </template>
   
@@ -11,6 +12,7 @@
   import rewardSection from '@/components/teachUdemy/rewardSection.vue';
   import teachBanner from '../components/teachUdemy/teachBanner.vue';
   import achievementSection from '../components/teachUdemy/achievementSection.vue';
+  import howtoBegin from '../components/teachUdemy/howToBeginSection.vue';
   
 
  
