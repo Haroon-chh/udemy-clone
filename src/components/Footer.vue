@@ -16,29 +16,29 @@
       <div class="row text-center text-md-start">
         <div class="col-12 col-md-3 mb-3">
           <ul class="list-unstyled">
-            <li>Udemy Business</li>
+            <li><router-link to="#">Udemy Business</router-link></li>
             <li><router-link to="/teaching">Teach on Udemy</router-link></li>
-            <li>Get the app</li>
+            <li><router-link to="#">Get the app</router-link></li>
             <li><router-link to="/about">About us</router-link></li>
             <li><router-link to="/contactUs">Contact us</router-link></li>
           </ul>
         </div>
         <div class="col-12 col-md-3 mb-3">
           <ul class="list-unstyled">
-            <li>Careers</li>
-            <li>Blog</li>
-            <li>Help and Support</li>
-            <li>Affiliate</li>
-            <li>Investors</li>
+            <li><router-link to="#">Careers</router-link></li>
+            <li><router-link to="#">Blog</router-link></li>
+            <li><router-link to="#">Help and Support</router-link></li>
+            <li><router-link to="#">Affiliate</router-link></li>
+            <li><router-link to="#">Investors</router-link></li>
           </ul>
         </div>
         <div class="col-12 col-md-3 mb-3">
           <ul class="list-unstyled">
-            <li>Terms</li>
-            <li>Privacy policy</li>
-            <li>Cookie settings</li>
-            <li>Sitemap</li>
-            <li>Accessibility statement</li>
+            <li><router-link to="#">Terms</router-link></li>
+            <li><router-link to="#">Privacy policy</router-link></li>
+            <li><router-link to="#">Cookie settings</router-link></li>
+            <li><router-link to="#">Sitemap</router-link></li>
+            <li><router-link to="#">Accessibility statement</router-link></li>
           </ul>
         </div>
         <div class="col-12 col-md-3 mb-3 d-flex flex-column align-items-md-end align-items-center">

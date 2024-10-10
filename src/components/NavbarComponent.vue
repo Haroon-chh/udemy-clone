@@ -118,12 +118,14 @@
 
           <!-- Teach on Udemy Link - Dropdown on Hover -->
           <li class="nav-item dropdown ms-3" @mouseover="openDropdown('teachDropdown')" @mouseleave="closeDropdown('teachDropdown')">
-            <a class="nav-link"><router-link to="/teaching">
+            <a class="nav-link">
               Teach on Udemy
-            </router-link></a>
+            </a>
             <ul class="dropdown-menu wide-dropdown" :class="{ show: isOpen.teachDropdown }">
               <p>Turn what you know into an opportunity and reach millions around the world.</p>
-              <button type="button" class="btn btn-dark rounded-0 fw-semibold">Learn More</button>
+              <router-link to="/teaching" class="btn btn-dark rounded-0 fw-semibold" role="button">
+              Learn More
+              </router-link>
             </ul>
           </li>
 
@@ -140,12 +142,18 @@
 
           <!-- Login Button -->
           <li class="nav-item ms-3">
-            <button class="btn btn-outline-secondary rounded-0 fw-semibold">Login</button>
+          <router-link to="/login" class="btn btn-outline-secondary rounded-0 fw-semibold">
+            Login
+          </router-link>
           </li>
 
+
           <li class="nav-item ms-3">
-            <button class="btn btn-dark rounded-0 fw-semibold">Sign Up</button>
+          <router-link to="/signup" class="btn btn-dark rounded-0 fw-semibold">
+          Sign Up
+          </router-link>
           </li>
+
 
           <!-- World Icon Button -->
           <li class="nav-item ms-3">
