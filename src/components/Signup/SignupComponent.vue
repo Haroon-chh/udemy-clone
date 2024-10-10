@@ -117,9 +117,10 @@ async function submitForm() {
     // Log the full response for debugging
     console.log('Registration response:', response);
 
-    if (response && response.message === "success" && response.data) {
+    // Check for success response
+    if (response && response.message === "You are successfully registered") {
       // Set success message and show the popup
-      successMessage.value = 'Registration successful! Redirecting to login...';
+      successMessage.value = response.message; // Use the success message from the response
       showSuccess.value = true;
 
       // Hide success popup after 2 seconds and redirect to login page
@@ -131,8 +132,23 @@ async function submitForm() {
       throw new Error('Unexpected response');
     }
   } catch (error) {
-    // Show error message popup
-    errorMessage.value = error.response?.data?.error || 'An error occurred. Please try again later.';
+    // Handle error response
+    if (error.response) {
+      // Check if the error response contains validation errors
+      if (error.response.data && error.response.data.message === "Validation errors") {
+        const validationErrors = error.response.data.errors;
+        // Display the first validation error for email if it exists
+        if (validationErrors.email && validationErrors.email.length > 0) {
+          errorMessage.value = validationErrors.email[0]; // Show the first email error
+        } else {
+          errorMessage.value = 'An error occurred. Please try again later.';
+        }
+      } else {
+        errorMessage.value = error.response.data.message || 'An error occurred. Please try again later.';
+      }
+    } else {
+      errorMessage.value = 'An error occurred. Please try again later.';
+    }
     showError.value = true;
 
     // Hide error popup after 5 seconds
