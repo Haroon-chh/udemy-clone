@@ -4,12 +4,26 @@ export default createStore({
   state: {
     user: JSON.parse(localStorage.getItem('authUser')) || null,
     loggedUser: JSON.parse(localStorage.getItem('logged_user')) || null,
+    // Navbar related states
+    isOpen: {
+      categoriesDropdown: false,
+      developmentDropdown: false,
+      webDevDropdown: false,
+      mobileDevDropdown: false,
+      businessDropdown: false,
+      teachDropdown: false,
+      cartDropdown: false
+    },
+    isLanguageModalOpen: false,
   },
   getters: {
     getUser: (state) => state.user,
     getUserRole: (state) => state.user ? state.user.role : localStorage.getItem('userRole'),
     getUserPermissions: (state) => state.user ? state.user.permissions : JSON.parse(localStorage.getItem('userPermissions') || '[]'),
     getLoggedUser: (state) => state.loggedUser,
+    // Navbar related getters
+    getDropdownState: (state) => (dropdown) => state.isOpen[dropdown],
+    getLanguageModalState: (state) => state.isLanguageModalOpen,
   },
   mutations: {
     setUser(state, userData) {
@@ -22,6 +36,19 @@ export default createStore({
       state.user = null;
       state.loggedUser = null;
     },
+    // Navbar related mutations
+    openDropdown(state, dropdown) {
+      state.isOpen[dropdown] = true;
+    },
+    closeDropdown(state, dropdown) {
+      state.isOpen[dropdown] = false;
+    },
+    openLanguageModal(state) {
+      state.isLanguageModalOpen = true;
+    },
+    closeLanguageModal(state) {
+      state.isLanguageModalOpen = false;
+    },
   },
   actions: {
     loginUser({ commit }, userData) {
@@ -30,8 +57,7 @@ export default createStore({
       localStorage.setItem('userRole', userData.data.role);
       localStorage.setItem('userPermissions', JSON.stringify(userData.data.permissions));
       commit('setUser', userData.data);
-      
-      // Also set the loggedUser
+
       const loggedUserData = {
         id: userData.data.id,
         name: userData.data.name,
@@ -61,6 +87,19 @@ export default createStore({
       if (loggedUser) {
         commit('setLoggedUser', loggedUser);
       }
+    },
+    // Navbar related actions
+    openDropdown({ commit }, dropdown) {
+      commit('openDropdown', dropdown);
+    },
+    closeDropdown({ commit }, dropdown) {
+      commit('closeDropdown', dropdown);
+    },
+    openLanguageModal({ commit }) {
+      commit('openLanguageModal');
+    },
+    closeLanguageModal({ commit }) {
+      commit('closeLanguageModal');
     },
   },
 });

@@ -191,37 +191,40 @@
 
   
 <script>
+import { mapActions, mapGetters } from 'vuex';
+
 export default {
-  data() {
-    return {
-      isOpen: {
-        categoriesDropdown: false,
-        developmentDropdown: false,
-        webDevDropdown: false,
-        mobileDevDropdown: false,
-        businessDropdown: false,
-        teachDropdown: false,
-        cartDropdown: false
-      },
-      isLanguageModalOpen: false
-    };
+  computed: {
+    // Use a function to dynamically access the dropdown state
+    isOpen() {
+      return this.$store.state.isOpen;
+    },
+    ...mapGetters({
+      isLanguageModalOpen: 'getLanguageModalState',
+    }),
   },
   methods: {
-    openDropdown(dropdown) {
-      this.isOpen[dropdown] = true;
+    ...mapActions(['openDropdown', 'closeDropdown', 'openLanguageModal', 'closeLanguageModal']),
+    toggleDropdown(dropdown) {
+      const isOpen = this.isOpen[dropdown]; // Access the dropdown state correctly
+      if (isOpen) {
+        this.closeDropdown(dropdown);
+      } else {
+        this.openDropdown(dropdown);
+      }
     },
-    closeDropdown(dropdown) {
-      this.isOpen[dropdown] = false;
-    },
-    openLanguageModal() {
-      this.isLanguageModalOpen = true;
-    },
-    closeLanguageModal() {
-      this.isLanguageModalOpen = false;
+    toggleLanguageModal() {
+      if (this.isLanguageModalOpen) {
+        this.closeLanguageModal();
+      } else {
+        this.openLanguageModal();
+      }
     }
-  },
+  }
 };
 </script>
+
+
 
   
   <style scoped>
