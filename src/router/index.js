@@ -5,7 +5,7 @@ import AboutUsView from '@/views/AboutUsView.vue';
 import LoginView from '@/views/LoginView.vue';
 import ContactUsView from '@/views/ContactUsView.vue';
 import CartView from '@/views/CartView.vue';
-import TeachUdemyView from '@/views/TeachUdemyView.vue';
+import TeachUdemyView from '../views/TeachUdemyView.vue';
 
 const routes = [
   {
