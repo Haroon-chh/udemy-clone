@@ -16,6 +16,7 @@
     "bootstrap-vue-3": "^0.5.1",
     "core-js": "^3.8.3",
     "icons": "^1.0.0",
+    "quill": "^2.0.2",
     "vue": "^3.2.13",
     "vue-axios": "^3.5.2",
     "vue-router": "^4.0.3",

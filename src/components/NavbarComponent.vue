@@ -118,12 +118,14 @@
 
           <!-- Teach on Udemy Link - Dropdown on Hover -->
           <li class="nav-item dropdown ms-3" @mouseover="openDropdown('teachDropdown')" @mouseleave="closeDropdown('teachDropdown')">
-            <a class="nav-link" href="#">
+            <a class="nav-link">
               Teach on Udemy
             </a>
             <ul class="dropdown-menu wide-dropdown" :class="{ show: isOpen.teachDropdown }">
               <p>Turn what you know into an opportunity and reach millions around the world.</p>
-              <button type="button" class="btn btn-dark rounded-0 fw-semibold">Learn More</button>
+              <router-link to="/teaching" class="btn btn-dark rounded-0 fw-semibold" role="button">
+              Learn More
+              </router-link>
             </ul>
           </li>
 
@@ -138,14 +140,23 @@
             </ul>
           </li>
 
-          <!-- Login Button -->
-          <li class="nav-item ms-3">
-            <button class="btn btn-outline-secondary rounded-0 fw-semibold">Login</button>
+           <!-- Check for authUser in localStorage -->
+           <li v-if="authUser" class="nav-item ms-3">
+            <ProfileComponent />
+          </li>
+          <li v-else class="nav-item ms-3">
+            <router-link to="/login" class="btn btn-outline-secondary rounded-0 fw-semibold">
+              Login
+            </router-link>
           </li>
 
-          <li class="nav-item ms-3">
-            <button class="btn btn-dark rounded-0 fw-semibold">Sign Up</button>
+          <li v-if="!authUser" class="nav-item ms-3">
+            <router-link to="/signup" class="btn btn-dark rounded-0 fw-semibold">
+              Sign Up
+            </router-link>
           </li>
+
+
 
           <!-- World Icon Button -->
           <li class="nav-item ms-3">
@@ -181,39 +192,53 @@
 </template>
 
 
+
+
   
 <script>
+import { mapActions, mapGetters } from 'vuex';
+import ProfileComponent from '../components/ProfileComponent.vue';
+
+
 export default {
-  data() {
-    return {
-      isOpen: {
-        categoriesDropdown: false,
-        developmentDropdown: false,
-        webDevDropdown: false,
-        mobileDevDropdown: false,
-        businessDropdown: false,
-        teachDropdown: false,
-        cartDropdown: false
-      },
-      isLanguageModalOpen: false
-    };
+  name: 'NavbarComponent',
+  components: {
+    ProfileComponent,
   },
-  methods: {
-    openDropdown(dropdown) {
-      this.isOpen[dropdown] = true;
+  computed: {
+    // Use a function to dynamically access the dropdown state
+    isOpen() {
+      return this.$store.state.isOpen;
     },
-    closeDropdown(dropdown) {
-      this.isOpen[dropdown] = false;
-    },
-    openLanguageModal() {
-      this.isLanguageModalOpen = true;
-    },
-    closeLanguageModal() {
-      this.isLanguageModalOpen = false;
+    ...mapGetters({
+      isLanguageModalOpen: 'getLanguageModalState',
+    }),
+    authUser() {
+      return localStorage.getItem('authUser');
     }
   },
+  methods: {
+    ...mapActions(['openDropdown', 'closeDropdown', 'openLanguageModal', 'closeLanguageModal']),
+    toggleDropdown(dropdown) {
+      const isOpen = this.isOpen[dropdown]; // Access the dropdown state correctly
+      if (isOpen) {
+        this.closeDropdown(dropdown);
+      } else {
+        this.openDropdown(dropdown);
+      }
+    },
+    toggleLanguageModal() {
+      if (this.isLanguageModalOpen) {
+        this.closeLanguageModal();
+      } else {
+        this.openLanguageModal();
+      }
+    }
+  }
 };
 </script>
+
+
 
   
   <style scoped>
