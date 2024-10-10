@@ -17,7 +17,7 @@
         <div class="col-12 col-md-3 mb-3">
           <ul class="list-unstyled">
             <li>Udemy Business</li>
-            <li>Teach on Udemy</li>
+            <li><router-link to="/teaching">Teach on Udemy</router-link></li>
             <li>Get the app</li>
             <li><router-link to="/about">About us</router-link></li>
             <li><router-link to="/contactUs">Contact us</router-link></li>

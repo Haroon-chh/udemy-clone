@@ -118,9 +118,9 @@
 
           <!-- Teach on Udemy Link - Dropdown on Hover -->
           <li class="nav-item dropdown ms-3" @mouseover="openDropdown('teachDropdown')" @mouseleave="closeDropdown('teachDropdown')">
-            <a class="nav-link" href="#">
+            <a class="nav-link"><router-link to="/teaching">
               Teach on Udemy
-            </a>
+            </router-link></a>
             <ul class="dropdown-menu wide-dropdown" :class="{ show: isOpen.teachDropdown }">
               <p>Turn what you know into an opportunity and reach millions around the world.</p>
               <button type="button" class="btn btn-dark rounded-0 fw-semibold">Learn More</button>
