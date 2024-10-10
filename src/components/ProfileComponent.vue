@@ -6,6 +6,8 @@
     <div v-if="isDropdownOpen" class="profile-dropdown">
       <a href="#" @click.prevent="goToProfile">Profile</a>
       <a href="#" @click.prevent="goToChangePassword">Change Password</a>
+      <button @click="logout" class="btn btn-outline-danger btn-sm ms-2">Logout</button>
+
     </div>
   </div>
 </template>
@@ -20,6 +22,7 @@ export default {
     const store = useStore();
     const router = useRouter();
     const isDropdownOpen = ref(false);
+    
 
     const fetchUserProfile = async () => {
       try {
@@ -73,6 +76,10 @@ export default {
       router.push('/change-password');
       isDropdownOpen.value = false;
     };
+    const logout = () => {
+      store.dispatch('logoutUser'); // Dispatch the logout action
+      router.push('/login'); // Redirect to the login page
+    };
 
     return {
       userInitials,
@@ -80,6 +87,7 @@ export default {
       toggleDropdown,
       goToProfile,
       goToChangePassword,
+      logout,
     };
   }
 };
