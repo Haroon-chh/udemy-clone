@@ -3,6 +3,7 @@
   <div class="dashboard-view">
     <!-- Public components available to all users -->
     <CarouselComponent v-if="!isAdmin" />
+    <CategoriesComponent  />     <!-- My Component new -->
     <LearningGoals v-if="!isAdmin" />
     <Testimonial v-if="!isAdmin" />
     <CardsRow v-if="!isAdmin" />
@@ -32,6 +33,7 @@ import CarouselComponent from '../components/dashboard/CarouselComponent.vue';
 import TrustedCompanies from '../components/dashboard/TrustedCompany.vue';
 import News from '../components/dashboard/NewsComponent.vue';
 import TrendingNow from '../components/dashboard/TrendingNow.vue';
+import CategoriesComponent from '../components/dashboard/CategoriesComponent.vue';
 
 // Admin-specific components
 
