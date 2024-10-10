@@ -11,8 +11,8 @@
     </div>
         <!-- Origins Section -->
     <div class="origins-section">
-      <h2>Our origins</h2>
-      <p class="text-center">
+      <h1>Our origins</h1>
+      <p class="text-center ">
         Growing up in a small Turkish village, Udemy founder Eren Bali had few <br>
         educational opportunities — until he got a computer. Fueled by his
         dream to <br> compete in mathematics, he used the internet to learn his way
@@ -29,17 +29,17 @@
     <p>The quickest way to get in touch with us is by using the contact information below.</p>
     <div class="grid-container">
       <div class="grid-item">
-        <h2>Learners</h2>
+        <h3>Learners</h3>
         <a href="#">Visit our Help Center</a><br />
         <a href="#">How to reach our support team</a>
       </div>
       <div class="grid-item">
-        <h2>Udemy Business</h2>
+        <h3>Udemy Business</h3>
         <a href="#">Visit our Help Center</a><br />
         <a href="#">Enterprise New Customer Inquiry</a>
       </div>
       <div class="grid-item">
-        <h2>Instructors</h2>
+        <h3>Instructors</h3>
         <a href="#">Visit our Help Center</a><br />
         <a href="#">Explore our Teaching Center</a>
       </div>
@@ -48,17 +48,17 @@
         <a href="#">Visit our Help Center</a>
       </div>
       <div class="grid-item">
-        <h2>Investors</h2>
+        <h3>Investors</h3>
         <a href="#">Learn more here</a><br />
         <a href="#">Contact our Investor Relations team</a>
       </div>
       <div class="grid-item">
-        <h2>Press</h2>
+        <h3>Press</h3>
         <a href="#">View general information</a><br />
         <a href="mailto:press@udemy.com">Email press@udemy.com</a>
       </div>
       <div class="grid-item">
-        <h2>Privacy</h2>
+        <h3>Privacy</h3>
         <a href="#">View privacy policy</a><br />
         <a href="mailto:privacy@udemy.com">Email privacy@udemy.com</a><br />
         <p>Mail:</p>
@@ -172,6 +172,10 @@ h2, a, p{
 }
 p{
   font-size: 22px;
+}
+h3{
+  font-family: 'Suisse Works', serif;
+
 }
 
 /* Image Styling */
