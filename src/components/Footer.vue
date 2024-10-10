@@ -19,8 +19,8 @@
             <li>Udemy Business</li>
             <li>Teach on Udemy</li>
             <li>Get the app</li>
-            <li>About us</li>
-            <li><a href="/contactUs"> Contact us </a></li>
+            <li><router-link to="/about">About us</router-link></li>
+            <li><router-link to="/contactUs">Contact us</router-link></li>
           </ul>
         </div>
         <div class="col-12 col-md-3 mb-3">
