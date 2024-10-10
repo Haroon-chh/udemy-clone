@@ -5,6 +5,7 @@ import AboutUsView from '@/views/AboutUsView.vue';
 import LoginView from '@/views/LoginView.vue';
 import ContactUsView from '@/views/ContactUsView.vue';
 import CartView from '@/views/CartView.vue';
+import TeachUdemyView from '@/views/TeachUdemyView.vue';
 
 const routes = [
   {
@@ -54,6 +55,14 @@ const routes = [
     meta: { title: 'Cart'},
 
   },
+  {
+    path: '/teaching',
+    name: 'teaching',
+    component: TeachUdemyView, // Add the Cart route
+    meta: { title: 'Teach with us'},
+
+  },
+
 ];
 
 const router = createRouter({
