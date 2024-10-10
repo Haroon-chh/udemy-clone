@@ -11,35 +11,38 @@
       <div class="col-md-5 bg-white p-5">
         <h1 class="mb-4 fs-3 fw-bold">Sign up and start learning</h1>
         
+        <!-- Success and Error Popup Components -->
+        <SuccessPopupComponent :show="showSuccess" :message="successMessage" />
+        <ErrorPopupComponent :show="showError" :message="errorMessage" />
+
         <!-- Signup Form -->
         <form @submit.prevent="submitForm">
-          
           <!-- Full Name -->
           <div class="mb-3 inputs position-relative">
             <input type="text" id="fullName" v-model="fullName" class="form-control border-0" required placeholder=" " />
             <label for="fullName" class="form-label">Full Name</label>
           </div>
-          
+
           <!-- Email -->
           <div class="mb-3 inputs position-relative">
             <input type="email" id="email" v-model="email" class="form-control border-0" required placeholder=" " />
             <label for="email" class="form-label">Email</label>
             <div v-if="emailError" class="text-danger">{{ emailError }}</div>
           </div>
-          
+
           <!-- Password -->
           <div class="mb-3 inputs position-relative">
             <input type="password" id="password" v-model="password" class="form-control border-0" required minlength="8" placeholder=" " />
             <label for="password" class="form-label">Password</label>
             <div v-if="passwordError" class="text-danger">{{ passwordError }}</div>
           </div>
-          
+
           <!-- Terms Checkbox -->
           <div class="mb-3 form-check">
             <input type="checkbox" id="terms" v-model="acceptedTerms" class="form-check-input" required />
             <label class="form-check-label" for="terms">Send me special offers, personalized recommendations, and learning tips.</label>
           </div>
-          
+
           <!-- Signup Button -->
           <button type="submit" class="btn signup-btn w-100 rounded-0 fw-bold">Sign Up</button>
         </form>
@@ -57,7 +60,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref , defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
+import ApiServices from '@/services/ApiServices'; // Adjust the path as necessary
+import SuccessPopup from '../SuccessPopup.vue'; // Adjust the path as necessary
+import ErrorPopup from '../ErrorPopup.vue'; // Adjust the path as necessary
+const SuccessPopupComponent = defineComponent(SuccessPopup);
+const ErrorPopupComponent = defineComponent(ErrorPopup);
+const router = useRouter();
 
 const fullName = ref('');
 const email = ref('');
@@ -65,27 +75,86 @@ const password = ref('');
 const acceptedTerms = ref(false);
 const emailError = ref('');
 const passwordError = ref('');
+const showSuccess = ref(false);
+const showError = ref(false);
+const successMessage = ref('');
+const errorMessage = ref('');
+
 
 function validateEmail(email) {
   const re = /\S+@\S+\.\S+/;
   return re.test(email);
 }
 
-function submitForm() {
+async function submitForm() {
   emailError.value = '';
   passwordError.value = '';
 
   if (!validateEmail(email.value)) {
     emailError.value = 'Please enter a valid email address';
+    return;
   }
 
   if (password.value.length < 8) {
     passwordError.value = 'Password must be at least 8 characters';
+    return;
   }
 
-  if (!emailError.value && !passwordError.value && acceptedTerms.value) {
-    alert('Form submitted successfully');
-    // Further submission logic goes here
+  if (!acceptedTerms.value) {
+    errorMessage.value = 'You must accept the terms to continue';
+    showError.value = true;
+    return;
+  }
+
+  try {
+    const response = await ApiServices.PostRequest('/register', {
+      name: fullName.value,
+      email: email.value,
+      password: password.value,
+      password_confirmation: password.value // Same password for confirmation
+    });
+
+    // Log the full response for debugging
+    console.log('Registration response:', response);
+
+    // Check for success response
+    if (response && response.message === "You are successfully registered") {
+      // Set success message and show the popup
+      successMessage.value = response.message; // Use the success message from the response
+      showSuccess.value = true;
+
+      // Hide success popup after 2 seconds and redirect to login page
+      setTimeout(() => {
+        showSuccess.value = false;
+        router.push('/login');
+      }, 2000); // 2000 milliseconds = 2 seconds
+    } else {
+      throw new Error('Unexpected response');
+    }
+  } catch (error) {
+    // Handle error response
+    if (error.response) {
+      // Check if the error response contains validation errors
+      if (error.response.data && error.response.data.message === "Validation errors") {
+        const validationErrors = error.response.data.errors;
+        // Display the first validation error for email if it exists
+        if (validationErrors.email && validationErrors.email.length > 0) {
+          errorMessage.value = validationErrors.email[0]; // Show the first email error
+        } else {
+          errorMessage.value = 'An error occurred. Please try again later.';
+        }
+      } else {
+        errorMessage.value = error.response.data.message || 'An error occurred. Please try again later.';
+      }
+    } else {
+      errorMessage.value = 'An error occurred. Please try again later.';
+    }
+    showError.value = true;
+
+    // Hide error popup after 5 seconds
+    setTimeout(() => {
+      showError.value = false; // Hide error popup
+    }, 5000); // 5000 milliseconds = 5 seconds
   }
 }
 </script>
