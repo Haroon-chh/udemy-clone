@@ -57,10 +57,12 @@ const routes = [
   },
   {
     path: '/teaching',
-    name: 'teachUdemy',
-    component: TeachUdemyView, // Add the Login route
-    meta: { title: 'Teaching'},
+    name: 'teaching',
+    component: TeachUdemyView, // Add the Cart route
+    meta: { title: 'Teach with us'},
+
   },
+
 ];
 
 const router = createRouter({
