@@ -40,7 +40,6 @@ import QuillEditor from '../components/dashboard/Admin/QuillEditor.vue';
 
 // Admin-specific components
 
-
 // Get the store and determine if the user is an admin
 const store = useStore();
 const userRole = computed(() => store.getters.getUserRole);
