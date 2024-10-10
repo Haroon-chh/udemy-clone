@@ -39,7 +39,7 @@ import TrendingNow from '../components/dashboard/TrendingNow.vue';
 
 
 // Admin-specific components
-import CardContainer from '@/components/dashboard/Admin/CardEditor.vue';
+import CardContainer from '../components/dashboard/Admin/CardEditor.vue';
 
 // Get the store and determine if the user is an admin
 const store = useStore();
