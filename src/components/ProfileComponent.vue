@@ -95,8 +95,8 @@ export default {
 
 <style scoped>
 .profile-container {
-  position: relative;
-  margin-right: 20px; /* Adjust as needed */
+  position: relative !important;
+  margin-right: 2%;
 }
 
 .profile-circle {
@@ -107,16 +107,17 @@ export default {
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  background-color: white;
-  color: black;
+  background-color:#2E2F31;
+  color: white;
   border: none;
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 2%;
 }
 
 .profile-dropdown {
-  position: fixed; /* Changed from absolute to fixed */
-  top: 10%; /* Adjust this value to match your header height */
+  position: fixed !important; /* Changed from absolute to fixed */
+  top: 13% !important; /* Adjust this value to match your header height */
   right: 1%; /* Align with the right side of the profile circle */
   background-color: white;
   border: 1px solid #ccc;
