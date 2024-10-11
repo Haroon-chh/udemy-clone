@@ -3,7 +3,7 @@
   <div class="dashboard-view">
     <!-- Public components available to all users -->
     <CarouselComponent v-if="!isAdmin" />
-    <CategoriesComponent  />     <!-- My Component new -->
+    <CategoriesComponent v-if="!isAdmin"  />     <!-- My Component new -->
     <LearningGoals v-if="!isAdmin" />
     <Testimonial v-if="!isAdmin" />
     <CardsRow v-if="!isAdmin" />
