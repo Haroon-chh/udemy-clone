@@ -7,8 +7,8 @@ export default createStore({
     admin: AdminStore,  // Register AdminStore module
   },
   state: {
-    user: JSON.parse(localStorage.getItem('authUser')) || null,
-    loggedUser: JSON.parse(localStorage.getItem('logged_user')) || null,
+    user: JSON.parse(localStorage.getItem('authUser') || '{}') || null,
+    loggedUser: JSON.parse(localStorage.getItem('logged_user') || '{}') || null,
     // Navbar related states
     isOpen: {
       categoriesDropdown: false,
@@ -57,16 +57,20 @@ export default createStore({
   },
   actions: {
     loginUser({ commit }, userData) {
-      localStorage.setItem('authUser', JSON.stringify(userData.data));
-      localStorage.setItem('access_token', userData.data.access_token);
-      localStorage.setItem('userRole', userData.data.role);
-      localStorage.setItem('userPermissions', JSON.stringify(userData.data.permissions));
+      // Store the user data and token in localStorage
+      localStorage.setItem('authUser', JSON.stringify(userData.data)); 
+      localStorage.setItem('access_token', userData.data.access_token); 
+      localStorage.setItem('userRole', userData.data.role); 
+      localStorage.setItem('userPermissions', JSON.stringify(userData.data.permissions)); 
+  
+      // Commit the user data to the state
       commit('setUser', userData.data);
-
+  
+      // Create and store the logged user information
       const loggedUserData = {
-        id: userData.data.id,
-        name: userData.data.name,
-        email: userData.data.email,
+        id: userData.data.id, // Ensure 'id' exists in userData
+        name: userData.data.name, // Ensure 'name' exists in userData
+        email: userData.data.email // Ensure 'email' exists in userData
       };
       localStorage.setItem('logged_user', JSON.stringify(loggedUserData));
       commit('setLoggedUser', loggedUserData);

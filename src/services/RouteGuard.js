@@ -1,4 +1,4 @@
-import store from "../store/index";
+import store from "../store";
 
 const RouteGuard = (to, from, next) => {
   const publicPages = ['/login', '/registration', '/forgot-password', '/reset-password'];
