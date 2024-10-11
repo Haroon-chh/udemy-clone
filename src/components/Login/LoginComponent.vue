@@ -92,7 +92,7 @@ const validateEmail = (email) => {
   return re.test(email);
 };
 
-const submitForm = async () => {
+const submitForm = async () => { 
   emailError.value = '';
   passwordError.value = '';
 
@@ -115,7 +115,7 @@ const submitForm = async () => {
     // Log the full response for debugging
     console.log('Login response:', response);
 
-    if (response && response.message === "success" && response.data) {
+    if (response && response.message === "OK" && response.data) {
       // Dispatch the entire userData instead of individual properties
       await store.dispatch('loginUser', response); // Pass the whole response object
 
@@ -129,15 +129,13 @@ const submitForm = async () => {
         router.push('/dashboard');
         // Hide success popup
       }, 2000); // 2000 milliseconds = 2 seconds
-
-      // Redirect to the dashboard
     } else {
       throw new Error('Unexpected response format');
     }
   } catch (error) {
     console.error('Error during login:', error);
     if (error.response && error.response.status === 401) {
-      errorMessage.value = error.response.data.message || 'Invalid credentials';
+      errorMessage.value = error.response.data.errors?.credentials[0] || 'Invalid credentials';
     } else {
       errorMessage.value = 'An error occurred. Please try again later.';
     }
@@ -149,6 +147,7 @@ const submitForm = async () => {
     }, 5000); // 5000 milliseconds = 5 seconds
   }
 };
+
 
 function socialLogin(provider) {
   alert(`Log in with ${provider} clicked`);
