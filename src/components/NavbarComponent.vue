@@ -134,14 +134,14 @@
             <a class="nav-link" href="#">
               <span class="material-icons">shopping_cart</span>
             </a>
-            <ul class="dropdown-menu mt-3 px-4 py-2 wide-dropdown" :class="{ show: isOpen.cartDropdown }">
+            <ul class="dropdown-menu mt-3 px-4 py-2" :class="{ show: isOpen.cartDropdown }">
               <p>Your cart is empty</p>
               <p class=""><a class="text-decoration-none" style="font-size:small; color: purple;" href="#">Keep Shopping</a></p>
             </ul>
           </li>
 
            <!-- Check for authUser in localStorage -->
-           <li v-if="authUser" class="nav-item ms-3">
+           <li v-if="authUser" class="nav-item ms-4">
             <ProfileComponent />
           </li>
           <li v-else class="nav-item ms-3">
