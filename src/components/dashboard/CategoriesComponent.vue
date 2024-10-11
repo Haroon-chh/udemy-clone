@@ -12,29 +12,28 @@
         v-for="category in categories"
         :key="category.id"
         @click="fetchCourseCategories(category.id)"
-        :class="['btn-category', { active: selectedCategoryId === category.id }]"
-      >
+        :class="['btn-category', { active: selectedCategoryId === category.id }]">
         {{ category.title }}
-        <span v-if="category.learners" class="learners-count">{{ category.learners }} learners</span>
       </button>
     </nav>
 
     <!-- Course Categories -->
-    <div v-if="courseCategories.length > 0" class="course-categories d-flex justify-content-center mb-4">
+    <div v-if="courseCategories && courseCategories.length > 0" class="course-categories d-flex justify-content-center mb-4">
       <button
         v-for="courseCategory in courseCategories"
         :key="courseCategory.id"
         @click="fetchCourses(courseCategory.id)"
-        :class="['btn-course-category', { active: selectedCourseCategoryId === courseCategory.id }]"
-      >
-        {{ courseCategory.title }}
-        <span v-if="courseCategory.learners" class="learners-count">{{ courseCategory.learners }} learners</span>
+        :class="['btn-course-category', { active: selectedCourseCategoryId === courseCategory.id }]">
+        <div class="category-content">
+          <span class="category-title">{{ courseCategory.title }}</span>
+          <span v-if="courseCategory.learners" class="learners-count">{{ courseCategory.learners }} learners</span>
+        </div>
       </button>
     </div>
     <div v-else class="text-center mt-3">Select a category to see course categories</div>
 
     <!-- Courses Display -->
-    <div v-if="courses.length > 0" class="courses d-flex flex-wrap justify-content-center">
+    <div v-if="courses && courses.length > 0" class="courses d-flex flex-wrap justify-content-center">
       <div v-for="course in courses" :key="course.id" class="course-card">
         <img :src="course.thumbnail_url" alt="Course thumbnail" class="course-thumbnail" />
         <div class="course-details">
@@ -47,7 +46,7 @@
         </div>
       </div>
     </div>
-    <div v-else class="text-center mt-3">Select a course category to see courses</div>
+    <div v-else class="text-center mt-3">Course doesn't exist</div>
   </div>
 </template>
 
@@ -67,7 +66,7 @@ export default {
     const fetchCategories = async () => {
       try {
         const response = await ApiServices.GetRequest('/categories');
-        categories.value = response.data;
+        categories.value = response?.data || [];
 
         // Automatically select and load the first category if categories are present
         if (categories.value.length > 0) {
@@ -82,14 +81,18 @@ export default {
       selectedCategoryId.value = categoryId;
       try {
         const response = await ApiServices.GetRequest(`/categories/${categoryId}/course-categories`);
-        courseCategories.value = response.data;
+        courseCategories.value = response?.data || [];
 
         // Automatically select and load courses for the first course category if present
         if (courseCategories.value.length > 0) {
           fetchCourses(courseCategories.value[0].id);
+        } else {
+          courses.value = []; // Reset courses if no course categories are available
         }
       } catch (error) {
         console.error('Error fetching course categories:', error);
+        courseCategories.value = []; // Reset course categories on error
+        courses.value = []; // Reset courses on error
       }
     };
 
@@ -97,9 +100,10 @@ export default {
       selectedCourseCategoryId.value = courseCategoryId;
       try {
         const response = await ApiServices.GetRequest(`/course-categories/${courseCategoryId}/course`);
-        courses.value = response.data;
+        courses.value = response?.data || [];
       } catch (error) {
         console.error('Error fetching courses:', error);
+        courses.value = []; // Reset courses on error
       }
     };
 
@@ -126,7 +130,6 @@ export default {
   margin: 0 auto;
 }
 
-/* Main Categories */
 .categories-nav, .course-categories {
   display: flex;
   gap: 1rem;
@@ -135,37 +138,43 @@ export default {
 }
 
 .btn-category, .btn-course-category {
-  background-color: transparent;
+  background-color: #f1f3f4;
   border: none;
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
-  color: silver;
+  color: #333;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.btn-category.active, .btn-course-category.active {
+  background-color: #333;
+  color: white;
+}
+
+.category-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: color 0.3s;
-  cursor: pointer;
-  position: relative;
+  text-align: center;
+}
+
+.category-title {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
 }
 
 .learners-count {
   font-size: 0.75rem;
-  color: gray;
-  margin-top: 0.25rem;
+  color: #555;
 }
 
 .btn-category:hover, .btn-course-category:hover {
-  color: black;
-}
-
-.btn-category.active::after, .btn-course-category.active::after {
-  content: '';
-  width: 100%;
-  height: 2px;
-  background-color: black;
-  position: absolute;
-  bottom: 0;
-  left: 0;
+  background-color: #ddd;
 }
 
 /* Courses */
