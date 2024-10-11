@@ -1,6 +1,11 @@
+// src/store/index.js
 import { createStore } from 'vuex';
+import AdminStore from './AdminStore';  // Import AdminStore module
 
 export default createStore({
+  modules: {
+    admin: AdminStore,  // Register AdminStore module
+  },
   state: {
     user: JSON.parse(localStorage.getItem('authUser')) || null,
     loggedUser: JSON.parse(localStorage.getItem('logged_user')) || null,

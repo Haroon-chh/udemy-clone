@@ -1,3 +1,4 @@
+// src/services/ApiServices.js
 import Vue from 'vue';
 import axios from "axios";
 import VueAxios from "vue-axios";
@@ -25,7 +26,7 @@ const ApiServices = {
     try {
       const response = await axios.post(`${baseURL}${endpoint}`, data, {
         headers: { 
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json", // Ensure this is set to handle JSON requests
         }
       });
       return response.data;  // Return just the response data
@@ -36,4 +37,3 @@ const ApiServices = {
   }
 };
 export default ApiServices;
-
