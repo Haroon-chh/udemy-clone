@@ -15,6 +15,11 @@
               Udemy fit us like a glove. Their team curates fresh, up-to-date courses from their marketplace
               and makes them available to customers.
             </p>
+            <footer class="blockquote-footer">
+              Varun Patil <br>
+              <small>Senior Manager of HR Development</small><br>
+              <a href="#" class="text-primary">Read the Synechron case study →</a>
+            </footer>
             
             
           </blockquote>
@@ -26,6 +31,11 @@
             <p class="testimonial-text">
               In total, it was a big success, I would get emails about what a fantastic resource it was.
             </p>
+            <footer class="blockquote-footer">
+              Alfred Helmerich <br>
+              <small>Executive Training Manager</small><br>
+              <a href="#" class="text-primary">Read the NTT DATA case study →</a>
+            </footer>
             
           </blockquote>
         </div>
@@ -37,36 +47,18 @@
               Udemy responds to the needs of the business in an agile and global manner. It's truly the
               best solution for our employees and their careers.
             </p>
-            
-          </blockquote>
-        </div>
-      </div>
-
-      <div class="row">
-      <div class="col-md-4">
-      <footer class="blockquote-footer">
-              Varun Patil <br>
-              <small>Senior Manager of HR Development</small><br>
-              <a href="#" class="text-primary">Read the Synechron case study →</a>
-            </footer>
-            
-        </div>
-        <div class="col-md-4">
-            <footer class="blockquote-footer">
-              Alfred Helmerich <br>
-              <small>Executive Training Manager</small><br>
-              <a href="#" class="text-primary">Read the NTT DATA case study →</a>
-            </footer>
-            
-        </div>
-        <div class="col-md-4">
             <footer class="blockquote-footer">
               Luz Santillana Romero <br>
               <small>Development and Engagement Director</small><br>
               <a href="#" class="text-primary">Read the Indra case study →</a>
             </footer>
+            
+            
+          </blockquote>
         </div>
-        </div>
+      </div>
+
+     
     </div>
   </template>
   
