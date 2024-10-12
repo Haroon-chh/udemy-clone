@@ -45,7 +45,7 @@ export default {
         }
 
         const data = await response.json();
-        if (data.message === 'success') {
+        if (data.message === 'OK') {
           store.dispatch('setLoggedUserData', data.data);
         }
       } catch (error) {
