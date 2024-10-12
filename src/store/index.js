@@ -4,7 +4,6 @@ export default createStore({
   state: {
     user: JSON.parse(localStorage.getItem('authUser') || '{}') || null,
     loggedUser: JSON.parse(localStorage.getItem('logged_user') || '{}') || null,
-    // Navbar related states
     isOpen: {
       categoriesDropdown: false,
       developmentDropdown: false,
@@ -12,7 +11,7 @@ export default createStore({
       mobileDevDropdown: false,
       businessDropdown: false,
       teachDropdown: false,
-      cartDropdown: false
+      cartDropdown: false,
     },
     isLanguageModalOpen: false,
   },
@@ -21,7 +20,6 @@ export default createStore({
     getUserRole: (state) => state.user ? state.user.role : localStorage.getItem('userRole'),
     getUserPermissions: (state) => state.user ? state.user.permissions : JSON.parse(localStorage.getItem('userPermissions') || '[]'),
     getLoggedUser: (state) => state.loggedUser,
-    // Navbar related getters
     getDropdownState: (state) => (dropdown) => state.isOpen[dropdown],
     getLanguageModalState: (state) => state.isLanguageModalOpen,
   },
@@ -36,7 +34,6 @@ export default createStore({
       state.user = null;
       state.loggedUser = null;
     },
-    // Navbar related mutations
     openDropdown(state, dropdown) {
       state.isOpen[dropdown] = true;
     },
@@ -51,21 +48,45 @@ export default createStore({
     },
   },
   actions: {
+    async fetchUserProfile({ commit }) {
+      try {
+        const accessToken = localStorage.getItem('access_token');
+        if (!accessToken) {
+          console.error('No access token found');
+          return;
+        }
+
+        const response = await fetch(`${process.env.VUE_APP_API_URL}/profile`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.message === 'OK') {
+          commit('setLoggedUser', data.data); // Save user profile in the store
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    },
     loginUser({ commit }, userData) {
-      // Store the user data and token in localStorage
-      localStorage.setItem('authUser', JSON.stringify(userData.data)); 
-      localStorage.setItem('access_token', userData.data.access_token); 
-      localStorage.setItem('userRole', userData.data.role); 
-      localStorage.setItem('userPermissions', JSON.stringify(userData.data.permissions)); 
-  
-      // Commit the user data to the state
+      localStorage.setItem('authUser', JSON.stringify(userData.data));
+      localStorage.setItem('access_token', userData.data.access_token);
+      localStorage.setItem('userRole', userData.data.role);
+      localStorage.setItem('userPermissions', JSON.stringify(userData.data.permissions));
       commit('setUser', userData.data);
-  
-      // Create and store the logged user information
+
       const loggedUserData = {
-        id: userData.data.id, // Ensure 'id' exists in userData
-        name: userData.data.name, // Ensure 'name' exists in userData
-        email: userData.data.email // Ensure 'email' exists in userData
+        id: userData.data.id,
+        name: userData.data.name,
+        email: userData.data.email,
       };
       localStorage.setItem('logged_user', JSON.stringify(loggedUserData));
       commit('setLoggedUser', loggedUserData);
@@ -92,7 +113,6 @@ export default createStore({
         commit('setLoggedUser', loggedUser);
       }
     },
-    // Navbar related actions
     openDropdown({ commit }, dropdown) {
       commit('openDropdown', dropdown);
     },
