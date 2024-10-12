@@ -144,7 +144,7 @@
           <li v-if="isLoggedIn" class="nav-item ms-4">
             <ProfileComponent />
           </li>
-          <li v-else class="nav-item ms-3">
+          <li v-if="!isLoggedIn" class="nav-item ms-3">
             <router-link to="/login" class="btn btn-outline-secondary rounded-0 fw-semibold">
               Login
             </router-link>
