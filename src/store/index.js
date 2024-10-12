@@ -1,4 +1,5 @@
 import { createStore } from 'vuex';
+import AuthApiServices from '@/services/AuthApiServices'; // Import your Auth API services
 
 export default createStore({
   state: {
@@ -92,6 +93,19 @@ export default createStore({
         commit('setLoggedUser', loggedUser);
       }
     },
+    // Fetch user profile
+    async fetchUserProfile({ commit }) {
+      try {
+        const response = await AuthApiServices.GetRequest('/profile');
+
+        if (response.message === 'OK') {
+          commit('setLoggedUser', response.data); // Save user profile in the store
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    },
+   
     // Navbar related actions
     openDropdown({ commit }, dropdown) {
       commit('openDropdown', dropdown);

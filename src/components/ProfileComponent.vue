@@ -22,38 +22,10 @@ export default {
     const store = useStore();
     const router = useRouter();
     const isDropdownOpen = ref(false);
-    
 
-    const fetchUserProfile = async () => {
-      try {
-        const accessToken = localStorage.getItem('access_token');
-        if (!accessToken) {
-          console.error('No access token found');
-          return;
-        }
-
-        const response = await fetch(`${process.env.VUE_APP_API_URL}/profile`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': 'true', // remove this when not using ngrok
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (data.message === 'success') {
-          store.dispatch('setLoggedUserData', data.data);
-        }
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
-      }
-    };
-
-    onMounted(fetchUserProfile);
+    onMounted(() => {
+      store.dispatch('fetchUserProfile'); // Dispatch the action to fetch the user profile
+    });
 
     const userInitials = computed(() => {
       const loggedUser = store.getters.getLoggedUser;
@@ -76,22 +48,24 @@ export default {
       router.push('/change-password');
       isDropdownOpen.value = false;
     };
+
     const logout = () => {
       store.dispatch('logoutUser'); // Dispatch the logout action
-      router.push('/login'); // Redirect to the login page
+      router.push('/login');
     };
 
     return {
-      userInitials,
       isDropdownOpen,
+      userInitials,
       toggleDropdown,
       goToProfile,
       goToChangePassword,
       logout,
     };
-  }
+  },
 };
 </script>
+
 
 <style scoped>
 .profile-container {
