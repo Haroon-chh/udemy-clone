@@ -10,10 +10,26 @@ const ApiServices = {
     axios.defaults.baseURL = baseURL;
     axios.defaults.headers.common["Content-Type"] = "application/json";
   },
-
-  async GetRequest(endpoint, params) {
+//  old method
+  // async GetRequest(endpoint, params) {
+  //   try {
+  //     const response = await axios.get(${baseURL}${endpoint}, { params });
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error('GET request failed:', error);
+  //     throw error;
+  //   }
+  // },
+  async GetRequest(endpoint, params = {}) {
     try {
-      const response = await axios.get(`${baseURL}${endpoint}`, { params });
+      const response = await axios.get(`${baseURL}${endpoint}`, {
+        params,
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
+      });
+  
       return response.data;
     } catch (error) {
       console.error('GET request failed:', error);
