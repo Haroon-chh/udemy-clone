@@ -5,6 +5,7 @@ export default createStore({
   state: {
     user: JSON.parse(localStorage.getItem('authUser') || '{}') || null,
     loggedUser: JSON.parse(localStorage.getItem('logged_user') || '{}') || null,
+    loggedIn: !!localStorage.getItem('access_token'), // Initialize loggedIn state based on token
     // Navbar related states
     isOpen: {
       categoriesDropdown: false,
@@ -22,6 +23,7 @@ export default createStore({
     getUserRole: (state) => state.user ? state.user.role : localStorage.getItem('userRole'),
     getUserPermissions: (state) => state.user ? state.user.permissions : JSON.parse(localStorage.getItem('userPermissions') || '[]'),
     getLoggedUser: (state) => state.loggedUser,
+    isLoggedIn: (state) => state.loggedIn, // New getter for loggedIn state
     // Navbar related getters
     getDropdownState: (state) => (dropdown) => state.isOpen[dropdown],
     getLanguageModalState: (state) => state.isLanguageModalOpen,
@@ -36,6 +38,9 @@ export default createStore({
     clearUser(state) {
       state.user = null;
       state.loggedUser = null;
+    },
+    setLoggedIn(state, status) { // New mutation to set loggedIn status
+      state.loggedIn = status;
     },
     // Navbar related mutations
     openDropdown(state, dropdown) {
@@ -58,10 +63,13 @@ export default createStore({
       localStorage.setItem('access_token', userData.data.access_token); 
       localStorage.setItem('userRole', userData.data.role); 
       localStorage.setItem('userPermissions', JSON.stringify(userData.data.permissions)); 
-  
+
       // Commit the user data to the state
       commit('setUser', userData.data);
-  
+      
+      // Set loggedIn state to true
+      commit('setLoggedIn', true);
+
       // Create and store the logged user information
       const loggedUserData = {
         id: userData.data.id, // Ensure 'id' exists in userData
@@ -78,6 +86,7 @@ export default createStore({
       localStorage.removeItem('authUser');
       localStorage.removeItem('logged_user');
       commit('clearUser');
+      commit('setLoggedIn', false); // Set loggedIn state to false
     },
     setLoggedUserData({ commit }, loggedUserData) {
       localStorage.setItem('logged_user', JSON.stringify(loggedUserData));
@@ -92,6 +101,8 @@ export default createStore({
       if (loggedUser) {
         commit('setLoggedUser', loggedUser);
       }
+      const token = localStorage.getItem('access_token');
+      commit('setLoggedIn', !!token); // Initialize loggedIn based on token
     },
     // Fetch user profile
     async fetchUserProfile({ commit }) {
@@ -105,7 +116,7 @@ export default createStore({
         console.error('Error fetching user profile:', error);
       }
     },
-   
+
     // Navbar related actions
     openDropdown({ commit }, dropdown) {
       commit('openDropdown', dropdown);

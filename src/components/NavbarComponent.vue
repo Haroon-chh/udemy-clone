@@ -140,8 +140,8 @@
             </ul>
           </li>
 
-           <!-- Check for authUser in localStorage -->
-           <li v-if="authUser" class="nav-item ms-4">
+                <!-- Check for logged in state from Vuex -->
+          <li v-if="isLoggedIn" class="nav-item ms-4">
             <ProfileComponent />
           </li>
           <li v-else class="nav-item ms-3">
@@ -149,13 +149,11 @@
               Login
             </router-link>
           </li>
-
-          <li v-if="!authUser" class="nav-item ms-3">
+          <li v-if="!isLoggedIn" class="nav-item ms-3">
             <router-link to="/signup" class="btn btn-dark rounded-0 fw-semibold">
               Sign Up
             </router-link>
           </li>
-
 
 
           <!-- World Icon Button -->
@@ -199,23 +197,17 @@
 import { mapActions, mapGetters } from 'vuex';
 import ProfileComponent from '../components/ProfileComponent.vue';
 
-
 export default {
   name: 'NavbarComponent',
   components: {
     ProfileComponent,
   },
   computed: {
-    // Use a function to dynamically access the dropdown state
+    // Use Vuex getter to check if user is logged in
+    ...mapGetters(['isLoggedIn', 'getLanguageModalState']),
     isOpen() {
       return this.$store.state.isOpen;
     },
-    ...mapGetters({
-      isLanguageModalOpen: 'getLanguageModalState',
-    }),
-    authUser() {
-      return localStorage.getItem('authUser');
-    }
   },
   methods: {
     ...mapActions(['openDropdown', 'closeDropdown', 'openLanguageModal', 'closeLanguageModal']),
