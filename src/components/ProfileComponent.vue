@@ -23,11 +23,9 @@ export default {
     const router = useRouter();
     const isDropdownOpen = ref(false);
 
-    const fetchUserProfile = async () => {
-      await store.dispatch('fetchUserProfile'); // Dispatch the action to fetch user profile
-    };
-
-    onMounted(fetchUserProfile);
+    onMounted(() => {
+      store.dispatch('fetchUserProfile'); // Dispatch the action to fetch the user profile
+    });
 
     const userInitials = computed(() => {
       const loggedUser = store.getters.getLoggedUser;
