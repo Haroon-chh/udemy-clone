@@ -3,9 +3,9 @@ import AuthApiServices from '@/services/AuthApiServices'; // Import your Auth AP
 
 export default createStore({
   state: {
-    user: JSON.parse(localStorage.getItem('authUser') || '{}') || null,
-    loggedUser: JSON.parse(localStorage.getItem('logged_user') || '{}') || null,
-    loggedIn: !!localStorage.getItem('access_token'), // Initialize loggedIn state based on token
+    user: null,
+    loggedUser: null,
+    loggedIn: false, // Initialize loggedIn as false by default
     // Navbar related states
     isOpen: {
       categoriesDropdown: false,
@@ -14,18 +14,19 @@ export default createStore({
       mobileDevDropdown: false,
       businessDropdown: false,
       teachDropdown: false,
-      cartDropdown: false
+      cartDropdown: false,
     },
     isLanguageModalOpen: false,
+    logoutMessage: '', // State to hold logout response message
   },
   getters: {
     getUser: (state) => state.user,
-    getUserRole: (state) => state.user ? state.user.role : localStorage.getItem('userRole'),
-    getUserPermissions: (state) => state.user ? state.user.permissions : JSON.parse(localStorage.getItem('userPermissions') || '[]'),
+    getUserRole: (state) => (state.user ? state.user.role : null),
+    getUserPermissions: (state) => (state.user ? state.user.permissions : []),
     getLoggedUser: (state) => state.loggedUser,
-    isLoggedIn: (state) => state.loggedIn, // New getter for loggedIn state
-    // Navbar related getters
-    getDropdownState: (state) => (dropdown) => state.isOpen[dropdown],
+    isLoggedIn: (state) => state.loggedIn, // Use Vuex state for loggedIn status
+    logoutMessage: (state) => state.logoutMessage, 
+    getDropdownState: (state) => (dropdown) => state.isOpen[dropdown], // Navbar related getter
     getLanguageModalState: (state) => state.isLanguageModalOpen,
   },
   mutations: {
@@ -39,15 +40,17 @@ export default createStore({
       state.user = null;
       state.loggedUser = null;
     },
-    setLoggedIn(state, status) { // New mutation to set loggedIn status
+    setLoggedIn(state, status) {
       state.loggedIn = status;
     },
-    // Navbar related mutations
+    setLogoutMessage(state, message) {
+      state.logoutMessage = message;
+    },
     openDropdown(state, dropdown) {
-      state.isOpen[dropdown] = true;
+      state.isOpen[dropdown] = true; // Open specified dropdown
     },
     closeDropdown(state, dropdown) {
-      state.isOpen[dropdown] = false;
+      state.isOpen[dropdown] = false; // Close specified dropdown
     },
     openLanguageModal(state) {
       state.isLanguageModalOpen = true;
@@ -58,18 +61,13 @@ export default createStore({
   },
   actions: {
     loginUser({ commit }, userData) {
-      // Store the user data and token in localStorage
-      localStorage.setItem('authUser', JSON.stringify(userData.data)); 
-      localStorage.setItem('access_token', userData.data.access_token); 
-      localStorage.setItem('userRole', userData.data.role); 
-      localStorage.setItem('userPermissions', JSON.stringify(userData.data.permissions)); 
-
-      // Commit the user data to the state
+      // Store user data and token in Vuex, and localStorage only for persistence
       commit('setUser', userData.data);
-      
-      // Set loggedIn state to true
       commit('setLoggedIn', true);
 
+      localStorage.setItem('authUser', JSON.stringify(userData.data));
+      localStorage.setItem('access_token', userData.data.access_token);
+      
       // Create and store the logged user information
       const loggedUserData = {
         id: userData.data.id, // Ensure 'id' exists in userData
@@ -79,38 +77,48 @@ export default createStore({
       localStorage.setItem('logged_user', JSON.stringify(loggedUserData));
       commit('setLoggedUser', loggedUserData);
     },
-    logoutUser({ commit }) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('userPermissions');
-      localStorage.removeItem('authUser');
-      localStorage.removeItem('logged_user');
-      commit('clearUser');
-      commit('setLoggedIn', false); // Set loggedIn state to false
-    },
-    setLoggedUserData({ commit }, loggedUserData) {
-      localStorage.setItem('logged_user', JSON.stringify(loggedUserData));
-      commit('setLoggedUser', loggedUserData);
+    async logoutUser({ commit }) {
+      try {
+        const response = await AuthApiServices.PostRequest('/logout'); // Replace with the actual logout endpoint
+  
+        if (response && response.status === 200) {
+          // Clear local storage and state
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('authUser');
+          localStorage.removeItem('logged_user');
+  
+          commit('clearUser');
+          commit('setLoggedIn', false);
+          return { message: 'Logout successful' };
+          // Ensure to return an object with a message
+        } else {
+          // If the API response is not as expected, return an error message
+          return { message: response.message || 'Logout failed' };
+        }
+      } catch (error) {
+        // Handle API call errors and return a fallback message
+        console.error('Error logging out:', error);
+        return { message: 'An error occurred while logging out' }; // Ensure an object with a message is returned
+      }
     },
     initializeStore({ commit }) {
-      const authUser = JSON.parse(localStorage.getItem('authUser'));
-      if (authUser) {
-        commit('setUser', authUser);
-      }
-      const loggedUser = JSON.parse(localStorage.getItem('logged_user'));
-      if (loggedUser) {
-        commit('setLoggedUser', loggedUser);
-      }
       const token = localStorage.getItem('access_token');
-      commit('setLoggedIn', !!token); // Initialize loggedIn based on token
+      const authUser = localStorage.getItem('authUser');
+      const loggedUser = JSON.parse(localStorage.getItem('logged_user'));
+
+      if (token && authUser) {
+        commit('setUser', JSON.parse(authUser));
+        commit('setLoggedUser', loggedUser);
+        commit('setLoggedIn', true);
+      } else {
+        commit('setLoggedIn', false);
+      }
     },
-    // Fetch user profile
     async fetchUserProfile({ commit }) {
       try {
         const response = await AuthApiServices.GetRequest('/profile');
-
         if (response.message === 'OK') {
-          commit('setLoggedUser', response.data); // Save user profile in the store
+          commit('setLoggedUser', response.data);
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
