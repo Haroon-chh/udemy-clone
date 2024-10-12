@@ -49,10 +49,16 @@ export default {
       isDropdownOpen.value = false;
     };
 
-    const logout = () => {
-      store.dispatch('logoutUser'); // Dispatch the logout action
-      router.push('/login');
-    };
+    const logout = async () => {
+  const response = await store.dispatch('logoutUser'); // Dispatch the logout action
+  
+  // Show success or error message
+  alert(response.message); // Show the response message in an alert
+
+  // Redirect to login
+  router.push('/login');
+};
+
 
     return {
       isDropdownOpen,

@@ -14,16 +14,18 @@ export default createStore({
       mobileDevDropdown: false,
       businessDropdown: false,
       teachDropdown: false,
-      cartDropdown: false
+      cartDropdown: false,
     },
     isLanguageModalOpen: false,
+    logoutMessage: '', // State to hold logout response message
   },
   getters: {
     getUser: (state) => state.user,
-    getUserRole: (state) => state.user ? state.user.role : localStorage.getItem('userRole'),
-    getUserPermissions: (state) => state.user ? state.user.permissions : JSON.parse(localStorage.getItem('userPermissions') || '[]'),
+    getUserRole: (state) => (state.user ? state.user.role : localStorage.getItem('userRole')),
+    getUserPermissions: (state) => (state.user ? state.user.permissions : JSON.parse(localStorage.getItem('userPermissions') || '[]')),
     getLoggedUser: (state) => state.loggedUser,
     isLoggedIn: (state) => state.loggedIn, // New getter for loggedIn state
+    logoutMessage: (state) => state.logoutMessage, // Getter for logout message
     // Navbar related getters
     getDropdownState: (state) => (dropdown) => state.isOpen[dropdown],
     getLanguageModalState: (state) => state.isLanguageModalOpen,
@@ -41,6 +43,9 @@ export default createStore({
     },
     setLoggedIn(state, status) { // New mutation to set loggedIn status
       state.loggedIn = status;
+    },
+    setLogoutMessage(state, message) { // Mutation to set logout message
+      state.logoutMessage = message;
     },
     // Navbar related mutations
     openDropdown(state, dropdown) {
@@ -79,15 +84,32 @@ export default createStore({
       localStorage.setItem('logged_user', JSON.stringify(loggedUserData));
       commit('setLoggedUser', loggedUserData);
     },
-    logoutUser({ commit }) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('userPermissions');
-      localStorage.removeItem('authUser');
-      localStorage.removeItem('logged_user');
-      commit('clearUser');
-      commit('setLoggedIn', false); // Set loggedIn state to false
+    async logoutUser({ commit }) {
+      try {
+        const response = await AuthApiServices.PostRequest('/logout'); // Replace with the actual logout endpoint
+    
+        // Check for success response
+        if (response.status === 200) { // Adjust based on your API's success criteria
+          // Clear local storage
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('userRole');
+          localStorage.removeItem('userPermissions');
+          localStorage.removeItem('authUser');
+          localStorage.removeItem('logged_user');
+    
+          commit('clearUser');
+          commit('setLoggedIn', false); // Set loggedIn state to false
+          return { message: 'Logout successful' }; // Return success message
+        } else {
+          // Handle unsuccessful logout (if needed)
+          return { message: response.message || 'Logout failed' }; // Store failure message
+        }
+      } catch (error) {
+        console.error('Error logging out:', error);
+        return { message: 'An error occurred while logging out' }; // Handle error message
+      }
     },
+    
     setLoggedUserData({ commit }, loggedUserData) {
       localStorage.setItem('logged_user', JSON.stringify(loggedUserData));
       commit('setLoggedUser', loggedUserData);

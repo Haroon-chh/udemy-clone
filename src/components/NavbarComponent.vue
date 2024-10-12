@@ -167,25 +167,26 @@
     </div>
 
     <!-- Language Modal -->
-    <div v-if="isLanguageModalOpen" class="modal fade show d-block" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Select Language</h5>
-            <button type="button" class="btn-close" @click="closeLanguageModal"></button>
-          </div>
-          <div class="modal-body">
-            <ul>
-              <li><a href="#">English</a></li>
-              <li><a href="#">Español</a></li>
-              <li><a href="#">Français</a></li>
-              <li><a href="#">Deutsch</a></li>
-              <li><a href="#">Português</a></li>
-            </ul>
-          </div>
-        </div>
+<div v-if="getLanguageModalState" class="modal fade show d-block" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select Language</h5>
+        <button type="button" class="btn-close" @click="closeLanguageModal"></button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li><a href="#">English</a></li>
+          <li><a href="#">Español</a></li>
+          <li><a href="#">Français</a></li>
+          <li><a href="#">Deutsch</a></li>
+          <li><a href="#">Português</a></li>
+        </ul>
       </div>
     </div>
+  </div>
+</div>
+
   </nav>
 </template>
 
@@ -203,12 +204,19 @@ export default {
     ProfileComponent,
   },
   computed: {
-    // Use Vuex getter to check if user is logged in
-    ...mapGetters(['isLoggedIn', 'getLanguageModalState']),
-    isOpen() {
-      return this.$store.state.isOpen;
-    },
+  // Use Vuex getters to check if user is logged in and get language modal state
+  ...mapGetters(['getLanguageModalState']),
+
+  // Directly access the isLoggedIn getter and rename it for clarity
+  isLoggedIn() {
+    return this.$store.getters.isLoggedIn; // Use Vuex getter for loggedIn status
   },
+
+  // Access the isOpen state directly from the Vuex store
+  isOpen() {
+    return this.$store.state.isOpen;
+  },
+},
   methods: {
     ...mapActions(['openDropdown', 'closeDropdown', 'openLanguageModal', 'closeLanguageModal']),
     toggleDropdown(dropdown) {
@@ -226,7 +234,7 @@ export default {
         this.openLanguageModal();
       }
     }
-  }
+  },
 };
 </script>
 
