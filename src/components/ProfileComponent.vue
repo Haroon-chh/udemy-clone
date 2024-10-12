@@ -54,7 +54,6 @@ export default {
   
   // Show success or error message
   alert(response.message); // Show the response message in an alert
-
   // Redirect to login
   router.push('/login');
 };
