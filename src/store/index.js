@@ -66,11 +66,11 @@ export default createStore({
       try {
         const response = await AuthApiServices.PostRequest('/login', credentials);
         console.log('Login API response:', response);
-
+    
         if (response && response.message === 'OK' && response.data) {
           commit('setUser', response.data);
           commit('setLoggedIn', true);
-
+    
           const loggedUserData = {
             id: response.data.id,
             role: response.data.role,
@@ -78,23 +78,37 @@ export default createStore({
             name: response.data.name,
             email: response.data.email,
           };
-
+    
           localStorage.setItem('authUser', JSON.stringify(response.data));
           localStorage.setItem('access_token', response.data.access_token);
           localStorage.setItem('logged_user', JSON.stringify(loggedUserData));
           commit('setLoggedUser', loggedUserData);
-
+    
+          // Return the actual success message from the API response
           return { success: true, message: 'Login successful!' };
-        } else {
-          return { success: false, message: 'Unexpected response format' };
+         } else {
+          return { success: false, message: response.message || 'Unexpected response format' };
         }
       } catch (error) {
         console.error('Error during login:', error);
-        throw error;
+    
+        // Handle error response structure
+        if (error.response && error.response.data) {
+          const apiMessage = error.response.data.message;
+          const credentialsError = error.response.data.errors?.credentials?.[0];
+    
+          // Prioritize specific credential errors over the general message
+          const errorMessage = credentialsError || apiMessage || 'An error occurred. Please try again.';
+          return { success: false, message: errorMessage };
+        }
+    
+        // Fallback error message for unexpected errors
+        return { success: false, message: 'An error occurred. Please try again.' };
       }
     },
+    
+    
     async logoutUser({ commit }) {
-      console.log('Starting logout process...');
       try {
         const response = await AuthApiServices.PostRequest('/logout');
         console.log('Logout API response:', response);

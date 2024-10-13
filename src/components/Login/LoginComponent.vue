@@ -111,7 +111,6 @@ const submitForm = async () => {
       password: password.value,
     });
 
-    console.log('Login response:', response);
 
     if (response.success) {
       successMessage.value = response.message;
