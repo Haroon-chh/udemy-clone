@@ -23,8 +23,16 @@ export default {
     const router = useRouter();
     const isDropdownOpen = ref(false);
 
+    // Fetch user profile if logged in
+    const fetchProfileIfLoggedIn = async () => {
+      const isLoggedIn = store.getters.isLoggedIn;
+      if (isLoggedIn) {
+        await store.dispatch('fetchUserProfile'); // Dispatch the action to fetch the user profile
+      }
+    };
+
     onMounted(() => {
-      store.dispatch('fetchUserProfile'); // Dispatch the action to fetch the user profile
+      fetchProfileIfLoggedIn(); // Fetch profile when the component is mounted
     });
 
     const userInitials = computed(() => {
@@ -50,12 +58,14 @@ export default {
     };
 
     const logout = async () => {
-  const response = await store.dispatch('logoutUser'); // Dispatch the logout action
-  
-  // Show success or error message
-  alert(response.message); // Show the response message in an alert
-  // Redirect to login
-  router.push('/login');
+    console.log('Dispatching logout action...'); // Log before dispatch
+    const response = await store.dispatch('logoutUser'); // Dispatch the logout action
+
+    // Show success or error message
+    alert(response.message); // Show the response message in an alert
+
+    // Redirect to login
+    router.push('/login');
 };
 
 

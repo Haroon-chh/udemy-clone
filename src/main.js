@@ -11,6 +11,8 @@ import '@fortawesome/fontawesome-free/js/all.js';
 
 const app = createApp (App);
 app.use(store);
+store.dispatch('initializeStore'); // Initialize the store on app load
+
 app.use(router);
 app.mount('#app')
 
