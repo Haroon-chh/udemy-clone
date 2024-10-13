@@ -374,5 +374,8 @@ p {
 .description-section p {
   font-size: 1.2rem;
   line-height: 1.6;
+  
 }
 </style>
+
+
