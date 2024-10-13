@@ -155,6 +155,36 @@ export default createStore({
         throw new Error('An error occurred while changing the password.');
       }
     },
+
+    //register function
+    async registerUser(_, userData) {
+      try {
+        const response = await AuthApiServices.PostRequest('/register', userData);
+        console.log('Register API response:', response);
+    
+        // Check for successful registration
+        if (response && response.message === 'You are successfully registered') {
+          return { success: true, message: response.message }; // Use the success message from the response
+        } else {
+          // Handle unexpected response format
+          return { success: false, message: 'Registration failed. Please try again.' };
+        }
+      } catch (error) {
+        console.error('Error during registration:', error);
+    
+        if (error.response && error.response.data) {
+          const apiMessage = error.response.data.message;
+          const errors = error.response.data.errors;
+    
+          // Customize your error handling as needed
+          const errorMessage = errors ? Object.values(errors).flat().join(' ') : apiMessage || 'An unexpected error occurred.';
+          return { success: false, message: errorMessage };
+        }
+    
+        return { success: false, message: 'An unexpected error occurred. Please try again later.' };
+      }
+    },
+    
     
     initializeStore({ commit }) {
       const token = localStorage.getItem('access_token');
