@@ -1,11 +1,15 @@
 <template>
-  <div class="profile-container">
-    <button @click="toggleDropdown" class="profile-circle" type="button" id="profileDropdown">
+  <div class="profile-container" @mouseover="openDropdown" @mouseleave="closeDropdown">
+    <button class="profile-circle" type="button" id="profileDropdown">
       {{ userInitials }}
     </button>
     <div v-if="isDropdownOpen" class="profile-dropdown">
-      <a href="#" @click.prevent="goToProfile">Profile</a>
-      <a href="#" @click.prevent="goToChangePassword">Change Password</a>
+      <h6 class="profile-name text-center">{{ userName }}</h6>
+      <hr />
+      <router-link to="/profile" class="dropdown-link">Edit Profile</router-link>
+      <router-link to="/subscriptions" class="dropdown-link">Subscriptions</router-link>
+      <router-link to="/settings" class="dropdown-link">Settings</router-link>
+      <hr />
       <button @click="logout" class="btn btn-outline-danger btn-sm ms-2">Logout</button>
     </div>
 
@@ -49,24 +53,27 @@ export default {
       );
     });
 
+    const userName = computed(() => {
+      return store.getters.getLoggedUser?.name || 'User';
+    });
+
     const fetchProfileIfLoggedIn = async () => {
       if (store.getters.isLoggedIn) {
         await store.dispatch('fetchUserProfile');
       }
     };
 
-    const toggleDropdown = () => {
-      isDropdownOpen.value = !isDropdownOpen.value;
+    const openDropdown = () => {
+      isDropdownOpen.value = true;
+    };
+
+    const closeDropdown = () => {
+      isDropdownOpen.value = false;
     };
 
     const goToProfile = () => {
       router.push('/profile');
-      isDropdownOpen.value = false;
-    };
-
-    const goToChangePassword = () => {
-      router.push('/change-password');
-      isDropdownOpen.value = false;
+      closeDropdown();
     };
 
     const logout = async () => {
@@ -75,16 +82,14 @@ export default {
         console.log('Logout response:', response);
 
         if (response.success) {
-          // Show success message and popup
           successMessage.value = response.message || 'Logout successful! Redirecting to login...';
           showSuccessPopup.value = true;
 
           setTimeout(() => {
             showSuccessPopup.value = false;
-            router.push('/login'); // Redirect to login page after logout
+            router.push('/login');
           }, 2000);
         } else {
-          // Handle unsuccessful logout
           errorMessage.value = response.message || 'Logout failed. Please try again.';
           showErrorPopup.value = true;
 
@@ -94,8 +99,6 @@ export default {
         }
       } catch (error) {
         console.error('Error during logout:', error);
-
-        // Show error message and popup
         errorMessage.value = error.message || 'An error occurred. Please try again.';
         showErrorPopup.value = true;
 
@@ -105,15 +108,15 @@ export default {
       }
     };
 
-
     onMounted(() => fetchProfileIfLoggedIn());
 
     return {
       isDropdownOpen,
       userInitials,
-      toggleDropdown,
+      userName,
+      openDropdown,
+      closeDropdown,
       goToProfile,
-      goToChangePassword,
       logout,
       showSuccessPopup,
       successMessage,
@@ -126,9 +129,10 @@ export default {
 
 <style scoped>
 .profile-container {
-  position: relative !important;
+  position: relative;
   margin-right: 2%;
 }
+
 .profile-circle {
   width: 50px;
   height: 50px;
@@ -142,62 +146,67 @@ export default {
   border: none;
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2%;
+  transition: background-color 0.3s;
 }
+
+.profile-circle:hover {
+  background-color: #444;
+}
+
 .profile-dropdown {
-  position: fixed !important;
-  top: 13% !important;
-  right: 1%;
+  position: absolute;
+  top: 50px;
+  right: 0;
   background-color: white;
   border: 1px solid #ccc;
   padding: 8px 0;
-  min-width: 150px;
+  min-width: 180px;
   z-index: 1000;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
 }
-.profile-dropdown a {
+
+.profile-name {
+  font-weight: bold;
+}
+
+.dropdown-link {
   display: block;
   padding: 8px 16px;
   color: #333;
   text-decoration: none;
+  transition: background-color 0.3s;
 }
-.profile-dropdown a:hover {
+
+.dropdown-link:hover {
   background-color: #f8f9fa;
 }
+
+hr {
+  margin: 8px 0;
+}
+
 @media (max-width: 768px) {
-  .profile-container {
-    margin-right: 10px;
-  }
   .profile-circle {
     width: 40px;
     height: 40px;
     font-size: 0.9em;
   }
+
   .profile-dropdown {
-    right: 5%;
-    min-width: 120px;
-  }
-  .profile-dropdown a {
-    padding: 6px 12px;
-    font-size: 0.9em;
+    min-width: 140px;
   }
 }
+
 @media (max-width: 480px) {
-  .profile-container {
-    margin-right: 5px;
-  }
   .profile-circle {
     width: 35px;
     height: 35px;
     font-size: 0.8em;
   }
+
   .profile-dropdown {
-    right: 2%;
-    min-width: 100px;
-  }
-  .profile-dropdown a {
-    padding: 4px 8px;
-    font-size: 0.8em;
+    min-width: 120px;
   }
 }
 </style>
