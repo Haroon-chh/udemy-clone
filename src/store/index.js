@@ -133,6 +133,28 @@ export default createStore({
         return { success: false, message: errorMessage };
       }
     },
+
+    //change password
+    async changePassword(_, { current_password, new_password, new_password_confirmation }) {
+      try {
+        const response = await AuthApiServices.PostRequest('/change-password', {
+          current_password,
+          new_password,
+          new_password_confirmation,
+        });
+  
+        if (response.success) {
+          // Handle successful response if needed, like updating user state or notifying
+          return { success: true, message: response.message };
+        } else {
+          // Handle unsuccessful response
+          return { success: false, message: response.message };
+        }
+      } catch (error) {
+        console.error('Error changing password:', error);
+        throw new Error('An error occurred while changing the password.');
+      }
+    },
     
     initializeStore({ commit }) {
       const token = localStorage.getItem('access_token');

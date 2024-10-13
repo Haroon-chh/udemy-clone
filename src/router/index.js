@@ -8,6 +8,7 @@ import CartView from '@/views/CartView.vue';
 import TeachUdemyView from '../views/TeachUdemyView.vue';
 import CourseDetailsView from '../views/CourseDetailsView.vue'; // Import new component
 import EditProfile from '../views/EditProfile.vue';
+import ChangePassword from '@/components/Profile/ChangePassword.vue';
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
@@ -58,6 +59,12 @@ const routes = [
     name: 'edit-profile',
     component: EditProfile,
     meta: { title: 'Edit Profile' },
+  },
+  {
+    path: '/change-password',
+    name: 'change-password',
+    component: ChangePassword,
+    meta: { title: 'Change Password' },
   },
   {
     path: '/course/:slug',
