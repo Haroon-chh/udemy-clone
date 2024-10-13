@@ -34,7 +34,7 @@
 
     <!-- Courses Display -->
     <div v-if="courses && courses.length > 0" class="courses d-flex flex-wrap justify-content-center">
-      <div v-for="course in courses" :key="course.id" class="course-card">
+      <div v-for="course in courses" :key="course.id" class="course-card" @click="$router.push({ name: 'CourseDetails', params: { slug: course.slug } })">
         <img :src="course.thumbnail_url" alt="Course thumbnail" class="course-thumbnail" />
         <div class="course-details">
           <h4>{{ course.title }}</h4>
@@ -52,11 +52,13 @@
 
 <script>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import ApiServices from '@/services/ApiServices';
 
 export default {
   name: 'CategoriesComponent',
   setup() {
+    const router = useRouter();
     const categories = ref([]);
     const courseCategories = ref([]);
     const courses = ref([]);
@@ -68,7 +70,6 @@ export default {
         const response = await ApiServices.GetRequest('/categories');
         categories.value = response?.data || [];
 
-        // Automatically select and load the first category if categories are present
         if (categories.value.length > 0) {
           fetchCourseCategories(categories.value[0].id);
         }
@@ -83,16 +84,15 @@ export default {
         const response = await ApiServices.GetRequest(`/categories/${categoryId}/course-categories`);
         courseCategories.value = response?.data || [];
 
-        // Automatically select and load courses for the first course category if present
         if (courseCategories.value.length > 0) {
           fetchCourses(courseCategories.value[0].id);
         } else {
-          courses.value = []; // Reset courses if no course categories are available
+          courses.value = [];
         }
       } catch (error) {
         console.error('Error fetching course categories:', error);
-        courseCategories.value = []; // Reset course categories on error
-        courses.value = []; // Reset courses on error
+        courseCategories.value = [];
+        courses.value = [];
       }
     };
 
@@ -103,8 +103,12 @@ export default {
         courses.value = response?.data || [];
       } catch (error) {
         console.error('Error fetching courses:', error);
-        courses.value = []; // Reset courses on error
+        courses.value = [];
       }
+    };
+
+    const goToCourseDetails = (slug) => {
+      router.push({ name: 'CourseDetails', params: { slug } });
     };
 
     onMounted(() => {
@@ -119,10 +123,12 @@ export default {
       selectedCourseCategoryId,
       fetchCourseCategories,
       fetchCourses,
+      goToCourseDetails,
     };
   },
 };
 </script>
+
 
 <style scoped>
 .container {
