@@ -43,5 +43,10 @@
   p {
     margin-bottom: 20px; /* Space between paragraph and button */
   }
+  @media (max-width: 768px) {
+  button{
+    width: 200px;
+  }
+  }
   </style>
   
