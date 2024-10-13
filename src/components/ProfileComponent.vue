@@ -74,19 +74,29 @@ export default {
         const response = await store.dispatch('logoutUser');
         console.log('Logout response:', response);
 
-        // Show success message and popup
-        successMessage.value = 'Logout successful! Redirecting to login...';
-        showSuccessPopup.value = true;
+        if (response.success) {
+          // Show success message and popup
+          successMessage.value = response.message || 'Logout successful! Redirecting to login...';
+          showSuccessPopup.value = true;
 
-        setTimeout(() => {
-          showSuccessPopup.value = false;
-          router.push('/dashboard');
-        }, 2000);
+          setTimeout(() => {
+            showSuccessPopup.value = false;
+            router.push('/login'); // Redirect to login page after logout
+          }, 2000);
+        } else {
+          // Handle unsuccessful logout
+          errorMessage.value = response.message || 'Logout failed. Please try again.';
+          showErrorPopup.value = true;
+
+          setTimeout(() => {
+            showErrorPopup.value = false;
+          }, 5000);
+        }
       } catch (error) {
         console.error('Error during logout:', error);
 
         // Show error message and popup
-        errorMessage.value = error.message || 'Logout failed. Please try again.';
+        errorMessage.value = error.message || 'An error occurred. Please try again.';
         showErrorPopup.value = true;
 
         setTimeout(() => {
@@ -94,6 +104,7 @@ export default {
         }, 5000);
       }
     };
+
 
     onMounted(() => fetchProfileIfLoggedIn());
 

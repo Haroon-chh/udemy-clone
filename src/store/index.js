@@ -112,23 +112,28 @@ export default createStore({
       try {
         const response = await AuthApiServices.PostRequest('/logout');
         console.log('Logout API response:', response);
-
+    
         if (response && response.message === 'Successfully logged out') {
           localStorage.removeItem('access_token');
           localStorage.removeItem('authUser');
           localStorage.removeItem('logged_user');
-
+    
           commit('clearUser');
           commit('setLoggedIn', false);
-          return { message: 'Logout successful' };
+    
+          return { success: true, message: 'logout success' };
         } else {
-          return { message: response.message || 'Logout failed' };
+          return { success: false, message: response.message || 'Unexpected response format' };
         }
       } catch (error) {
         console.error('Error logging out:', error);
-        return { message: 'An error occurred while logging out' };
+    
+        const errorMessage =
+          error.response?.data?.message || 'An error occurred while logging out.';
+        return { success: false, message: errorMessage };
       }
     },
+    
     initializeStore({ commit }) {
       const token = localStorage.getItem('access_token');
       const authUser = localStorage.getItem('authUser');
