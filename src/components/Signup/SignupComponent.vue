@@ -1,7 +1,6 @@
 <template>
   <div class="container-fluid d-flex align-items-center justify-content-center bg-white my-4">
     <div class="row w-75 shadow-lg">
-      
       <!-- Left Side - Picture -->
       <div class="col-md-7 p-0 bg-white">
         <img :src="require('@/assets/signup-pic.png')" alt="Signup Image" class="img-fluid w-100 h-100" />
@@ -62,12 +61,14 @@
 <script setup>
 import { ref, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
-import SuccessPopup from '../SuccessPopup.vue'; // Adjust path as necessary
-import ErrorPopup from '../ErrorPopup.vue'; // Adjust path as necessary
+import { useStore } from 'vuex'; // Import useStore
+import SuccessPopup from '../SuccessPopup.vue'; // Adjust the path as necessary
+import ErrorPopup from '../ErrorPopup.vue'; // Adjust the path as necessary
 
 const SuccessPopupComponent = defineComponent(SuccessPopup);
 const ErrorPopupComponent = defineComponent(ErrorPopup);
+const router = useRouter();
+const store = useStore(); // Create store instance
 
 const fullName = ref('');
 const email = ref('');
@@ -79,9 +80,6 @@ const showSuccess = ref(false);
 const showError = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
-const router = useRouter();
-
-const baseURL = 'http://192.168.15.96:8000/api';
 
 function validateEmail(email) {
   const re = /\S+@\S+\.\S+/;
@@ -103,43 +101,51 @@ async function submitForm() {
   }
 
   if (!acceptedTerms.value) {
-    alert('You must accept the terms to continue');
+    errorMessage.value = 'You must accept the terms to continue';
+    showError.value = true;
     return;
   }
 
-  try {
-    const response = await axios.post(`${baseURL}/register`, {
-      name: fullName.value,
-      email: email.value,
-      password: password.value,
-      password_confirmation: password.value // Same password for confirmation
-    });
+  // Create a FormData object to hold the form data
+  const formData = new FormData();
+  formData.append('name', fullName.value);
+  formData.append('email', email.value);
+  formData.append('password', password.value);
+  formData.append('password_confirmation', password.value); // Same password for confirmation
 
-    if (response.status === 200) {
+  try {
+    const response = await store.dispatch('registerUser', formData);
+
+    // Log the full response for debugging
+    console.log('Registration response:', response);
+
+    // Check for success response
+    if (response.success) {
       // Set success message and show the popup
-      successMessage.value = 'Registration successful! Redirecting to login...';
+      successMessage.value = response.message; // Use the success message from the response
       showSuccess.value = true;
 
       // Hide success popup after 2 seconds and redirect to login page
       setTimeout(() => {
         showSuccess.value = false;
         router.push('/login');
-      }, 2000);
+      }, 2000); // 2000 milliseconds = 2 seconds
     } else {
       throw new Error('Unexpected response');
     }
   } catch (error) {
-    // Show error message popup
-    errorMessage.value = error.response?.data?.error || 'An error occurred. Please try again later.';
+    // Handle error response
+    errorMessage.value = error.message || 'An error occurred. Please try again later.';
     showError.value = true;
 
     // Hide error popup after 5 seconds
     setTimeout(() => {
-      showError.value = false;
-    }, 5000);
+      showError.value = false; // Hide error popup
+    }, 5000); // 5000 milliseconds = 5 seconds
   }
 }
 </script>
+
 
 <style scoped>
 .signup-btn {
@@ -179,6 +185,7 @@ async function submitForm() {
   font-size: smaller;
 }
 
+
 .inputs {
   position: relative;
   border: 1px solid black;
@@ -216,6 +223,21 @@ input {
 input:focus {
   border: none;
   box-shadow: none;
+}
+/* Custom checkbox style */
+.form-check-input{
+  height: 20px;
+  width: 20px;
+  border-color: #000000;
+}
+.form-check-input:checked {
+  background-color: black;
+  border-color: black;
+}
+
+
+.form-check-input {
+  accent-color: black; /* Modern browsers support this property for changing checkbox color */
 }
 
 /* Mobile Responsiveness */

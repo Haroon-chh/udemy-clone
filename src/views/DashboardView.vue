@@ -3,6 +3,7 @@
   <div class="dashboard-view">
     <!-- Public components available to all users -->
     <CarouselComponent v-if="!isAdmin" />
+    <CategoriesComponent v-if="!isAdmin"  />     <!-- My Component new -->
     <LearningGoals v-if="!isAdmin" />
     <Testimonial v-if="!isAdmin" />
     <CardsRow v-if="!isAdmin" />
@@ -10,9 +11,12 @@
     <TrendingNow v-if="!isAdmin" />
     <FullStory v-if="!isAdmin" />
     <News v-if="!isAdmin" />
+    <TrustedCompanies v-if="!isAdmin" />
 
     <!-- Admin-specific components -->
-    <TrustedCompanies v-if="isAdmin" />
+    <QuillEditor v-if="isAdmin"/>
+    <!-- <QuillPlayground v-if="isAdmin"/> -->
+    
 
    
   </div>
@@ -32,9 +36,11 @@ import CarouselComponent from '../components/dashboard/CarouselComponent.vue';
 import TrustedCompanies from '../components/dashboard/TrustedCompany.vue';
 import News from '../components/dashboard/NewsComponent.vue';
 import TrendingNow from '../components/dashboard/TrendingNow.vue';
+import QuillEditor from '../components/dashboard/Admin/QuillEditor.vue';
+// import QuillPlayground from '../components/dashboard/Admin/QuillPlayground.vue';
+import CategoriesComponent from '../components/dashboard/CategoriesComponent.vue';
 
 // Admin-specific components
-
 
 // Get the store and determine if the user is an admin
 const store = useStore();
