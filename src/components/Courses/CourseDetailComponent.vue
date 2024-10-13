@@ -68,7 +68,7 @@ export default {
   background: linear-gradient(135deg, #f3f4f6, #e0e7ff);
   min-height: 100vh;
 }
-
+h
 .course-card {
   display: flex;
   background: #ffffff;
