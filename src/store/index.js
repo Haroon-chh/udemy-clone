@@ -21,17 +21,21 @@ export default createStore({
   },
   getters: {
     getUser: (state) => state.user,
-    getUserRole: (state) => (state.user ? state.user.role : null),
-    getUserPermissions: (state) => (state.user ? state.user.permissions : []),
+    getUserRole: (state) => (state.user ? state.user.role : null), // Get user role
+    getUserPermissions: (state) => (state.user ? state.user.permissions : []), // Get user permissions
     getLoggedUser: (state) => state.loggedUser,
     isLoggedIn: (state) => state.loggedIn, // Use Vuex state for loggedIn status
-    logoutMessage: (state) => state.logoutMessage, 
+    logoutMessage: (state) => state.logoutMessage,
     getDropdownState: (state) => (dropdown) => state.isOpen[dropdown], // Navbar related getter
     getLanguageModalState: (state) => state.isLanguageModalOpen,
   },
   mutations: {
     setUser(state, userData) {
-      state.user = userData;
+      state.user = {
+        role: userData.role, // Store the role
+        permissions: userData.permissions, // Store the permissions
+        // You can store other user-related data if needed
+      };
     },
     setLoggedUser(state, loggedUserData) {
       state.loggedUser = loggedUserData;
@@ -61,46 +65,56 @@ export default createStore({
   },
   actions: {
     loginUser({ commit }, userData) {
-      // Store user data and token in Vuex, and localStorage only for persistence
-      commit('setUser', userData.data);
+      // Store user data and token in Vuex, and localStorage for persistence
+      commit('setUser', userData.data); // Store the role and permissions
       commit('setLoggedIn', true);
 
       localStorage.setItem('authUser', JSON.stringify(userData.data));
       localStorage.setItem('access_token', userData.data.access_token);
-      
-      // Create and store the logged user information
+
+      // Create and store the logged user information, including role and permissions
       const loggedUserData = {
         id: userData.data.id, // Ensure 'id' exists in userData
-        name: userData.data.name, // Ensure 'name' exists in userData
-        email: userData.data.email // Ensure 'email' exists in userData
+        role: userData.data.role, // Store the role
+        permissions: userData.data.permissions, // Store the permissions
+        name: userData.data.name, // Store the user's name if needed
+        email: userData.data.email, // Store the email if needed
       };
+
       localStorage.setItem('logged_user', JSON.stringify(loggedUserData));
       commit('setLoggedUser', loggedUserData);
     },
     async logoutUser({ commit }) {
+      console.log('Starting logout process...'); // Log the start of the process
       try {
-        const response = await AuthApiServices.PostRequest('/logout'); // Replace with the actual logout endpoint
+          const response = await AuthApiServices.PostRequest('/logout'); // Call the logout endpoint
+          console.log('Logout API response:', response); // Log the response
   
-        if (response && response.status === 200) {
-          // Clear local storage and state
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('authUser');
-          localStorage.removeItem('logged_user');
+          if (response && response.message === 'Successfully logged out') {
+              console.log('Logout successful, clearing local storage');
+              localStorage.removeItem('access_token');
+              localStorage.removeItem('authUser');
+              localStorage.removeItem('logged_user');
+              
+              console.log('Local storage after clearing:', {
+                  access_token: localStorage.getItem('access_token'),
+                  authUser: localStorage.getItem('authUser'),
+                  logged_user: localStorage.getItem('logged_user'),
+              });
   
-          commit('clearUser');
-          commit('setLoggedIn', false);
-          return { message: 'Logout successful' };
-          // Ensure to return an object with a message
-        } else {
-          // If the API response is not as expected, return an error message
-          return { message: response.message || 'Logout failed' };
-        }
+              commit('clearUser');
+              commit('setLoggedIn', false);
+              return { message: 'Logout successful' };
+          } else {
+              return { message: response.message || 'Logout failed' };
+          }
       } catch (error) {
-        // Handle API call errors and return a fallback message
-        console.error('Error logging out:', error);
-        return { message: 'An error occurred while logging out' }; // Ensure an object with a message is returned
+          console.error('Error logging out:', error);
+          return { message: 'An error occurred while logging out' };
       }
-    },
+  }
+  
+  ,
     initializeStore({ commit }) {
       const token = localStorage.getItem('access_token');
       const authUser = localStorage.getItem('authUser');
