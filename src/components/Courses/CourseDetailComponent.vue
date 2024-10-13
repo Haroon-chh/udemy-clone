@@ -65,10 +65,10 @@ export default {
   justify-content: center;
   align-items: flex-start;
   padding: 2rem;
-  background: linear-gradient(135deg, #f3f4f6, #e0e7ff);
+  background: linear-gradient(140deg, #ffffff, #ffffff);
   min-height: 100vh;
 }
-h
+
 .course-card {
   display: flex;
   background: #ffffff;

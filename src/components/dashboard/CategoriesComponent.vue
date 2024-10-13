@@ -134,7 +134,7 @@ export default {
 h2{
   font-family: 'Suisse Works', serif;
   font-weight: bold;
-  font-size: 52px;
+  font-size: 50px;
 }
 .container {
   max-width: 1200px;
