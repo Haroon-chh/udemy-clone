@@ -185,6 +185,7 @@ async function submitForm() {
   font-size: smaller;
 }
 
+
 .inputs {
   position: relative;
   border: 1px solid black;
@@ -222,6 +223,21 @@ input {
 input:focus {
   border: none;
   box-shadow: none;
+}
+/* Custom checkbox style */
+.form-check-input{
+  height: 20px;
+  width: 20px;
+  border-color: #000000;
+}
+.form-check-input:checked {
+  background-color: black;
+  border-color: black;
+}
+
+
+.form-check-input {
+  accent-color: black; /* Modern browsers support this property for changing checkbox color */
 }
 
 /* Mobile Responsiveness */
