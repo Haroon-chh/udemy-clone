@@ -3,7 +3,7 @@
     <!-- Heading and Paragraph -->
     <div class="text-center mb-4">
       <h2>Explore Our Categories</h2>
-      <p>Browse through a variety of categories to find the courses that suit you best.</p>
+      <p class="text-center">Browse through a variety of categories to find the courses that suit you best.</p>
     </div>
 
     <!-- Main Categories Navigation -->
@@ -131,6 +131,11 @@ export default {
 
 
 <style scoped>
+h2{
+  font-family: 'Suisse Works', serif;
+  font-weight: bold;
+  font-size: 52px;
+}
 .container {
   max-width: 1200px;
   margin: 0 auto;
