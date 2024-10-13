@@ -23,8 +23,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import SuccessPopup from '../components/SuccessPopup.vue';
-import ErrorPopup from '../components/ErrorPopup.vue';
+import SuccessPopup from '../SuccessPopup.vue';
+import ErrorPopup from '../ErrorPopup.vue';
 
 export default {
   name: 'ProfileComponent',

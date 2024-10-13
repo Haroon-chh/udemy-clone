@@ -196,7 +196,7 @@
   
 <script>
 import { mapActions, mapGetters } from 'vuex';
-import ProfileComponent from '../components/ProfileComponent.vue';
+import ProfileComponent from './Profile/ProfileComponent.vue';
 
 export default {
   name: 'NavbarComponent',
