@@ -5,8 +5,7 @@ export default createStore({
   state: {
     user: null,
     loggedUser: null,
-    loggedIn: false, // Initialize loggedIn as false by default
-    // Navbar related states
+    loggedIn: false,
     isOpen: {
       categoriesDropdown: false,
       developmentDropdown: false,
@@ -17,24 +16,23 @@ export default createStore({
       cartDropdown: false,
     },
     isLanguageModalOpen: false,
-    logoutMessage: '', // State to hold logout response message
+    logoutMessage: '',
   },
   getters: {
     getUser: (state) => state.user,
-    getUserRole: (state) => (state.user ? state.user.role : null), // Get user role
-    getUserPermissions: (state) => (state.user ? state.user.permissions : []), // Get user permissions
+    getUserRole: (state) => (state.user ? state.user.role : null),
+    getUserPermissions: (state) => (state.user ? state.user.permissions : []),
     getLoggedUser: (state) => state.loggedUser,
-    isLoggedIn: (state) => state.loggedIn, // Use Vuex state for loggedIn status
+    isLoggedIn: (state) => state.loggedIn,
     logoutMessage: (state) => state.logoutMessage,
-    getDropdownState: (state) => (dropdown) => state.isOpen[dropdown], // Navbar related getter
+    getDropdownState: (state) => (dropdown) => state.isOpen[dropdown],
     getLanguageModalState: (state) => state.isLanguageModalOpen,
   },
   mutations: {
     setUser(state, userData) {
       state.user = {
-        role: userData.role, // Store the role
-        permissions: userData.permissions, // Store the permissions
-        // You can store other user-related data if needed
+        role: userData.role,
+        permissions: userData.permissions,
       };
     },
     setLoggedUser(state, loggedUserData) {
@@ -51,10 +49,10 @@ export default createStore({
       state.logoutMessage = message;
     },
     openDropdown(state, dropdown) {
-      state.isOpen[dropdown] = true; // Open specified dropdown
+      state.isOpen[dropdown] = true;
     },
     closeDropdown(state, dropdown) {
-      state.isOpen[dropdown] = false; // Close specified dropdown
+      state.isOpen[dropdown] = false;
     },
     openLanguageModal(state) {
       state.isLanguageModalOpen = true;
@@ -64,57 +62,59 @@ export default createStore({
     },
   },
   actions: {
-    loginUser({ commit }, userData) {
-      // Store user data and token in Vuex, and localStorage for persistence
-      commit('setUser', userData.data); // Store the role and permissions
-      commit('setLoggedIn', true);
+    async loginUser({ commit }, credentials) {
+      try {
+        const response = await AuthApiServices.PostRequest('/login', credentials);
+        console.log('Login API response:', response);
 
-      localStorage.setItem('authUser', JSON.stringify(userData.data));
-      localStorage.setItem('access_token', userData.data.access_token);
+        if (response && response.message === 'OK' && response.data) {
+          commit('setUser', response.data);
+          commit('setLoggedIn', true);
 
-      // Create and store the logged user information, including role and permissions
-      const loggedUserData = {
-        id: userData.data.id, // Ensure 'id' exists in userData
-        role: userData.data.role, // Store the role
-        permissions: userData.data.permissions, // Store the permissions
-        name: userData.data.name, // Store the user's name if needed
-        email: userData.data.email, // Store the email if needed
-      };
+          const loggedUserData = {
+            id: response.data.id,
+            role: response.data.role,
+            permissions: response.data.permissions,
+            name: response.data.name,
+            email: response.data.email,
+          };
 
-      localStorage.setItem('logged_user', JSON.stringify(loggedUserData));
-      commit('setLoggedUser', loggedUserData);
+          localStorage.setItem('authUser', JSON.stringify(response.data));
+          localStorage.setItem('access_token', response.data.access_token);
+          localStorage.setItem('logged_user', JSON.stringify(loggedUserData));
+          commit('setLoggedUser', loggedUserData);
+
+          return { success: true, message: 'Login successful!' };
+        } else {
+          return { success: false, message: 'Unexpected response format' };
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+        throw error;
+      }
     },
     async logoutUser({ commit }) {
-      console.log('Starting logout process...'); // Log the start of the process
+      console.log('Starting logout process...');
       try {
-          const response = await AuthApiServices.PostRequest('/logout'); // Call the logout endpoint
-          console.log('Logout API response:', response); // Log the response
-  
-          if (response && response.message === 'Successfully logged out') {
-              console.log('Logout successful, clearing local storage');
-              localStorage.removeItem('access_token');
-              localStorage.removeItem('authUser');
-              localStorage.removeItem('logged_user');
-              
-              console.log('Local storage after clearing:', {
-                  access_token: localStorage.getItem('access_token'),
-                  authUser: localStorage.getItem('authUser'),
-                  logged_user: localStorage.getItem('logged_user'),
-              });
-  
-              commit('clearUser');
-              commit('setLoggedIn', false);
-              return { message: 'Logout successful' };
-          } else {
-              return { message: response.message || 'Logout failed' };
-          }
+        const response = await AuthApiServices.PostRequest('/logout');
+        console.log('Logout API response:', response);
+
+        if (response && response.message === 'Successfully logged out') {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('authUser');
+          localStorage.removeItem('logged_user');
+
+          commit('clearUser');
+          commit('setLoggedIn', false);
+          return { message: 'Logout successful' };
+        } else {
+          return { message: response.message || 'Logout failed' };
+        }
       } catch (error) {
-          console.error('Error logging out:', error);
-          return { message: 'An error occurred while logging out' };
+        console.error('Error logging out:', error);
+        return { message: 'An error occurred while logging out' };
       }
-  }
-  
-  ,
+    },
     initializeStore({ commit }) {
       const token = localStorage.getItem('access_token');
       const authUser = localStorage.getItem('authUser');
@@ -138,8 +138,6 @@ export default createStore({
         console.error('Error fetching user profile:', error);
       }
     },
-
-    // Navbar related actions
     openDropdown({ commit }, dropdown) {
       commit('openDropdown', dropdown);
     },

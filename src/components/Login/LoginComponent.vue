@@ -67,8 +67,7 @@
 <script setup>
 import { ref, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex'; 
-import ApiServices from '@/services/ApiServices'; // Adjust the path as necessary
+import { useStore } from 'vuex';
 import SuccessPopup from '../SuccessPopup.vue'; // Adjust the path as necessary
 import ErrorPopup from '../ErrorPopup.vue'; // Adjust the path as necessary
 
@@ -80,7 +79,7 @@ const password = ref('');
 const emailError = ref('');
 const passwordError = ref('');
 const router = useRouter();
-const store = useStore(); 
+const store = useStore();
 
 const showSuccess = ref(false);
 const showError = ref(false);
@@ -92,7 +91,7 @@ const validateEmail = (email) => {
   return re.test(email);
 };
 
-const submitForm = async () => { 
+const submitForm = async () => {
   emailError.value = '';
   passwordError.value = '';
 
@@ -107,53 +106,41 @@ const submitForm = async () => {
   }
 
   try {
-    const response = await ApiServices.PostRequest('/login', {
+    const response = await store.dispatch('loginUser', {
       email: email.value,
-      password: password.value
+      password: password.value,
     });
 
-    // Log the full response for debugging
     console.log('Login response:', response);
 
-    if (response && response.message === "OK" && response.data) {
-      // Dispatch the entire userData instead of individual properties
-      await store.dispatch('loginUser', response); // Pass the whole response object
+    if (response.success) {
+      successMessage.value = response.message;
+      showSuccess.value = true;
 
-      // Show success message
-      successMessage.value = 'Login successful! Redirecting...'; // Set a custom success message
-      showSuccess.value = true; // Show success popup
-
-      // Set a timeout to hide the success popup after 2 seconds
       setTimeout(() => {
         showSuccess.value = false;
         router.push('/dashboard');
-        // Hide success popup
-      }, 2000); // 2000 milliseconds = 2 seconds
+      }, 2000);
     } else {
-      throw new Error('Unexpected response format');
+      throw new Error(response.message || 'Unexpected response format');
     }
   } catch (error) {
     console.error('Error during login:', error);
-    if (error.response && error.response.status === 401) {
-      errorMessage.value = error.response.data.errors?.credentials[0] || 'Invalid credentials';
-    } else {
-      errorMessage.value = 'An error occurred. Please try again later.';
-    }
-    showError.value = true; // Show error popup
+    errorMessage.value =
+      error.response?.data.errors?.credentials[0] || 'An error occurred. Please try again later.';
+    showError.value = true;
 
-    // Set a timeout to hide the error popup after 5 seconds
     setTimeout(() => {
-      showError.value = false; // Hide error popup
-    }, 5000); // 5000 milliseconds = 5 seconds
+      showError.value = false;
+    }, 5000);
   }
 };
 
-
 function socialLogin(provider) {
   alert(`Log in with ${provider} clicked`);
-  // Logic for social login can be implemented here
 }
 </script>
+
 
 <style scoped>
 .login-btn {
