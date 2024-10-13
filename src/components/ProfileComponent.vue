@@ -6,7 +6,7 @@
     <div v-if="isDropdownOpen" class="profile-dropdown">
       <h6 class="profile-name text-center">{{ userName }}</h6>
       <hr />
-      <router-link to="/profile" class="dropdown-link">Edit Profile</router-link>
+      <router-link to="/edit-profile" class="dropdown-link">Edit Profile</router-link>
       <router-link to="/subscriptions" class="dropdown-link">Subscriptions</router-link>
       <router-link to="/settings" class="dropdown-link">Settings</router-link>
       <hr />

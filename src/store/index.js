@@ -157,6 +157,7 @@ export default createStore({
         console.error('Error fetching user profile:', error);
       }
     },
+    
     openDropdown({ commit }, dropdown) {
       commit('openDropdown', dropdown);
     },
