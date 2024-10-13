@@ -1,29 +1,120 @@
 <template>
-  <div class="course-details-container">
-    <div class="course-card">
-      <div class="image-container">
-        <img class="course-thumbnail" :src="course.thumbnail_url" alt="Course Thumbnail" />
-      </div>
-      <div class="content">
-        <h1 class="course-title">{{ course.title }}</h1>
-        <p class="course-description">{{ course.description }}</p>
-        <ul class="course-features">
-          <li v-for="(item, index) in course.short_description" :key="index">
-            <i class="feature-icon"></i> {{ item }}
-          </li>
-        </ul>
-        <div class="course-pricing">
-          <p class="price">
-            <span class="original-price">${{ course.price }}</span>
-            <span class="discounted-price">${{ course.discounted_price }}</span>
-          </p>
-          <p class="duration">
-            <i class="fas fa-clock duration-icon"></i> {{ course.duration }} hours
-          </p>
+  <div>
+    <div class="course-details-container">
+      <div class="course-card">
+        <div class="image-container">
+          <img
+            class="course-thumbnail"
+            :src="course.thumbnail_url"
+            alt="Course Thumbnail"
+          />
         </div>
-        <button class="enroll-button">Enroll Now</button>
+        <div class="content">
+          <h1 class="course-title">{{ course.title }}</h1>
+          <p class="course-description">{{ course.description }}</p>
+          <ul class="course-features">
+            <li v-for="(item, index) in course.short_description" :key="index">
+              <i class="feature-icon"></i> {{ item }}
+            </li>
+          </ul>
+          <div class="course-pricing">
+            <p class="price">
+              <span class="original-price">${{ course.price }}</span>
+              <span class="discounted-price">${{ course.discounted_price }}</span>
+            </p>
+            <p class="duration">
+              <i class="fas fa-clock duration-icon"></i> {{ course.duration }} hours
+            </p>
+          </div>
+          <button class="enroll-button">Enroll Now</button>
+        </div>
       </div>
     </div>
+
+    <div class="learning-points">
+      <h2 class="learning-points-title">What you'll learn</h2>
+      <div class="learning-points-content">
+        <div class="learning-points-column">
+          <ul class="list-unstyled">
+            <li class="mb-3">
+              <i class="bi bi-check2"></i>
+              Build 16 web development projects for your portfolio, ready to apply for junior developer jobs.
+            </li>
+            <li class="mb-3">
+              <i class="bi bi-check2"></i>
+              After the course, you will be able to build ANY website you want.
+            </li>
+            <li class="mb-3">
+              <i class="bi bi-check2"></i>
+              Work as a freelance web developer.
+            </li>
+            <li class="mb-3">
+              <i class="bi bi-check2"></i>
+              Master backend development with Node.
+            </li>
+          </ul>
+        </div>
+        <div class="learning-points-column">
+          <ul class="list-unstyled">
+            <li class="mb-3">
+              <i class="bi bi-check2"></i>
+              Learn the latest technologies, including Javascript, React, Node, and even Web3 development.
+            </li>
+            <li class="mb-3">
+              <i class="bi bi-check2"></i>
+              Build fully-fledged websites and web apps for your startup or business.
+            </li>
+            <li class="mb-3">
+              <i class="bi bi-check2"></i>
+              Master frontend development with React.
+            </li>
+            <li class="mb-3">
+              <i class="bi bi-check2"></i>
+              Learn professional developer best practices.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- End Learning Points Section -->
+      <div class="container py-5">
+    <div class="row text-center">
+      <div class="col-12">
+        <h2 class="learning-points-title" >This course includes:</h2>
+      </div>
+      <div class="col-lg-4 col-md-6 my-3" v-for="(item, index) in courseDetails" :key="index">
+        <div class="d-flex align-items-center justify-content-center">
+          <i :class="item.icon"></i>
+          <div class="ps-3">
+            <p>{{ item.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+   <div class="container py-5">
+    <!-- Requirements Section -->
+    <div class="requirements-section my-5">
+      <h2 class="learning-points-title" >Requirements</h2>
+      <ul class="requirements-list text-center">
+        <li>No programming experience needed - I'll teach you everything you need to know</li>
+        <li>A computer with access to the internet</li>
+        <li>No paid software required</li>
+        <li>I'll walk you through, step-by-step how to get all the software installed and set up</li>
+      </ul>
+    </div>
+
+    <!-- Description Section -->
+    <div class="description-section my-5">
+      <h2 class="learning-points-title" >Description</h2>
+      <p class="text-center">
+        Welcome to the Complete Web Development Bootcamp, <strong>the only course you need</strong> 
+        to learn to code and become a full-stack web developer. 
+        With 150,000+ ratings and a 4.8 average, my Web Development course is 
+        one of the <strong>HIGHEST RATED</strong> courses in the history of Udemy!
+      </p>
+    </div>
+  </div>
   </div>
 </template>
 
@@ -36,6 +127,7 @@ export default {
   name: 'CourseDetailsComponent',
   setup() {
     const course = ref({});
+    const courseDetails = ref([]);
     const route = useRoute();
 
     const fetchCourseDetails = async () => {
@@ -43,6 +135,16 @@ export default {
         const slug = route.params.slug;
         const response = await ApiServices.GetRequest(`/courses/${slug}`);
         course.value = response.data || {};
+
+        // Assuming the API provides these details in the response
+        courseDetails.value = [
+          { icon: 'bi bi-play-circle', description: `${course.value.videoHours || 0} hours on-demand video` },
+          { icon: 'bi bi-code-slash', description: `${course.value.codingExercises || 0} coding exercises` },
+          { icon: 'bi bi-file-earmark-text', description: `${course.value.articles || 0} articles` },
+          { icon: 'bi bi-cloud-arrow-down', description: `${course.value.downloadableResources || 0} downloadable resources` },
+          { icon: 'bi bi-phone', description: `Access on mobile and TV` },
+          { icon: 'bi bi-trophy', description: `Certificate of completion` },
+        ];
       } catch (error) {
         console.error('Error fetching course details:', error);
       }
@@ -54,6 +156,7 @@ export default {
 
     return {
       course,
+      courseDetails,
     };
   },
 };
@@ -64,9 +167,9 @@ export default {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 2rem;
-  background: linear-gradient(140deg, #ffffff, #ffffff);
+  padding: 1rem;
   min-height: 100vh;
+
 }
 
 .course-card {
@@ -105,7 +208,7 @@ export default {
 }
 
 .course-title {
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #1e3a8a;
   margin-bottom: 1rem;
@@ -189,5 +292,87 @@ export default {
 
 .enroll-button:hover {
   background: linear-gradient(135deg, #1e40af, #2563eb);
+}
+
+/* Learning Points Section */
+.learning-points {
+  padding: 2rem;
+  border-radius: 15px;
+  margin-top: 2rem;
+}
+
+.learning-points-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #1e3a8a;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.learning-points-content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.learning-points-column {
+  width: 48%;
+}
+
+.learning-points-column ul {
+  padding: 0;
+}
+
+.bi {
+  color: green;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .course-card {
+    flex-direction: column;
+  }
+
+  .learning-points-content {
+    flex-direction: column;
+  }
+
+  .learning-points-column {
+    width: 100%;
+  }
+}
+i {
+  font-size: 2rem;
+}
+
+p {
+  margin-bottom: 0;
+  font-size: 1.2rem;
+}
+.requirements-section h2 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.requirements-list {
+  list-style-type: none;
+  padding-left: 20px;
+  font-size: 1.1rem;
+}
+
+.requirements-list li {
+  margin-bottom: 10px;
+}
+
+/* Style for Description Section */
+.description-section h2 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.description-section p {
+  font-size: 1.2rem;
+  line-height: 1.6;
 }
 </style>
