@@ -6,69 +6,80 @@ import LoginView from '@/views/LoginView.vue';
 import ContactUsView from '@/views/ContactUsView.vue';
 import CartView from '@/views/CartView.vue';
 import TeachUdemyView from '../views/TeachUdemyView.vue';
+import CourseDetailsView from '../views/CourseDetailsView.vue'; // Import new component
+import EditProfile from '../views/EditProfile.vue';
+import ChangePassword from '@/components/Profile/ChangePassword.vue';
 
 const routes = [
-  {
-    path: '/',
-    redirect: '/dashboard',
-    
-  },
+  { path: '/', redirect: '/dashboard' },
   {
     path: '/dashboard',
     name: 'dashboard',
     component: DashboardView,
-    meta: { title: 'Dashboard'},
-
+    meta: { title: 'Dashboard' },
   },
   {
     path: '/signup',
     name: 'signup',
     component: SignupView,
-    meta: { title: 'SignUp'},
-
+    meta: { title: 'SignUp' },
   },
   {
     path: '/about',
     name: 'about',
     component: AboutUsView,
-    meta: { title: 'About Us'},
-
+    meta: { title: 'About Us' },
   },
   {
     path: '/login',
     name: 'login',
-    component: LoginView, // Add the Login route
-    meta: { title: 'Login'},
-
+    component: LoginView,
+    meta: { title: 'Login' },
   },
   {
     path: '/ContactUs',
     name: 'ContactUs',
-    component: ContactUsView, // Add the Login route
-    meta: { title: 'ContactUs'},
-
+    component: ContactUsView,
+    meta: { title: 'Contact Us' },
   },
   {
     path: '/cart',
     name: 'cart',
-    component: CartView, // Add the Cart route
-    meta: { title: 'Cart'},
-
+    component: CartView,
+    meta: { title: 'Cart' },
   },
   {
     path: '/teaching',
     name: 'teaching',
-    component: TeachUdemyView, // Add the Cart route
-    meta: { title: 'Teach with us'},
-
+    component: TeachUdemyView,
+    meta: { title: 'Teach with us' },
   },
-
+  {
+    path: '/edit-profile',
+    name: 'edit-profile',
+    component: EditProfile,
+    meta: { title: 'Edit Profile' },
+  },
+  {
+    path: '/change-password',
+    name: 'change-password',
+    component: ChangePassword,
+    meta: { title: 'Change Password' },
+  },
+  {
+    path: '/course/:slug',
+    name: 'CourseDetails',  // Match exactly with what you're using in $router.push
+    component: CourseDetailsView,
+    meta: { title: 'Course Details' },
+  }
+  ,
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title || 'Udemy Clone';
   next();

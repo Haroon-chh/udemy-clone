@@ -134,28 +134,26 @@
             <a class="nav-link" href="#">
               <span class="material-icons">shopping_cart</span>
             </a>
-            <ul class="dropdown-menu mt-3 px-4 py-2 wide-dropdown" :class="{ show: isOpen.cartDropdown }">
+            <ul class="dropdown-menu mt-3 px-4 py-2" :class="{ show: isOpen.cartDropdown }">
               <p>Your cart is empty</p>
               <p class=""><a class="text-decoration-none" style="font-size:small; color: purple;" href="#">Keep Shopping</a></p>
             </ul>
           </li>
 
-           <!-- Check for authUser in localStorage -->
-           <li v-if="authUser" class="nav-item ms-3">
+                <!-- Check for logged in state from Vuex -->
+          <li v-if="isLoggedIn" class="nav-item ms-4">
             <ProfileComponent />
           </li>
-          <li v-else class="nav-item ms-3">
+          <li v-if="!isLoggedIn" class="nav-item ms-3">
             <router-link to="/login" class="btn btn-outline-secondary rounded-0 fw-semibold">
               Login
             </router-link>
           </li>
-
-          <li v-if="!authUser" class="nav-item ms-3">
+          <li v-if="!isLoggedIn" class="nav-item ms-3">
             <router-link to="/signup" class="btn btn-dark rounded-0 fw-semibold">
               Sign Up
             </router-link>
           </li>
-
 
 
           <!-- World Icon Button -->
@@ -169,25 +167,26 @@
     </div>
 
     <!-- Language Modal -->
-    <div v-if="isLanguageModalOpen" class="modal fade show d-block" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Select Language</h5>
-            <button type="button" class="btn-close" @click="closeLanguageModal"></button>
-          </div>
-          <div class="modal-body">
-            <ul>
-              <li><a href="#">English</a></li>
-              <li><a href="#">Español</a></li>
-              <li><a href="#">Français</a></li>
-              <li><a href="#">Deutsch</a></li>
-              <li><a href="#">Português</a></li>
-            </ul>
-          </div>
-        </div>
+<div v-if="getLanguageModalState" class="modal fade show d-block" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select Language</h5>
+        <button type="button" class="btn-close" @click="closeLanguageModal"></button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li><a href="#">English</a></li>
+          <li><a href="#">Español</a></li>
+          <li><a href="#">Français</a></li>
+          <li><a href="#">Deutsch</a></li>
+          <li><a href="#">Português</a></li>
+        </ul>
       </div>
     </div>
+  </div>
+</div>
+
   </nav>
 </template>
 
@@ -197,8 +196,7 @@
   
 <script>
 import { mapActions, mapGetters } from 'vuex';
-import ProfileComponent from '../components/ProfileComponent.vue';
-
+import ProfileComponent from './Profile/ProfileComponent.vue';
 
 export default {
   name: 'NavbarComponent',
@@ -206,17 +204,19 @@ export default {
     ProfileComponent,
   },
   computed: {
-    // Use a function to dynamically access the dropdown state
-    isOpen() {
-      return this.$store.state.isOpen;
-    },
-    ...mapGetters({
-      isLanguageModalOpen: 'getLanguageModalState',
-    }),
-    authUser() {
-      return localStorage.getItem('authUser');
-    }
+  // Use Vuex getters to check if user is logged in and get language modal state
+  ...mapGetters(['getLanguageModalState']),
+
+  // Directly access the isLoggedIn getter and rename it for clarity
+  isLoggedIn() {
+    return this.$store.getters.isLoggedIn; // Use Vuex getter for loggedIn status
   },
+
+  // Access the isOpen state directly from the Vuex store
+  isOpen() {
+    return this.$store.state.isOpen;
+  },
+},
   methods: {
     ...mapActions(['openDropdown', 'closeDropdown', 'openLanguageModal', 'closeLanguageModal']),
     toggleDropdown(dropdown) {
@@ -234,7 +234,7 @@ export default {
         this.openLanguageModal();
       }
     }
-  }
+  },
 };
 </script>
 
