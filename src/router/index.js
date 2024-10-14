@@ -6,6 +6,7 @@ import LoginView from '@/views/LoginView.vue';
 import ContactUsView from '@/views/ContactUsView.vue';
 import CartView from '@/views/CartView.vue';
 import TeachUdemyView from '../views/TeachUdemyView.vue';
+import SiteSettingComponent from '../components/dashboard/Admin/SiteSettingComponent.vue'
 
 const routes = [
   {
@@ -60,6 +61,13 @@ const routes = [
     name: 'teaching',
     component: TeachUdemyView, // Add the Cart route
     meta: { title: 'Teach with us'},
+
+  },
+  {
+    path: '/site-setting',
+    name: 'site-setting',
+    component: SiteSettingComponent, // Add the Cart route
+    meta: { title: 'setting'},
 
   },
 
