@@ -26,7 +26,7 @@ export default {
   name: "SidePanelComponent",
   data() {
     return {
-      categories: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], // Placeholder category buttons
+      categories: ["NavBar", "About Us", "Contact Us", "Teach On Udemy", "Footer"], // Placeholder category buttons
     };
   },
 };
