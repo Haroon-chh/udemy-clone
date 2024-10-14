@@ -1,7 +1,6 @@
 <template>
   <div class="container-fluid d-flex align-items-center justify-content-center bg-white my-4">
     <div class="row w-75 shadow-lg">
-      
       <!-- Left Side - Picture -->
       <div class="col-md-7 p-0 bg-white">
         <img :src="require('@/assets/signup-pic.png')" alt="Signup Image" class="img-fluid w-100 h-100" />
@@ -60,14 +59,16 @@
 </template>
 
 <script setup>
-import { ref , defineComponent } from 'vue';
+import { ref, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
-import ApiServices from '@/services/ApiServices'; // Adjust the path as necessary
+import { useStore } from 'vuex'; // Import useStore
 import SuccessPopup from '../SuccessPopup.vue'; // Adjust the path as necessary
 import ErrorPopup from '../ErrorPopup.vue'; // Adjust the path as necessary
+
 const SuccessPopupComponent = defineComponent(SuccessPopup);
 const ErrorPopupComponent = defineComponent(ErrorPopup);
 const router = useRouter();
+const store = useStore(); // Create store instance
 
 const fullName = ref('');
 const email = ref('');
@@ -79,7 +80,6 @@ const showSuccess = ref(false);
 const showError = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
-
 
 function validateEmail(email) {
   const re = /\S+@\S+\.\S+/;
@@ -106,19 +106,21 @@ async function submitForm() {
     return;
   }
 
+  // Create a FormData object to hold the form data
+  const formData = new FormData();
+  formData.append('name', fullName.value);
+  formData.append('email', email.value);
+  formData.append('password', password.value);
+  formData.append('password_confirmation', password.value); // Same password for confirmation
+
   try {
-    const response = await ApiServices.PostRequest('/register', {
-      name: fullName.value,
-      email: email.value,
-      password: password.value,
-      password_confirmation: password.value // Same password for confirmation
-    });
+    const response = await store.dispatch('registerUser', formData);
 
     // Log the full response for debugging
     console.log('Registration response:', response);
 
     // Check for success response
-    if (response && response.message === "You are successfully registered") {
+    if (response.success) {
       // Set success message and show the popup
       successMessage.value = response.message; // Use the success message from the response
       showSuccess.value = true;
@@ -133,22 +135,7 @@ async function submitForm() {
     }
   } catch (error) {
     // Handle error response
-    if (error.response) {
-      // Check if the error response contains validation errors
-      if (error.response.data && error.response.data.message === "Validation errors") {
-        const validationErrors = error.response.data.errors;
-        // Display the first validation error for email if it exists
-        if (validationErrors.email && validationErrors.email.length > 0) {
-          errorMessage.value = validationErrors.email[0]; // Show the first email error
-        } else {
-          errorMessage.value = 'An error occurred. Please try again later.';
-        }
-      } else {
-        errorMessage.value = error.response.data.message || 'An error occurred. Please try again later.';
-      }
-    } else {
-      errorMessage.value = 'An error occurred. Please try again later.';
-    }
+    errorMessage.value = error.message || 'An error occurred. Please try again later.';
     showError.value = true;
 
     // Hide error popup after 5 seconds
@@ -158,6 +145,7 @@ async function submitForm() {
   }
 }
 </script>
+
 
 <style scoped>
 .signup-btn {
@@ -197,6 +185,7 @@ async function submitForm() {
   font-size: smaller;
 }
 
+
 .inputs {
   position: relative;
   border: 1px solid black;
@@ -234,6 +223,21 @@ input {
 input:focus {
   border: none;
   box-shadow: none;
+}
+/* Custom checkbox style */
+.form-check-input{
+  height: 20px;
+  width: 20px;
+  border-color: #000000;
+}
+.form-check-input:checked {
+  background-color: black;
+  border-color: black;
+}
+
+
+.form-check-input {
+  accent-color: black; /* Modern browsers support this property for changing checkbox color */
 }
 
 /* Mobile Responsiveness */

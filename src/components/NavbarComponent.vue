@@ -134,24 +134,25 @@
             <a class="nav-link" href="#">
               <span class="material-icons">shopping_cart</span>
             </a>
-            <ul class="dropdown-menu mt-3 px-4 py-2 wide-dropdown" :class="{ show: isOpen.cartDropdown }">
+            <ul class="dropdown-menu mt-3 px-4 py-2" :class="{ show: isOpen.cartDropdown }">
               <p>Your cart is empty</p>
               <p class=""><a class="text-decoration-none" style="font-size:small; color: purple;" href="#">Keep Shopping</a></p>
             </ul>
           </li>
 
-          <!-- Login Button -->
-          <li class="nav-item ms-3">
-          <router-link to="/login" class="btn btn-outline-secondary rounded-0 fw-semibold">
-            Login
-          </router-link>
+                <!-- Check for logged in state from Vuex -->
+          <li v-if="isLoggedIn" class="nav-item ms-4">
+            <ProfileComponent />
           </li>
-
-
-          <li class="nav-item ms-3">
-          <router-link to="/signup" class="btn btn-dark rounded-0 fw-semibold">
-          Sign Up
-          </router-link>
+          <li v-if="!isLoggedIn" class="nav-item ms-3">
+            <router-link to="/login" class="btn btn-outline-secondary rounded-0 fw-semibold">
+              Login
+            </router-link>
+          </li>
+          <li v-if="!isLoggedIn" class="nav-item ms-3">
+            <router-link to="/signup" class="btn btn-dark rounded-0 fw-semibold">
+              Sign Up
+            </router-link>
           </li>
 
 
@@ -166,62 +167,78 @@
     </div>
 
     <!-- Language Modal -->
-    <div v-if="isLanguageModalOpen" class="modal fade show d-block" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Select Language</h5>
-            <button type="button" class="btn-close" @click="closeLanguageModal"></button>
-          </div>
-          <div class="modal-body">
-            <ul>
-              <li><a href="#">English</a></li>
-              <li><a href="#">Español</a></li>
-              <li><a href="#">Français</a></li>
-              <li><a href="#">Deutsch</a></li>
-              <li><a href="#">Português</a></li>
-            </ul>
-          </div>
-        </div>
+<div v-if="getLanguageModalState" class="modal fade show d-block" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select Language</h5>
+        <button type="button" class="btn-close" @click="closeLanguageModal"></button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li><a href="#">English</a></li>
+          <li><a href="#">Español</a></li>
+          <li><a href="#">Français</a></li>
+          <li><a href="#">Deutsch</a></li>
+          <li><a href="#">Português</a></li>
+        </ul>
       </div>
     </div>
+  </div>
+</div>
+
   </nav>
 </template>
 
 
+
+
   
 <script>
+import { mapActions, mapGetters } from 'vuex';
+import ProfileComponent from './Profile/ProfileComponent.vue';
+
 export default {
-  data() {
-    return {
-      isOpen: {
-        categoriesDropdown: false,
-        developmentDropdown: false,
-        webDevDropdown: false,
-        mobileDevDropdown: false,
-        businessDropdown: false,
-        teachDropdown: false,
-        cartDropdown: false
-      },
-      isLanguageModalOpen: false
-    };
+  name: 'NavbarComponent',
+  components: {
+    ProfileComponent,
   },
+  computed: {
+  // Use Vuex getters to check if user is logged in and get language modal state
+  ...mapGetters(['getLanguageModalState']),
+
+  // Directly access the isLoggedIn getter and rename it for clarity
+  isLoggedIn() {
+    return this.$store.getters.isLoggedIn; // Use Vuex getter for loggedIn status
+  },
+
+  // Access the isOpen state directly from the Vuex store
+  isOpen() {
+    return this.$store.state.isOpen;
+  },
+},
   methods: {
-    openDropdown(dropdown) {
-      this.isOpen[dropdown] = true;
+    ...mapActions(['openDropdown', 'closeDropdown', 'openLanguageModal', 'closeLanguageModal']),
+    toggleDropdown(dropdown) {
+      const isOpen = this.isOpen[dropdown]; // Access the dropdown state correctly
+      if (isOpen) {
+        this.closeDropdown(dropdown);
+      } else {
+        this.openDropdown(dropdown);
+      }
     },
-    closeDropdown(dropdown) {
-      this.isOpen[dropdown] = false;
-    },
-    openLanguageModal() {
-      this.isLanguageModalOpen = true;
-    },
-    closeLanguageModal() {
-      this.isLanguageModalOpen = false;
+    toggleLanguageModal() {
+      if (this.isLanguageModalOpen) {
+        this.closeLanguageModal();
+      } else {
+        this.openLanguageModal();
+      }
     }
   },
 };
 </script>
+
+
 
   
   <style scoped>
