@@ -9,6 +9,7 @@ import TeachUdemyView from '../views/TeachUdemyView.vue';
 import CourseDetailsView from '../views/CourseDetailsView.vue'; // Import new component
 import EditProfile from '../views/EditProfile.vue';
 import ChangePassword from '@/components/Profile/ChangePassword.vue';
+import AddArticle from '@/components/dashboard/Admin/AddArticle.vue';
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
@@ -17,6 +18,14 @@ const routes = [
     name: 'dashboard',
     component: DashboardView,
     meta: { title: 'Dashboard' },
+    children: [
+      {
+        path: 'add-article',
+        name: 'add-article',
+        component: AddArticle,
+        meta: { title: 'Add Article' },
+      },
+    ],
   },
   {
     path: '/signup',

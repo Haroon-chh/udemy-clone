@@ -14,10 +14,10 @@
     <TrustedCompanies v-if="!isAdmin" />
 
     <!-- Admin-specific components -->
-    <QuillEditor v-if="isAdmin"/>
+    <CardContainer v-if="isAdmin"/>
     <!-- <QuillPlayground v-if="isAdmin"/> -->
     
-
+  <router-view v-if ="isAdmin" />
    
   </div>
 </template>
@@ -36,9 +36,9 @@ import CarouselComponent from '../components/dashboard/CarouselComponent.vue';
 import TrustedCompanies from '../components/dashboard/TrustedCompany.vue';
 import News from '../components/dashboard/NewsComponent.vue';
 import TrendingNow from '../components/dashboard/TrendingNow.vue';
-import QuillEditor from '../components/dashboard/Admin/QuillEditor.vue';
 // import QuillPlayground from '../components/dashboard/Admin/QuillPlayground.vue';
 import CategoriesComponent from '../components/dashboard/CategoriesComponent.vue';
+import CardContainer from '@/components/dashboard/Admin/CardContainer.vue';
 
 // Admin-specific components
 
