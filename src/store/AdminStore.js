@@ -22,7 +22,7 @@ const AdminStore = {
         console.log('Article Data:', plainArticleData);
 
         // Use AuthApiServices to send a POST request with authorization headers using fetch
-        const response = await AuthApiServices.PostRequestWithAuth(endpoint, plainArticleData);
+        const response = await AuthApiServices.PostRequest(endpoint, plainArticleData);
         return response;  // Return the response to the component
       } catch (error) {
         console.error('Error creating article with fetch:', error);
