@@ -188,6 +188,11 @@ export default {
     min-height: 100px;
   }
 
+
+  .helo{
+    color:#000;
+  }
+
   .image-section {
     width: 100%;
     text-align: center;
