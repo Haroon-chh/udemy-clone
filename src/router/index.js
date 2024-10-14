@@ -7,7 +7,7 @@ import LoginView from '@/views/LoginView.vue';
 import ContactUsView from '@/views/ContactUsView.vue';
 import CartView from '@/views/CartView.vue';
 import TeachUdemyView from '../views/TeachUdemyView.vue';
-import AddArticle from '@/components/dashboard/Admin/AddArticle.vue'; // Import AddArticle component
+import AddArticle from '@/components/dashboard/Admin/AddArticle.vue';
 
 const routes = [
   {
@@ -21,7 +21,7 @@ const routes = [
     meta: { title: 'Dashboard' },
     children: [
       {
-        path: 'add-article', // This is a child route for "dashboard"
+        path: 'add-article',
         name: 'add-article',
         component: AddArticle,
         meta: { title: 'Add Article' },
