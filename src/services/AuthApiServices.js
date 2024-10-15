@@ -14,38 +14,81 @@ const AuthApiServices = {
   // Fetch the access token from localStorage
   getAuthHeaders() {
     const accessToken = localStorage.getItem('access_token');
+    if (accessToken) {
+      return {
+        Authorization: `Bearer ${accessToken}`, // Ensure access_token is passed
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true', // Handle ngrok bypass
+      };
+    }
     return {
-      'Authorization': `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
       'ngrok-skip-browser-warning': 'true',
     };
   },
 
+  // Generic GET request
   async GetRequest(endpoint, params = {}) {
     try {
       const response = await axios.get(`${baseURL}${endpoint}`, {
         params,
-        headers: this.getAuthHeaders(), // Add auth headers here
+        headers: this.getAuthHeaders(), // Pass authorization headers
       });
-
-      return response.data;
+      return response.data; // Return the response data
     } catch (error) {
       console.error('GET request failed:', error);
+      if (error.response) {
+        throw new Error(error.response.data.message || 'GET request failed');
+      }
       throw error;
     }
   },
 
+  // Generic POST request
   async PostRequest(endpoint, data) {
     try {
       const response = await axios.post(`${baseURL}${endpoint}`, data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          ...this.getAuthHeaders(), // Add auth headers here
-        },
+        headers: this.getAuthHeaders(), // Pass authorization headers
       });
-      return response.data;  // Return just the response data
+      return response.data; // Return the response data
     } catch (error) {
       console.error('POST request failed:', error);
+      if (error.response) {
+        throw new Error(error.response.data.message || 'POST request failed');
+      }
+      throw error;
+    }
+  },
+
+  // Generic PUT request
+  async PutRequest(endpoint, data) {
+    try {
+      const response = await axios.put(`${baseURL}${endpoint}`, data, {
+        headers: this.getAuthHeaders(), // Pass authorization headers
+      });
+      return response.data; // Return the response data
+    } catch (error) {
+      console.error('PUT request failed:', error);
+      if (error.response) {
+        throw new Error(error.response.data.message || 'PUT request failed');
+      }
+      throw error;
+    }
+  },
+
+  // Generic DELETE request
+  async DeleteRequest(endpoint, params = {}) {
+    try {
+      const response = await axios.delete(`${baseURL}${endpoint}`, {
+        params,
+        headers: this.getAuthHeaders(), // Pass authorization headers
+      });
+      return response.data; // Return the response data
+    } catch (error) {
+      console.error('DELETE request failed:', error);
+      if (error.response) {
+        throw new Error(error.response.data.message || 'DELETE request failed');
+      }
       throw error;
     }
   },
