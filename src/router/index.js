@@ -10,6 +10,7 @@ import CourseDetailsView from '../views/CourseDetailsView.vue'; // Import new co
 import EditProfile from '../views/EditProfile.vue';
 import ChangePassword from '@/components/Profile/ChangePassword.vue';
 import AddArticle from '@/components/dashboard/Admin/AddArticle.vue';
+import PageSettingView from '../views/PageSettingView.vue';
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
@@ -80,6 +81,12 @@ const routes = [
     name: 'CourseDetails',  // Match exactly with what you're using in $router.push
     component: CourseDetailsView,
     meta: { title: 'Course Details' },
+  },
+  {
+    path: '/page-settings',
+    name: 'PageSettings',  // Match exactly with what you're using in $router.push
+    component: PageSettingView,
+    meta: { title: 'Page Settings' },
   }
   ,
 ];
