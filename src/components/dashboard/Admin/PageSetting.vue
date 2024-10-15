@@ -27,17 +27,14 @@
   export default {
     name: 'SidePanelComponent',
     computed: {
-      // Properly map 'pages' from the namespaced store
       ...mapState('PageSettingsStore', ['pages']),
     },
     methods: {
-      // Dispatch the action to fetch pages
       fetchPages() {
         this.$store.dispatch('PageSettingsStore/getPages');
       },
     },
     mounted() {
-      // Use mounted() to trigger the fetch
       this.fetchPages();
     },
   };
@@ -48,8 +45,25 @@
     width: 300px;
     height: 100vh;
     background-color: #5a2ee3;
+    overflow-y: auto; /* Enable vertical scrolling */
+    scrollbar-width: thin; /* Firefox-specific */
+    scrollbar-color: #ddd #5a2ee3;
   }
   
+  /* Custom scroll styling for WebKit browsers */
+  .side-panel::-webkit-scrollbar {
+    width: 8px;
+  }
+  .side-panel::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 10px;
+  }
+  .side-panel::-webkit-scrollbar-track {
+    background-color: #5a2ee3;
+    border-radius: 10px;
+  }
+  
+  /* Category Button Styles */
   .category-btn {
     background-color: #5a2ee3;
     color: white;
@@ -69,6 +83,7 @@
     transform: translateY(-2px);
   }
   
+  /* Main Content Area Styles */
   .content {
     background-color: #f8f9fa;
   }
