@@ -6,11 +6,12 @@ import LoginView from '@/views/LoginView.vue';
 import ContactUsView from '@/views/ContactUsView.vue';
 import CartView from '@/views/CartView.vue';
 import TeachUdemyView from '../views/TeachUdemyView.vue';
-import CourseDetailsView from '../views/CourseDetailsView.vue'; // Import new component
+import CourseDetailsView from '../views/CourseDetailsView.vue';
 import EditProfile from '../views/EditProfile.vue';
 import ChangePassword from '@/components/Profile/ChangePassword.vue';
 import AddArticle from '@/components/dashboard/Admin/AddArticle.vue';
 import PageSettingView from '../views/PageSettingView.vue';
+import ViewArticles from '@/components/dashboard/Admin/ViewArticles.vue';  
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
@@ -25,6 +26,12 @@ const routes = [
         name: 'add-article',
         component: AddArticle,
         meta: { title: 'Add Article' },
+      },
+      {
+        path: 'view-articles',
+        name: 'view-articles',
+        component: ViewArticles,
+        meta: { title: 'View Articles' },
       },
     ],
   },
@@ -78,7 +85,7 @@ const routes = [
   },
   {
     path: '/course/:slug',
-    name: 'CourseDetails',  // Match exactly with what you're using in $router.push
+    name: 'CourseDetails',
     component: CourseDetailsView,
     meta: { title: 'Course Details' },
   },
@@ -87,8 +94,7 @@ const routes = [
     name: 'PageSettings',  // Match exactly with what you're using in $router.push
     component: PageSettingView,
     meta: { title: 'Page Settings' },
-  }
-  ,
+  },
 ];
 
 const router = createRouter({
