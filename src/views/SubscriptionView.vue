@@ -1,12 +1,13 @@
 <template>
-    <div>
-      <subscription />
-    </div>
-  </template>
-  
-  <script setup>
-  import subscription from '@/components/Profile/SubscriptionComponent.vue';
-  </script>
-  
-  <style scoped>
-  </style>
+  <div>
+    <SubscriptionComponent />
+  </div>
+</template>
+
+<script setup>
+  import SubscriptionComponent from '../components/Profile/SubscriptionComponent.vue';
+
+</script>
+
+<style scoped>
+</style>

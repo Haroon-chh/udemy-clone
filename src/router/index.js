@@ -10,6 +10,8 @@ import CourseDetailsView from '../views/CourseDetailsView.vue'; // Import new co
 import EditProfile from '../views/EditProfile.vue';
 import ChangePassword from '@/components/Profile/ChangePassword.vue';
 import AddArticle from '@/components/dashboard/Admin/AddArticle.vue';
+import SubscriptionView from '@/views/SubscriptionView.vue'; // Import Subscription View
+
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
@@ -80,8 +82,13 @@ const routes = [
     name: 'CourseDetails',  // Match exactly with what you're using in $router.push
     component: CourseDetailsView,
     meta: { title: 'Course Details' },
-  }
-  ,
+  },
+  {
+    path: '/subscriptions', // Add the subscription route
+    name: 'subscriptions',
+    component: SubscriptionView,
+    meta: { title: 'Subscriptions' },
+  },
 ];
 
 const router = createRouter({
