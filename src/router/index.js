@@ -10,7 +10,7 @@ import CourseDetailsView from '../views/CourseDetailsView.vue'; // Import new co
 import EditProfile from '../views/EditProfile.vue';
 import ChangePassword from '@/components/Profile/ChangePassword.vue';
 import AddArticle from '@/components/dashboard/Admin/AddArticle.vue';
-import PageSettingView from '@/views/PageSettingView.vue';
+import PageSettingView from '../views/PageSettingView.vue';
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
