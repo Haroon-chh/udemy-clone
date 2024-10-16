@@ -221,17 +221,6 @@ export default {
 </script>
 
 <style scoped>
-/* Same styles as before */
-.badge-cart {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  background-color: red;
-  color: white;
-  border-radius: 50%;
-  padding: 5px;
-  font-size: 12px;
-}
 
 .course-details-container {
   display: flex;

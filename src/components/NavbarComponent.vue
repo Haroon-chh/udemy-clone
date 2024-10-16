@@ -83,7 +83,6 @@
             <ul class="dropdown-menu mt-3 px-4 py-2" :class="{ show: isOpen.cartDropdown }">
               <div v-if="cartCount > 0">
                 <p>{{ cartCount }} items in your cart</p>
-                <p class="text-end"><router-link to="/cart" class="text-decoration-none">Go to Cart</router-link></p>
               </div>
               <div v-else>
                 <p>No items in your cart</p>
@@ -91,7 +90,7 @@
             </ul>
           </li>
 
-          <!-- Check for logged in state from Vuex -->
+          <!-- Check for logged in state -->
           <li v-if="isLoggedIn" class="nav-item ms-4">
             <ProfileComponent />
           </li>
@@ -158,7 +157,8 @@ export default {
   computed: {
     ...mapGetters(['getLanguageModalState']),
     isLoggedIn() {
-      return this.$store.getters.isLoggedIn;
+      const user = JSON.parse(localStorage.getItem('authUser')); // Checking for logged-in user
+      return user && user.access_token;
     },
     isOpen() {
       return this.$store.state.isOpen;
@@ -166,7 +166,7 @@ export default {
   },
   methods: {
     ...mapActions(['openDropdown', 'closeDropdown', 'openLanguageModal', 'closeLanguageModal']),
-    
+
     toggleDropdown(dropdown) {
       const isOpen = this.isOpen[dropdown];
       if (isOpen) {
@@ -176,8 +176,8 @@ export default {
       }
     },
     handleCartAccess() {
-      const user = JSON.parse(localStorage.getItem('user')); // Check if user is logged in
-      if (user && user.isLoggedIn) {
+      const user = JSON.parse(localStorage.getItem('authUser')); // Check if user is logged in
+      if (user && user.access_token) {
         this.$router.push('/cart');
       } else {
         this.showErrorPopup = true;
@@ -242,8 +242,17 @@ export default {
   right: -10px;
   background-color: red;
   color: white;
-  border-radius: 50%;
-  padding: 5px;
+  border-radius: 50%; /* Ensures the badge is circular */
+  width: 24px; /* Adjust this to control the size of the circle */
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-size: 12px;
+  font-weight: bold;
+  padding: 0;
+  line-height: 1;
+  text-align: center;
 }
+
 </style>
