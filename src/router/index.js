@@ -13,6 +13,8 @@ import AddArticle from '@/components/dashboard/Admin/AddArticle.vue';
 import PageSettingView from '../views/PageSettingView.vue';
 import ViewArticles from '@/components/dashboard/Admin/ViewArticles.vue';  
 import QuillEditorComponent from '@/components/dashboard/Admin/QuillEditorComponent.vue';
+import SubscriptionView from '@/views/SubscriptionView.vue'; // Import Subscription View
+
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
@@ -104,6 +106,13 @@ const routes = [
         props: true,
       },
     ],
+  },
+
+  {
+    path: '/subscriptions', // Add the subscription route
+    name: 'subscriptions',
+    component: SubscriptionView,
+    meta: { title: 'Subscriptions' },
   },
 ];
 
