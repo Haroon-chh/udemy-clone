@@ -7,6 +7,7 @@
             class="course-thumbnail"
             :src="course.thumbnail_url"
             alt="Course Thumbnail"
+            ref="thumbnail"
           />
         </div>
         <div class="content">
@@ -26,7 +27,8 @@
               <i class="fas fa-clock duration-icon"></i> {{ course.duration }} hours
             </p>
           </div>
-          <button class="enroll-button">Enroll Now</button>
+          <!-- Buy Button -->
+          <button class="enroll-button" @click="addToCart(course)">Buy</button>
         </div>
       </div>
     </div>
@@ -76,45 +78,12 @@
         </div>
       </div>
     </div>
-    <!-- End Learning Points Section -->
-      <div class="container py-5">
-    <div class="row text-center">
-      <div class="col-12">
-        <h2 class="learning-points-title" >This course includes:</h2>
-      </div>
-      <div class="col-lg-4 col-md-6 my-3" v-for="(item, index) in courseDetails" :key="index">
-        <div class="d-flex align-items-center justify-content-center">
-          <i :class="item.icon"></i>
-          <div class="ps-3">
-            <p>{{ item.description }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-   <div class="container py-5">
-    <!-- Requirements Section -->
-    <div class="requirements-section my-5">
-      <h2 class="learning-points-title" >Requirements</h2>
-      <ul class="requirements-list text-center">
-        <li>No programming experience needed - I'll teach you everything you need to know</li>
-        <li>A computer with access to the internet</li>
-        <li>No paid software required</li>
-        <li>I'll walk you through, step-by-step how to get all the software installed and set up</li>
-      </ul>
-    </div>
 
-    <!-- Description Section -->
-    <div class="description-section my-5">
-      <h2 class="learning-points-title" >Description</h2>
-      <p class="text-center">
-        Welcome to the Complete Web Development Bootcamp, <strong>the only course you need</strong> 
-        to learn to code and become a full-stack web developer. 
-        With 150,000+ ratings and a 4.8 average, my Web Development course is 
-        one of the <strong>HIGHEST RATED</strong> courses in the history of Udemy!
-      </p>
-    </div>
-  </div>
+    <!-- Success Popup for "Course added to cart" -->
+    <SuccessPopup v-if="showSuccessPopup" :show="showSuccessPopup" :message="popupMessage" />
+
+    <!-- Error Popup for "Already in cart" message -->
+    <ErrorPopup v-if="showErrorPopup" :show="showErrorPopup" :message="popupMessage" />
   </div>
 </template>
 
@@ -122,12 +91,22 @@
 import { ref, onMounted } from 'vue';
 import ApiServices from '@/services/ApiServices';
 import { useRoute } from 'vue-router';
+import SuccessPopup from '@/components/SuccessPopup.vue'; // Import SuccessPopup
+import ErrorPopup from '@/components/ErrorPopup.vue'; // Import ErrorPopup
 
 export default {
   name: 'CourseDetailsComponent',
+  components: {
+    SuccessPopup, // Register SuccessPopup
+    ErrorPopup, // Register ErrorPopup
+  },
   setup() {
     const course = ref({});
     const courseDetails = ref([]);
+    const isAdded = ref(false); // To track if the course is already added
+    const showSuccessPopup = ref(false); // For "Course added to cart" message
+    const showErrorPopup = ref(false); // For "Already in cart" message
+    const popupMessage = ref(''); // Message to display in the popup
     const route = useRoute();
 
     const fetchCourseDetails = async () => {
@@ -136,7 +115,6 @@ export default {
         const response = await ApiServices.GetRequest(`/courses/${slug}`);
         course.value = response.data || {};
 
-        // Assuming the API provides these details in the response
         courseDetails.value = [
           { icon: 'bi bi-play-circle', description: `${course.value.videoHours || 0} hours on-demand video` },
           { icon: 'bi bi-code-slash', description: `${course.value.codingExercises || 0} coding exercises` },
@@ -145,9 +123,84 @@ export default {
           { icon: 'bi bi-phone', description: `Access on mobile and TV` },
           { icon: 'bi bi-trophy', description: `Certificate of completion` },
         ];
+
+        checkIfAddedToCart(course.value.id);
       } catch (error) {
         console.error('Error fetching course details:', error);
       }
+    };
+
+    const checkIfAddedToCart = (courseId) => {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      isAdded.value = cart.some(item => item.id === courseId);
+    };
+
+    const addToCart = (course) => {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      if (isAdded.value) {
+        popupMessage.value = 'This course is already in your cart!';
+        showPopup('error');
+      } else {
+        cart.push(course);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        isAdded.value = true;
+        popupMessage.value = 'Course added to cart!';
+        showPopup('success');
+        animateToCart();
+        updateCartCount();
+      }
+    };
+
+    const showPopup = (type) => {
+      if (type === 'success') {
+        showSuccessPopup.value = true;
+        setTimeout(() => {
+          showSuccessPopup.value = false;
+        }, 3000); // Hide success popup after 3 seconds
+      } else if (type === 'error') {
+        showErrorPopup.value = true;
+        setTimeout(() => {
+          showErrorPopup.value = false;
+        }, 3000); // Hide error popup after 3 seconds
+      }
+    };
+
+    const animateToCart = () => {
+      const thumbnail = document.querySelector('.course-thumbnail');
+      const cartIcon = document.querySelector('.material-icons.shopping_cart');
+
+      if (thumbnail && cartIcon) {
+        const thumbnailRect = thumbnail.getBoundingClientRect();
+        const cartIconRect = cartIcon.getBoundingClientRect();
+
+        const clone = thumbnail.cloneNode(true);
+        document.body.appendChild(clone);
+        clone.style.position = 'absolute';
+        clone.style.top = `${thumbnailRect.top}px`;
+        clone.style.left = `${thumbnailRect.left}px`;
+        clone.style.width = `${thumbnailRect.width}px`;
+        clone.style.transition = 'all 1s ease-in-out';
+        clone.style.zIndex = 1000;
+
+        setTimeout(() => {
+          clone.style.top = `${cartIconRect.top}px`;
+          clone.style.left = `${cartIconRect.left}px`;
+          clone.style.width = '20px';
+          clone.style.height = '20px';
+          clone.style.opacity = '0';
+
+          setTimeout(() => {
+            document.body.removeChild(clone);
+          }, 1000);
+        }, 100);
+      }
+    };
+
+    const updateCartCount = () => {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const event = new Event('storage'); // This triggers a localStorage update
+      localStorage.setItem('cart', JSON.stringify(cart)); // Update localStorage
+      window.dispatchEvent(event); // Dispatch the event
     };
 
     onMounted(() => {
@@ -157,19 +210,35 @@ export default {
     return {
       course,
       courseDetails,
+      addToCart,
+      isAdded,
+      showSuccessPopup,
+      showErrorPopup,
+      popupMessage,
     };
   },
 };
 </script>
 
 <style scoped>
+/* Same styles as before */
+.badge-cart {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px;
+  font-size: 12px;
+}
+
 .course-details-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 1rem;
   min-height: 100vh;
-
 }
 
 .course-card {
@@ -340,6 +409,7 @@ export default {
     width: 100%;
   }
 }
+
 i {
   font-size: 2rem;
 }
@@ -348,6 +418,7 @@ p {
   margin-bottom: 0;
   font-size: 1.2rem;
 }
+
 .requirements-section h2 {
   font-size: 1.8rem;
   font-weight: bold;
@@ -364,7 +435,6 @@ p {
   margin-bottom: 10px;
 }
 
-/* Style for Description Section */
 .description-section h2 {
   font-size: 1.8rem;
   font-weight: bold;
@@ -374,8 +444,5 @@ p {
 .description-section p {
   font-size: 1.2rem;
   line-height: 1.6;
-  
 }
 </style>
-
-

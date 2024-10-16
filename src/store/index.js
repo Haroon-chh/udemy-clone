@@ -4,12 +4,14 @@ import AdminStore from './AdminStore';
 import speakeasy from 'speakeasy'; // For 2FA secret generation
 import PageSettingsStore from './pageSettingsStore';
 import StudentStore from './StudentStore';
+import AddcartStore from './AddcartStore';
 
 export default createStore({
   modules: {
     AdminStore,
      PageSettingsStore,
-      StudentStore
+      StudentStore,
+    AddcartStore
   },
   state: {
     user: null,
