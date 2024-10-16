@@ -1,33 +1,60 @@
 <template>
   <div class="container my-5">
-    <!-- Main heading -->
-    <div class="text-center">
-      <h1 class="fw-bold display-4 mb-3">Your Subscription Plans</h1>
-      <p class="lead text-muted">Choose the plan that's right for you</p>
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <h1 class="fw-bold display-4">Manage Your Subscription</h1>
+      <p class="lead text-muted">Select a plan or check your current subscription status below.</p>
     </div>
 
-    <!-- Active plans section -->
-    <div class="active-plans-section mb-5">
-      <h5 class="fw-bold">Active plans</h5>
-      <div class="border border-light rounded p-4 text-center shadow-sm">
-        <p class="text-muted mb-0">You don’t have any active subscriptions</p>
+    <!-- Active subscription details -->
+    <div v-if="activeSubscription" class="subscription-details mb-5">
+      <h4 class="fw-bold">Your Active Subscription</h4>
+
+      <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Subscription ID:</strong> {{ activeSubscription.id }}</p>
+            <p><strong>Status:</strong> <span :class="statusClass">{{ activeSubscription.status }}</span></p>
+            <p><strong>Student ID:</strong> {{ activeSubscription.student_id }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Created At:</strong> {{ formatDate(activeSubscription.created_at) }}</p>
+            <p><strong>Updated At:</strong> {{ formatDate(activeSubscription.updated_at) }}</p>
+          </div>
+        </div>
       </div>
+
+      <!-- Trial info (if applicable) -->
+      <div v-if="activeSubscription.trial_start_at && activeSubscription.trial_end_at" class="alert alert-info">
+        <p><strong>Trial Period:</strong> {{ formatDate(activeSubscription.trial_start_at) }} to {{ formatDate(activeSubscription.trial_end_at) }}</p>
+      </div>
+
+      <!-- Additional trial message -->
+      <div v-else class="alert alert-info">
+        <p>{{ trialMessage }}</p>
+      </div>
+    </div>
+
+    <!-- No active subscription message -->
+    <div v-else class="no-subscription mb-5 text-center">
+      <h5 class="fw-bold">No Active Subscription</h5>
+      <p class="text-muted">You don't have an active subscription at the moment. Choose a plan to subscribe.</p>
     </div>
 
     <!-- Subscription Plan Card -->
     <div class="row justify-content-center">
-      <div class="col-md-10">
+      <div class="col-md-8">
         <div class="card subscription-card shadow-lg border-0 rounded-4">
           <div class="row g-0">
             <!-- Subscription details -->
             <div class="col-lg-6 p-4">
               <h4 class="fw-bold">Personal Plan</h4>
               <p class="text-muted mb-3">
-                Unlock your potential with access to our entire course library:
+                Unlock all courses for a fixed price. This plan gives you access to:
               </p>
               <ul class="list-unstyled mb-4">
                 <li class="mb-2">
-                  <i class="bi bi-check-circle-fill text-success me-2"></i> Access to 12,000+ top courses
+                  <i class="bi bi-check-circle-fill text-success me-2"></i> Access to 12,000+ courses
                 </li>
                 <li class="mb-2">
                   <i class="bi bi-check-circle-fill text-success me-2"></i> Courses in tech, business, and more
@@ -37,17 +64,16 @@
                 </li>
               </ul>
 
-              <!-- Buttons -->
-              <div class="d-flex align-items-center">
-                <button class="btn btn-primary btn-lg me-3">Subscribe</button>
-                <a href="#" class="text-decoration-none text-primary">Learn more</a>
-              </div>
+              <!-- Show "You are already subscribed" message or Subscribe Button -->
+              <button v-if="!isSubscribed" class="btn btn-primary btn-lg" @click="subscribeToPlan" :disabled="subscriptionStatus === 'success'">
+                Subscribe for $11/month
+              </button>
+              <p v-if="isSubscribed" class="text-success fw-bold mt-3">You are already subscribed!</p>
 
-              <!-- Price and terms -->
-              <p class="text-muted mt-3">Starting at <span class="fw-bold">$11.00</span> per month after 7-day trial. Cancel anytime.</p>
+              <p class="text-muted mt-3">7-day free trial, cancel anytime.</p>
             </div>
 
-            <!-- Image section -->
+            <!-- Plan image -->
             <div class="col-lg-6 d-none d-lg-block">
               <img :src="subscriptionImage" alt="Subscription plan image" class="img-fluid h-100 rounded-end">
             </div>
@@ -55,73 +81,114 @@
         </div>
       </div>
     </div>
+
+    <!-- API Response Section -->
   </div>
 </template>
 
 <script setup>
-import subscriptionImage from '@/assets/subscription-image.png'; // Make sure to put your actual image path
+import { ref, computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import subscriptionImage from '@/assets/subscription-image.png';
+
+const store = useStore();
+
+// Local state for API responses
+const apiResponse = ref(null);
+const apiCheckResponse = ref(null);
+const isSubscribed = ref(false);  // Track if the user is already subscribed
+
+// Fetch active subscription from the state
+const activeSubscription = computed(() => store.getters['StudentStore/getActiveSubscription']);
+const subscriptionStatus = computed(() => store.getters['StudentStore/getSubscriptionStatus']);
+
+// Format date utility
+const formatDate = (date) => new Date(date).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+// Define the class based on status for styling purposes
+const statusClass = computed(() => {
+  if (activeSubscription.value && activeSubscription.value.status === 'active') {
+    return 'badge bg-success';
+  }
+  return 'badge bg-secondary';
+});
+
+// Define the trial message based on API response
+const trialMessage = computed(() => {
+  return store.state.StudentStore.activeSubscription.status === 'active'
+    ? 'Your trial period is still active. You can continue to enjoy the benefits until the trial ends.'
+    : 'You do not have any active trials.';
+});
+
+// Subscribe to the plan
+const subscribeToPlan = async () => {
+  await store.dispatch('StudentStore/subscribe');
+  apiResponse.value = store.state.StudentStore.activeSubscription;
+  
+  // Set localStorage flag after successful subscription
+  localStorage.setItem('isSubscribed', true);
+  isSubscribed.value = true;
+};
+
+// Check if the user is already subscribed (on page load)
+const checkSubscriptionStatus = () => {
+  const subscriptionFlag = localStorage.getItem('isSubscribed');
+  isSubscribed.value = !!subscriptionFlag;  // Convert to boolean
+};
+
+// Check active subscription on component mount
+onMounted(() => {
+  store.dispatch('StudentStore/checkSubscription').then(() => {
+    apiCheckResponse.value = store.state.StudentStore.activeSubscription;
+  });
+
+  // Check local storage for subscription status
+  checkSubscriptionStatus();
+});
 </script>
 
 <style scoped>
-/* Custom styles */
-.subscription-card {
+/* Styling for the component */
+.subscription-details {
   background-color: #f8f9fa;
-  border-radius: 16px;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 20px;
 }
 
-h1.display-4 {
-  font-size: 2.75rem;
+.card.subscription-card {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
 }
 
-h4.fw-bold {
-  color: #343a40;
+.no-subscription {
+  padding: 20px;
 }
 
-.list-unstyled i {
-  font-size: 1.2rem;
+.alert {
+  border-radius: 10px;
 }
 
-.btn-primary {
-  background-color: #6c63ff;
-  border: none;
-  transition: background-color 0.3s ease;
+.badge.bg-success {
+  background-color: #28a745;
 }
 
-.btn-primary:hover {
-  background-color: #564fd3;
+.badge.bg-secondary {
+  background-color: #6c757d;
 }
 
-.text-primary {
-  font-weight: 500;
+pre {
+  overflow: auto;
+  max-height: 300px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
-.text-primary:hover {
-  text-decoration: underline;
+button.btn:disabled {
+  background-color: #6c757d;
 }
-
-/* Responsive styles */
-@media (max-width: 768px) {
-  .subscription-card {
-    text-align: center;
-  }
-
-  .list-unstyled {
-    padding-left: 0;
-  }
-
-  .col-lg-6 {
-    display: block !important;
-    margin-top: 2rem;
-  }
-
-  h1.display-4 {
-    font-size: 2.25rem;
-  }
-
-  .btn-lg {
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-}
-
 </style>
