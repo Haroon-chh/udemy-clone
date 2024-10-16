@@ -53,7 +53,8 @@
 <script>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import * as speakeasy from 'speakeasy';
+// import * as speakeasy from 'speakeasy';
+import AuthApiServices from '@/services/AuthApiServices.js';
 import QRCode from 'qrcode';
 
 export default {
@@ -98,31 +99,39 @@ export default {
       }
     };
 
+    // Function to toggle 2FA
     const toggleTwoFactorAuth = async () => {
       isEnabling2FA.value = true;
-      enteredSecret.value = ''; // Clear the secret key input field when toggling
+      generatedSecret.value = ''; // Clear the secret key input field when toggling
 
       if (!isTwoFactorEnabled.value) {
-        // Enable 2FA: Generate secret and QR code
-        const secret = speakeasy.generateSecret({ name: 'UdemyCloneApp', length: 20 });
-        generatedSecret.value = secret.base32;
-        console.log('Generated Secret Key:', generatedSecret.value);
-
+        // Enable 2FA: Call API to generate secret and QR code using GET request
         try {
-          const qrCodeURL = await QRCode.toDataURL(secret.otpauth_url);
+          const response = await AuthApiServices.GetRequest('/generate-secret-key'); // Call API using GetRequest
+          const secretKey = response.data.google2fa_secret; // Get secret key from response
+          generatedSecret.value = secretKey;
+
+          const otpauthUrl = `otpauth://totp/UdemyCloneApp?secret=${secretKey}&issuer=UdemyCloneApp`; // Create otpauth URL
+
+          // Generate QR code from otpauth URL
+          const qrCodeURL = await QRCode.toDataURL(otpauthUrl);
           qrCodeDataURL.value = qrCodeURL;
+
+          console.log('Generated Secret Key:', generatedSecret.value);
         } catch (err) {
-          console.error('Error generating QR code:', err);
+          console.error('Error generating secret key or QR code:', err);
         }
       } else {
-        // Generate a fresh secret and QR code for disabling 2FA
-        const disableSecret = speakeasy.generateSecret({ name: 'UdemyCloneApp', length: 20 });
-        disableGeneratedSecret.value = disableSecret.base32;
-        console.log('Generated Secret Key for Disabling:', disableGeneratedSecret.value);
-
+        // Handle disable 2FA logic here (if needed)
         try {
-          const disableQrCodeURL = await QRCode.toDataURL(disableSecret.otpauth_url);
+          const disableSecret = 'DISABLE_2FA_SECRET'; // Example secret, you may adjust this logic
+          disableGeneratedSecret.value = disableSecret;
+
+          const disableOtpauthUrl = `otpauth://totp/UdemyCloneApp?secret=${disableSecret}&issuer=UdemyCloneApp`;
+          const disableQrCodeURL = await QRCode.toDataURL(disableOtpauthUrl);
           disableQrCodeDataURL.value = disableQrCodeURL;
+
+          console.log('Generated Disable Secret Key:', disableGeneratedSecret.value);
         } catch (err) {
           console.error('Error generating disable QR code:', err);
         }
