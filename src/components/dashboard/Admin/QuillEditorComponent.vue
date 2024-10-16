@@ -1,6 +1,6 @@
 <template>
     <div class="quill-editor-container">
-      <!-- Input Field with Copy Button -->
+      <!-- Input Field -->
       <div class="input-with-copy">
         <input
           type="text"
@@ -9,9 +9,6 @@
           placeholder="Content to load in Quill"
           @input="updateQuillContent"
         />
-        <button @click="copyToClipboard" class="copy-btn" title="Copy to Clipboard">
-          <span class="material-icons">content_copy</span>
-        </button>
       </div>
   
       <!-- Quill Editor -->
@@ -77,12 +74,6 @@
         }
       };
   
-    //   const copyToClipboard = () => {
-    //     navigator.clipboard.writeText(rawContent.value)
-    //       .then(() => alert('Copied to clipboard!'))
-    //       .catch((err) => console.error('Failed to copy text:', err));
-    //   };
-  
       const updateQuillContent = () => {
         quill.root.innerHTML = rawContent.value;
       };
@@ -108,7 +99,6 @@
       return {
         rawContent,
         htmlPreview,
-        // copyToClipboard,
         resetQuill,
         showHtmlPreview,
         updateQuillContent,
@@ -133,18 +123,6 @@
   
   input.form-control {
     flex: 1;
-  }
-  
-  .copy-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: #007bff;
-  }
-  
-  .copy-btn:hover {
-    color: #0056b3;
   }
   
   #editor {
