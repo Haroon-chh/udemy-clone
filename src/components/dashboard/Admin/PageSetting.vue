@@ -3,20 +3,20 @@
       <!-- Side Panel -->
       <div class="side-panel p-3">
         <div class="btn-group-vertical w-100">
-          <button
+          <router-link
             v-for="(page, index) in pages"
             :key="index"
+            :to="{ name: 'PageEditor', params: { slug: page.slug } }" 
             class="btn category-btn my-2 w-100"
           >
             {{ page.title }}
-          </button>
+          </router-link>
         </div>
       </div>
   
       <!-- Main Content Area -->
       <div class="content flex-grow-1 p-3">
-        <h4>Main Content Area</h4>
-        <p>You can place your main content here.</p>
+        <router-view/>
       </div>
     </div>
   </template>
