@@ -2,10 +2,12 @@ import { createStore } from 'vuex';
 import AuthApiServices from '@/services/AuthApiServices'; // Import your Auth API services
 import AdminStore from './AdminStore';
 import speakeasy from 'speakeasy'; // For 2FA secret generation
+import AddcartStore from './AddcartStore';
 
 export default createStore({
   modules: {
-    admin: AdminStore,
+    AdminStore,
+    AddcartStore
   },
   state: {
     user: null,
