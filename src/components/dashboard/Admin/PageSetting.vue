@@ -44,7 +44,7 @@
   .side-panel {
     width: 300px;
     height: 100vh;
-    background-color: #5a2ee3;
+    background-color: rgb(35, 35, 35);
     overflow-y: auto; /* Enable vertical scrolling */
     scrollbar-width: thin; /* Firefox-specific */
     scrollbar-color: #ddd #5a2ee3;
@@ -65,7 +65,7 @@
   
   /* Category Button Styles */
   .category-btn {
-    background-color: #5a2ee3;
+    background-color:#A435F0;
     color: white;
     border: 2px solid white;
     padding: 10px 20px;

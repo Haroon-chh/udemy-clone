@@ -28,15 +28,15 @@
   </template>
   
   <script>
-  import { ref, onMounted, nextTick } from 'vue';
+  import { ref, onMounted, nextTick, watch } from 'vue'; // Import 'watch'
   import { useStore } from 'vuex';
   import Quill from 'quill';
-  import { useRoute } from 'vue-router'; // To get slug from route params
+  import { useRoute } from 'vue-router'; // Get slug from route params
   
   export default {
     name: 'QuillEditorComponent',
     setup() {
-      const store = useStore(); // Access Vuex store
+      const store = useStore(); // Vuex store access
       const route = useRoute(); // Get route parameters (slug)
       const rawContent = ref(''); // Input value
       const htmlPreview = ref(''); // HTML preview
@@ -95,6 +95,14 @@
         initializeQuill(); // Initialize Quill editor
         await loadPageContent(); // Load content by slug
       });
+  
+      // Watch for route param changes (slug) and reload content
+      watch(
+        () => route.params.slug,
+        async () => {
+          await loadPageContent();
+        }
+      );
   
       return {
         rawContent,
