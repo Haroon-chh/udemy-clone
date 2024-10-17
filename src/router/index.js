@@ -12,6 +12,10 @@ import ChangePassword from '@/components/Profile/ChangePassword.vue';
 import AddArticle from '@/components/dashboard/Admin/AddArticle.vue';
 import PageSettingView from '../views/PageSettingView.vue';
 import ViewArticles from '@/components/dashboard/Admin/ViewArticles.vue';  
+import QuillEditorComponent from '@/components/dashboard/Admin/QuillEditorComponent.vue';
+import SubscriptionView from '@/views/SubscriptionView.vue'; // Import Subscription View
+import ActiveSubscription from '@/components/dashboard/Admin/ActiveSubscription.vue';
+import SiteSettings from '@/components/dashboard/Admin/SiteSettings.vue';
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
@@ -93,6 +97,35 @@ const routes = [
     path: '/page-settings',
     name: 'PageSettings',  // Match exactly with what you're using in $router.push
     component: PageSettingView,
+    meta: { title: 'Page Settings' },
+    children: [
+      {
+        path: ':slug',
+        name: 'PageEditor',
+        component: QuillEditorComponent,
+        meta: { title: 'Page Editor' },
+        props: true,
+      },
+    ],
+  },
+
+  {
+    path: '/subscriptions', // Add the subscription route
+    name: 'subscriptions',
+    component: SubscriptionView,
+    meta: { title: 'Subscriptions' },
+  },
+  {
+    path: '/active-subscriptions',  // Add this new route under dashboard
+    name: 'active-subscriptions',
+    component: ActiveSubscription,
+    meta: { title: 'Active Subscriptions' },
+  },
+
+  {
+    path: '/site-settings',
+    name: 'SiteSettings', 
+    component: SiteSettings,
     meta: { title: 'Page Settings' },
   },
 ];

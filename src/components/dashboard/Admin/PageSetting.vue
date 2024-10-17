@@ -3,75 +3,89 @@
       <!-- Side Panel -->
       <div class="side-panel p-3">
         <div class="btn-group-vertical w-100">
-          <button
-            v-for="(category, index) in categories"
+          <router-link
+            v-for="(page, index) in pages"
             :key="index"
+            :to="{ name: 'PageEditor', params: { slug: page.slug } }" 
             class="btn category-btn my-2 w-100"
           >
-            {{ category }}
-          </button>
+            {{ page.title }}
+          </router-link>
         </div>
       </div>
   
       <!-- Main Content Area -->
       <div class="content flex-grow-1 p-3">
-        <h4>Main Content Area</h4>
-        <p>You can place your main content here.</p>
+        <router-view/>
       </div>
     </div>
   </template>
   
   <script>
-  import { ref } from 'vue';
+  import { mapState } from 'vuex';
   
   export default {
     name: 'SidePanelComponent',
-    setup() {
-      // Define categories as a ref to make it reactive
-      const categories = ref([
-        'NavBar',
-        'About Us',
-        'Contact Us',
-        'Teach On Udemy',
-        'Footer',
-      ]);
-  
-      // Return reactive state to the template
-      return { categories };
+    computed: {
+      ...mapState('PageSettingsStore', ['pages']),
+    },
+    methods: {
+      fetchPages() {
+        this.$store.dispatch('PageSettingsStore/getPages');
+      },
+    },
+    mounted() {
+      this.fetchPages();
     },
   };
   </script>
   
   <style scoped>
   .side-panel {
-    width: 300px; /* Increased width of the side panel */
-    height: 100vh; /* Full height */
-    background-color: #5a2ee3; /* Side panel background color */
+    width: 300px;
+    height: 100vh;
+    background-color: rgb(35, 35, 35);
+    overflow-y: auto; /* Enable vertical scrolling */
+    scrollbar-width: thin; /* Firefox-specific */
+    scrollbar-color: #ddd #5a2ee3;
   }
   
-  /* Professional styling for category buttons */
+  /* Custom scroll styling for WebKit browsers */
+  .side-panel::-webkit-scrollbar {
+    width: 8px;
+  }
+  .side-panel::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 10px;
+  }
+  .side-panel::-webkit-scrollbar-track {
+    background-color: #5a2ee3;
+    border-radius: 10px;
+  }
+  
+  /* Category Button Styles */
   .category-btn {
-    background-color: #5a2ee3; /* Same background color as side panel */
-    color: white; /* White text */
-    border: 2px solid white; /* White border */
-    padding: 10px 20px; /* Add padding for a larger button size */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
-    transition: all 0.3s ease; /* Smooth transition for hover effects */
-    font-size: 16px; /* Slightly larger font size */
-    font-weight: 500; /* Medium font weight */
+    background-color:#A435F0;
+    color: white;
+    border: 2px solid white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    font-size: 16px;
+    font-weight: 500;
   }
   
   .category-btn:hover {
-    background-color: #483dbb; /* Darker shade on hover */
-    color: white; /* Keep text white on hover */
-    border-color: #ddd; /* Lighten the border on hover */
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2); /* Enhance shadow on hover */
-    transform: translateY(-2px); /* Lift button on hover */
+    background-color: #483dbb;
+    border-color: #ddd;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
   }
   
+  /* Main Content Area Styles */
   .content {
-    background-color: #f8f9fa; /* Light background for contrast */
+    background-color: #f8f9fa;
   }
   </style>
-``  
+  
