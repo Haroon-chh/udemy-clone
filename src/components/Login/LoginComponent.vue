@@ -10,50 +10,34 @@
       <!-- Right Side - Login Form -->
       <div class="col-md-6 bg-white p-5">
         <h1 class="mb-4">Log in to your account</h1>
-
+        
         <!-- Success and Error Popup Components -->
         <SuccessPopupComponent :show="showSuccess" :message="successMessage" />
         <ErrorPopupComponent :show="showError" :message="errorMessage" />
-
+        
         <!-- Login Form -->
         <form @submit.prevent="submitForm">
+          
           <!-- Email -->
-          <div class="mb-3 inputs position-relative" v-if="!requires2FA">
+          <div class="mb-3 inputs position-relative">
             <input type="email" id="email" v-model="email" class="form-control border-0" required placeholder="" />
             <label for="email" class="form-label">Email</label>
             <div v-if="emailError" class="text-danger">{{ emailError }}</div>
           </div>
-
+          
           <!-- Password -->
-          <div class="mb-3 inputs position-relative" v-if="!requires2FA">
+          <div class="mb-3 inputs position-relative">
             <input type="password" id="password" v-model="password" class="form-control border-0" required minlength="8" placeholder="" />
             <label for="password" class="form-label">Password</label>
             <div v-if="passwordError" class="text-danger">{{ passwordError }}</div>
           </div>
-
-          <!-- 2FA TOTP Code Input -->
-          <div v-if="requires2FA">
-            <h4>Enter the 2FA code from your authenticator app</h4>
-            <div class="mb-3 inputs position-relative">
-              <input type="text" v-model="enteredTOTP" class="form-control border-0" placeholder="Enter your 2FA code" />
-              <div v-if="totpError" class="text-danger">{{ totpError }}</div>
-            </div>
-          </div>
-
-          <!-- QR Code for 2FA Setup -->
-          <div v-if="showQrCode">
-            <h4>Scan the QR Code</h4>
-            <img :src="qrCodeDataURL" alt="QR Code" class="qr-code" />
-          </div>
-
-          <!-- Log In or Verify Button -->
-          <button type="submit" class="btn login-btn w-100 rounded-0">
-            {{ requires2FA ? 'Verify 2FA' : 'Log In' }}
-          </button>
+          
+          <!-- Login Button -->
+          <button type="submit" class="btn login-btn w-100 rounded-0">Log In</button>
         </form>
 
         <!-- Other Log In Options -->
-        <div class="mt-4 text-center" v-if="!requires2FA">
+        <div class="mt-4 text-center">
           <div class="separator">Other log in options</div>
           <div class="social-icons d-flex justify-content-center my-3">
             <button class="btn btn-outline-secondary mx-2" @click="socialLogin('Google')">
@@ -67,8 +51,25 @@
             </button>
           </div>
         </div>
+         <!-- Modal for 2FA Verification -->
+         <div v-if="show2FAModal" class="modal show d-block" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Enter 2FA Code</h5>
+                <button type="button" class="btn-close" @click="show2FAModal = false"></button>
+              </div>
+              <div class="modal-body">
+                <input type="text" v-model="otp" maxlength="6" class="form-control" placeholder="6-digit code" />
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @click="verify2FA">Verify</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <!-- Sign Up Option -->
+        <!-- Don't Have an Account & Organization Login -->
         <div class="mt-4 text-center">
           Don't have an account? <a href="/signup">Sign up</a>
         </div>
@@ -84,128 +85,113 @@
 import { ref, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import QRCode from 'qrcode';
-import { authenticator } from 'otplib'; // Use otplib for TOTP
-import SuccessPopup from '../SuccessPopup.vue';
-import ErrorPopup from '../ErrorPopup.vue';
+import SuccessPopup from '../SuccessPopup.vue'; // Adjust path if necessary
+import ErrorPopup from '../ErrorPopup.vue'; // Adjust path if necessary
 
 const SuccessPopupComponent = defineComponent(SuccessPopup);
 const ErrorPopupComponent = defineComponent(ErrorPopup);
 
 const email = ref('');
 const password = ref('');
+const otp = ref(''); // OTP input for 2FA
+
 const emailError = ref('');
 const passwordError = ref('');
-const totpError = ref('');
-const enteredTOTP = ref('');
-const showQrCode = ref(false);
-const qrCodeDataURL = ref('');
-const requires2FA = ref(false);
-const secret = ref(''); // Store the secret key generated for TOTP
-
 const router = useRouter();
 const store = useStore();
 
+const show2FAModal = ref(false); // 2FA modal visibility state
 const showSuccess = ref(false);
 const showError = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
 
-// Validation function for email
 const validateEmail = (email) => {
   const re = /\S+@\S+\.\S+/;
   return re.test(email);
 };
 
-// Handle form submission (login or 2FA verification)
 const submitForm = async () => {
   emailError.value = '';
   passwordError.value = '';
-  totpError.value = '';
 
-  if (!requires2FA.value) {
-    if (!validateEmail(email.value)) {
-      emailError.value = 'Please enter a valid email address';
-      return;
-    }
+  if (!validateEmail(email.value)) {
+    emailError.value = 'Please enter a valid email address';
+    return;
+  }
 
-    if (password.value.length < 8) {
-      passwordError.value = 'Password must be at least 8 characters';
-      return;
-    }
+  if (password.value.length < 8) {
+    passwordError.value = 'Password must be at least 8 characters';
+    return;
+  }
 
-    try {
-      // Step 1: Normal login process
-      const response = await store.dispatch('loginUser', {
-        email: email.value,
-        password: password.value,
-      });
+  try {
+    const response = await store.dispatch('loginUser', {
+      email: email.value,
+      password: password.value,
+    });
 
-      // Simulate 2FA status with localStorage
-      const twoFactorEnabled = localStorage.getItem('twoFactorEnabled') === 'true';
+    console.log('Login response:', response); // Debugging
 
-      if (twoFactorEnabled) {
-        // Step 2: User has 2FA enabled, show secret input
-        requires2FA.value = true;
-        generateQrCode(); // Generate the QR code for TOTP setup
-      } else if (response.success) {
-        // Proceed to dashboard if no 2FA is required
+    if (response.success) {
+      const is2FAEnabled = response.data?.['2fa'] === true; // Double-check evaluation
+
+      if (is2FAEnabled) {
+        console.log('2FA is enabled, showing modal'); // Debug
+        show2FAModal.value = true; // Show the modal
+      } else {
         successMessage.value = response.message;
         showSuccess.value = true;
 
         setTimeout(() => {
           showSuccess.value = false;
-          router.push('/dashboard');
+          router.push('/dashboard'); // Redirect if 2FA is not required
         }, 2000);
-      } else {
-        throw new Error(response.message || 'Unexpected response format');
       }
-    } catch (error) {
-      console.error('Error during login:', error);
-      errorMessage.value = error.response?.data.errors?.credentials?.[0] || 'An error occurred. Please try again later.';
-      showError.value = true;
-
-      setTimeout(() => {
-        showError.value = false;
-      }, 5000);
+    } else {
+      throw new Error(response.message || 'Unexpected response format');
     }
-  } else {
-    // Step 3: Verify the TOTP code using otplib
-    if (!enteredTOTP.value) {
-      totpError.value = 'Please enter the 2FA code.';
-      return;
-    }
+  } catch (error) {
+    console.error('Error during login:', error);
 
-    // Verify the TOTP code entered by the user
-    const verified = authenticator.check(enteredTOTP.value, secret.value);
+    errorMessage.value =
+      error.response?.data?.errors?.credentials?.[0] ||
+      'An error occurred. Please try again later.';
+    showError.value = true;
 
-    if (verified) {
+    setTimeout(() => {
+      showError.value = false;
+    }, 5000);
+  }
+};
+
+
+const verify2FA = async () => {
+  try {
+    const response = await store.dispatch('verify2FA', { otp: otp.value });
+
+    if (response.success) {
+      show2FAModal.value = false; // Hide 2FA modal
       successMessage.value = '2FA verified successfully!';
       showSuccess.value = true;
 
       setTimeout(() => {
         showSuccess.value = false;
-        router.push('/dashboard');
+        router.push('/dashboard'); // Redirect after successful 2FA verification
       }, 2000);
     } else {
-      totpError.value = 'Invalid 2FA code, please try again.';
+      throw new Error(response.message || 'Invalid 2FA code');
     }
-  }
-};
+  } catch (error) {
+    console.error('Error during 2FA verification:', error);
+    errorMessage.value =
+      error.response?.data?.errors?.one_time_password?.[0] ||
+      'Invalid 2FA code. Please try again.';
+    showError.value = true;
 
-// Generate QR code for 2FA if needed
-const generateQrCode = async () => {
-  secret.value = authenticator.generateSecret(); // Generate a TOTP secret
-
-  const otpauthUrl = authenticator.keyuri(email.value, 'UdemyCloneApp', secret.value);
-
-  try {
-    const qrCodeURL = await QRCode.toDataURL(otpauthUrl);
-    qrCodeDataURL.value = qrCodeURL;
-    showQrCode.value = true;
-    console.log('2FA Secret:', secret.value); // Output secret for debugging
-  } catch (err) {
-    console.error('Error generating QR code:', err);
+    setTimeout(() => {
+      showError.value = false;
+    }, 5000);
   }
 };
 
@@ -213,6 +199,7 @@ function socialLogin(provider) {
   alert(`Log in with ${provider} clicked`);
 }
 </script>
+
 
 <style scoped>
 .login-btn {
@@ -247,12 +234,6 @@ function socialLogin(provider) {
   font-size: 24px;
 }
 
-.qr-code {
-  margin: 20px 0;
-  width: 200px;
-  height: 200px;
-}
-
 .organization-login {
   color: #6c63ff;
   font-weight: 600;
@@ -278,37 +259,39 @@ function socialLogin(provider) {
 .inputs {
   position: relative;
   border: 1px solid black;
-  height: 70px;
+  height: 70px; /* Increased height for inputs */
   padding-top: 1.5rem;
   padding-bottom: 0.5rem;
   margin-bottom: 20px;
 }
 
 .form-label {
-  position: absolute;
-  top: 1.3rem;
-  left: 0.75rem;
-  font-size: 14px;
-  color: #000000;
-  font-weight: bold;
-  transition: all 0.2s ease-in-out;
-  pointer-events: none;
-}
+    position: absolute;
+    top: 1.3rem;
+    left: 0.75rem;
+    font-size: 14px;
+    color: #000000;
+    font-weight: bold;
+    transition: all 0.2s ease-in-out;
+    pointer-events: none;
+  }
 
 input:focus + .form-label,
-input:not(:placeholder-shown) + .form-label {
-  top: -0rem;
-  left: 0.75rem;
-  font-size: 0.75rem;
-}
+  input:not(:placeholder-shown) + .form-label {
+    top: -0rem;
+    left: 0.75rem;
+    font-size: 0.75rem;
+    margin-bottom: 0%;
+
+  }
 
 input {
   background-color: transparent;
   outline: none;
   box-shadow: none;
   height: 30px;
-  font-size: 16px;
-  padding: 0 12px;
+  font-size: 16px; /* Font size for input text */
+  padding: 0 12px; /* Padding inside input */
 }
 
 input:focus {
@@ -319,5 +302,111 @@ input:focus {
 input:not(:placeholder-shown) {
   border: none;
   box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  /* Container adjustments to reduce free space */
+  .container-fluid {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align content at the start */
+    height: auto; /* Remove full height constraint */
+    padding: 20px; /* General padding */
+    box-sizing: border-box;
+  }
+
+  /* Ensure the row does not overflow and centers */
+  .row {
+    flex-direction: column;
+    align-items: center;
+    width: 100% !important;
+    margin: 0; /* Remove any default margins */
+    padding: 0; /* Remove any default paddings */
+  }
+
+  /* Hide the image container on mobile view */
+  .col-md-6.p-0 {
+    display: none; /* Hide the image on mobile screens */
+  }
+
+  /* Adjust login form section */
+  .col-md-6.bg-white.p-5 {
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+  }
+
+  /* Adjust heading text */
+  .col-md-6.bg-white.p-5 h1 {
+    font-size: 16px; /* Smaller font size for mobile */
+    margin-top: 10px;
+    line-height: 1.4;
+  }
+
+  /* Keep social icons in a single line */
+  .social-icons {
+    flex-direction: row !important;
+    justify-content: center;
+    flex-wrap: nowrap;
+  }
+
+  /* Adjust social button size and spacing */
+  .social-icons button {
+    width: auto;
+    margin: 0 8px;
+    font-size: 18px;
+    padding: 10px;
+  }
+
+  /* Adjust form fields and buttons */
+  .form-control {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  /* Adjust button styling */
+  .btn {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  /* Adjust separator width */
+  .separator {
+    width: 100% !important;
+  }
+
+  /* Adjust text alignment and spacing */
+  .text-center h1 {
+    font-size: 16px;
+    margin-top: 10px;
+    color: #333;
+  }
+
+  /* Adjust anchor link styles */
+  .text-center a {
+    display: block;
+    margin: 5px 0;
+    font-size: 14px;
+  }
+
+  /* Adjust organization login link */
+  .organization-login {
+    font-size: 14px;
+  }
+
+  /* Adjust text center alignment */
+  .text-center {
+    font-size: 14px;
+  }
+
+  /* Ensure footer is at the bottom without extra margin */
+  footer {
+    width: 100%;
+    padding: 10px;
+    background-color: #f9f9f9;
+    text-align: center;
+    box-sizing: border-box;
+    position: relative; /* Ensure footer stays below content */
+  }
 }
 </style>
