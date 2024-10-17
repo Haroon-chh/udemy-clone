@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { ref, reactive, nextTick, onUnmounted, toRaw } from 'vue';
+import { ref, reactive, nextTick, onUnmounted } from 'vue';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import { useRouter } from 'vue-router';
@@ -104,56 +104,81 @@ export default {
     // Handle image file selection
     const handleImageUpload = (event) => {
       const file = event.target.files[0];
+
       if (file) {
-        selectedImage.value = file; // Store the file
-      }
-    };
+        const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        const maxSize = 2 * 1024 * 1024; // 2MB
 
-    const uploadImageToServer = async () => {
-      if (!selectedImage.value) return;
+        // Validate file type
+        if (!validImageTypes.includes(file.type)) {
+          alert('Invalid file type. Only JPEG, JPG, PNG, or GIF files are allowed.');
+          selectedImage.value = null;
+          return;
+        }
 
-      // Create FormData and append the file
-      const formData = new FormData();
-      formData.append('image', selectedImage.value);
+        // Validate file size
+        if (file.size > maxSize) {
+          alert('File size exceeds the 2MB limit.');
+          selectedImage.value = null;
+          return;
+        }
 
-      try {
-        const response = await store.dispatch('admin/uploadImage', formData); // Make sure to implement this action in Vuex
-        return response.data.image_path; // Assuming backend returns the saved image path
-      } catch (error) {
-        console.error('Failed to upload image:', error);
-        throw error;
+        selectedImage.value = file; // Store the valid file
+        console.log("Selected Image: ", file);  // Log the selected image
       }
     };
 
     const publishArticle = async () => {
-      if (!articleData.title || !articleData.course_id || !articleData.user_id || !articleData.status) {
-        alert('Please fill in all required fields.');
-        return;
+  if (!articleData.title || !articleData.course_id || !articleData.user_id || !articleData.status) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+
+  if (quill) {
+    articleData.body = quill.root.innerHTML;
+
+    if (!articleData.body || articleData.body === '<p><br></p>') {
+      alert('Please enter content for the article body.');
+      return;
+    }
+
+    try {
+      // Prepare FormData for sending the article
+      const formData = new FormData();
+      formData.append('title', articleData.title);
+      formData.append('body', articleData.body);
+      formData.append('user_id', articleData.user_id);
+      formData.append('course_id', articleData.course_id);
+      formData.append('status', articleData.status);
+
+      // Append image file if available
+      if (selectedImage.value) {
+        formData.append('image_file', selectedImage.value);
       }
 
-      if (quill) {
-        articleData.body = quill.root.innerHTML;
+      // Dispatch the action to create the article with the image
+      const response = await store.dispatch('AdminStore/createArticle', formData);
+      console.log('Backend Response:', response);  // Log the response from the backend
 
-        if (!articleData.body || articleData.body === '<p><br></p>') {
-          alert('Please enter content for the article body.');
-          return;
-        }
+      // Log the full article data to check image_path and image_url
+      console.log('Article Data:', response.data.article);
 
-        try {
-          // If an image is selected, upload it to the server first
-          if (selectedImage.value) {
-            articleData.image_path = await uploadImageToServer();
-          }
+      alert('Article published successfully!');
+      goBackToDashboard();
+    } catch (error) {
+      console.error('Error occurred while publishing the article:', error);
 
-          await store.dispatch('admin/createArticle', toRaw(articleData));  // Send article data to the backend
-          alert('Article published successfully!');
-          goBackToDashboard();
-        } catch (error) {
-          alert('Failed to publish the article. Please try again.');
-          console.error(error);
-        }
+      if (error.response) {
+        console.log('Error Response Data:', error.response.data);
+        console.log('Error Status:', error.response.status);
+        console.log('Error Headers:', error.response.headers);
+      } else {
+        console.log('Error Message:', error.message);
       }
-    };
+    }
+  }
+};
+
 
     const goBackToDashboard = () => {
       router.push({ name: 'dashboard' });

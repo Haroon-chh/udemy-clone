@@ -5,13 +5,15 @@ import speakeasy from 'speakeasy'; // For 2FA secret generation
 import PageSettingsStore from './pageSettingsStore';
 import StudentStore from './StudentStore';
 import AddcartStore from './AddcartStore';
+import CategoriesStore from './CategoriesStore';
 
 export default createStore({
   modules: {
     AdminStore,
-     PageSettingsStore,
-      StudentStore,
-    AddcartStore
+    PageSettingsStore,
+    StudentStore,
+    AddcartStore,
+    CategoriesStore
   },
   state: {
     user: null,
