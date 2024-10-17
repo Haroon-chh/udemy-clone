@@ -119,6 +119,8 @@ export default createStore({
           localStorage.removeItem('access_token');
           localStorage.removeItem('authUser');
           localStorage.removeItem('logged_user');
+          localStorage.removeItem('cart');
+          localStorage.removeItem('isSubscribed')
     
           commit('clearUser');
           commit('setLoggedIn', false);
