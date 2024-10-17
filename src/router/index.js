@@ -12,6 +12,7 @@ import ChangePassword from '@/components/Profile/ChangePassword.vue';
 import AddArticle from '@/components/dashboard/Admin/AddArticle.vue';
 import PageSettingView from '../views/PageSettingView.vue';
 import ViewArticles from '@/components/dashboard/Admin/ViewArticles.vue';  
+import SiteSettings from '@/components/dashboard/Admin/SiteSettings.vue';
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
@@ -93,6 +94,13 @@ const routes = [
     path: '/page-settings',
     name: 'PageSettings',  // Match exactly with what you're using in $router.push
     component: PageSettingView,
+    meta: { title: 'Page Settings' },
+  },
+
+  {
+    path: '/site-settings',
+    name: 'SiteSettings', 
+    component: SiteSettings,
     meta: { title: 'Page Settings' },
   },
 ];
