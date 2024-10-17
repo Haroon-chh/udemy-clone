@@ -1,9 +1,8 @@
 <template>
-  <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+  <div id="carouselExampleControls" class="carousel slide mt-0" data-bs-ride="carousel" data-bs-interval="3000">
     <div class="carousel-inner">
       <div class="carousel-item" :class="{ active: index === 0 }" v-for="(image, index) in images" :key="index">
-        <!-- Add responsive class for smaller screens -->
-        <img :src="getImageUrl(image)" class="d-block w-100 carousel-image" alt="slide image">
+        <img :src="getImageUrl(index)" class="d-block w-100 carousel-image" alt="slide image">
 
         <!-- First Image's Card (Fixed) -->
         <div class="card custom-card d-flex flex-column" v-if="index === 0">
@@ -28,11 +27,11 @@
     </div>
 
     <!-- Custom Carousel Controls (Smaller, Centered) -->
-    <button class="carousel-control-prev custom-arrow" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+    <button class="carousel-control-prev custom-arrow" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </button>
-    <button class="carousel-control-next custom-arrow" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+    <button class="carousel-control-next custom-arrow" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
@@ -44,15 +43,39 @@ export default {
   name: 'CarouselComponent',
   data() {
     return {
-      images: [
+      largeScreenImages: [
         'dashboard-carousel-img1.jpg', 
         'dashboard-carousel-img2.jpg'
       ],
+      smallScreenImages: [
+        'dashboard-carousel-img-SmallScreen1.jpg', 
+        'dashboard-carousel-img-SmallScreen2.jpg'
+      ],
+      isSmallScreen: false,
     };
   },
+  computed: {
+    images() {
+      // Return the correct set of images based on screen size
+      return this.isSmallScreen ? this.smallScreenImages : this.largeScreenImages;
+    }
+  },
+  mounted() {
+    this.checkScreenSize();
+    window.addEventListener('resize', this.checkScreenSize);
+  },
+  beforeUnmount() { // Replacing beforeDestroy with beforeUnmount
+    window.removeEventListener('resize', this.checkScreenSize);
+  },
   methods: {
-    getImageUrl(image) {
+    getImageUrl(index) {
+      // Return the appropriate image URL based on the screen size
+      const image = this.images[index];
       return require(`@/assets/${image}`);
+    },
+    checkScreenSize() {
+      // Update the flag for small screens
+      this.isSmallScreen = window.innerWidth <= 768; // Small screens are 768px and below
     }
   }
 };
@@ -95,6 +118,13 @@ export default {
 
   .carousel-image {
     height: auto;
+  }
+
+  /* Hide carousel control buttons on small screens */
+  .carousel-control-prev,
+  .carousel-control-next {
+    display: none;
+    visibility: hidden;
   }
 }
 
