@@ -39,12 +39,17 @@
 
         <!-- Input to enter the secret key -->
         <div class="form-group">
-          <label for="secret">{{ isTwoFactorEnabled ? 'Enter Secret Key to Disable' : 'Enter Secret Key from Console' }}</label>
-          <input type="text" id="secret" v-model="enteredSecret" placeholder="Enter secret key" />
+          <label for="secret">{{ isTwoFactorEnabled ? 'Enter Password to Disable' : 'Enter One Time Password' }}</label>
+          <input type="text" id="secret" v-model="enteredSecret" placeholder="Enter one time password" />
         </div>
+        
+        <!-- Update Template -->
+<div class="form-group" v-if="isTwoFactorEnabled">
+  <label for="password">Enter Password to Disable 2FA</label>
+  <input type="password" id="password" v-model="disablePassword" placeholder="Enter your password" required />
+</div>
+<button @click="isTwoFactorEnabled ? disableTwoFactorAuth() : enableTwoFactorAuth()" class="btn btn-success small-button">{{ isTwoFactorEnabled ? 'Disable 2FA' : 'Verify and Enable 2FA' }}</button>
 
-        <!-- Submit button for 2FA verification -->
-        <button @click="verifySecret" class="btn btn-success small-button">{{ isTwoFactorEnabled ? 'Disable 2FA' : 'Verify and Enable 2FA' }}</button>
       </div>
     </div>
   </div>
@@ -53,7 +58,6 @@
 <script>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
-// import * as speakeasy from 'speakeasy';
 import AuthApiServices from '@/services/AuthApiServices.js';
 import QRCode from 'qrcode';
 
@@ -69,14 +73,13 @@ export default {
     const disableQrCodeDataURL = ref('');
     const enteredSecret = ref('');
     const generatedSecret = ref('');
-    const disableGeneratedSecret = ref('');
+    const disablePassword = ref(''); // New ref for the password input
 
     const userInitials = computed(() => {
       return user.value?.name
         ?.split(' ')
         .map((n) => n[0])
-        .join('')
-        .toUpperCase() || '';
+        .join('') || '';
     });
 
     const userName = computed(() => user.value?.name || 'User');
@@ -84,7 +87,6 @@ export default {
 
     onMounted(() => {
       username.value = user.value?.name || '';
-      // Retrieve the 2FA status from localStorage
       const twoFactorStatus = localStorage.getItem('twoFactorEnabled');
       isTwoFactorEnabled.value = twoFactorStatus === 'true';
     });
@@ -99,21 +101,17 @@ export default {
       }
     };
 
-    // Function to toggle 2FA
     const toggleTwoFactorAuth = async () => {
       isEnabling2FA.value = true;
-      generatedSecret.value = ''; // Clear the secret key input field when toggling
+      generatedSecret.value = '';
 
       if (!isTwoFactorEnabled.value) {
-        // Enable 2FA: Call API to generate secret and QR code using GET request
         try {
-          const response = await AuthApiServices.GetRequest('/generate-secret-key'); // Call API using GetRequest
-          const secretKey = response.data.google2fa_secret; // Get secret key from response
+          const response = await AuthApiServices.GetRequest('/generate-secret-key');
+          const secretKey = response.data.google2fa_secret;
           generatedSecret.value = secretKey;
 
-          const otpauthUrl = `otpauth://totp/UdemyCloneApp?secret=${secretKey}&issuer=UdemyCloneApp`; // Create otpauth URL
-
-          // Generate QR code from otpauth URL
+          const otpauthUrl = `otpauth://totp/UdemyCloneApp?secret=${secretKey}&issuer=UdemyCloneApp`;
           const qrCodeURL = await QRCode.toDataURL(otpauthUrl);
           qrCodeDataURL.value = qrCodeURL;
 
@@ -122,38 +120,58 @@ export default {
           console.error('Error generating secret key or QR code:', err);
         }
       } else {
-        // Handle disable 2FA logic here (if needed)
-        try {
-          const disableSecret = 'DISABLE_2FA_SECRET'; // Example secret, you may adjust this logic
-          disableGeneratedSecret.value = disableSecret;
-
-          const disableOtpauthUrl = `otpauth://totp/UdemyCloneApp?secret=${disableSecret}&issuer=UdemyCloneApp`;
-          const disableQrCodeURL = await QRCode.toDataURL(disableOtpauthUrl);
-          disableQrCodeDataURL.value = disableQrCodeURL;
-
-          console.log('Generated Disable Secret Key:', disableGeneratedSecret.value);
-        } catch (err) {
-          console.error('Error generating disable QR code:', err);
-        }
+        // Logic to handle disabling 2FA, if required
       }
     };
 
-    const verifySecret = async () => {
-      if ((!isTwoFactorEnabled.value && enteredSecret.value === generatedSecret.value) ||
-          (isTwoFactorEnabled.value && enteredSecret.value === disableGeneratedSecret.value)) {
-        if (isTwoFactorEnabled.value) {
-          alert('2FA disabled successfully!');
-          localStorage.setItem('twoFactorEnabled', 'false'); // Save status to localStorage
-          await store.dispatch('disableTwoFactorAuth', { userId: user.value?.id });
-        } else {
-          alert('2FA enabled successfully!');
-          localStorage.setItem('twoFactorEnabled', 'true'); // Save status to localStorage
-          await store.dispatch('enableTwoFactorAuth', { userId: user.value?.id, secret: generatedSecret.value });
+    const enableTwoFactorAuth = async () => {
+    try {
+        console.log('Entered Secret:', enteredSecret.value); // Log the entered secret
+        const response = await AuthApiServices.PostRequest('/enable-2fa', {
+            one_time_password: enteredSecret.value,
+        });
+
+        console.log('API Response:', response); // Log the response to check the structure
+
+        if (response.message === "2-Factor Authentication successfully enabled.") {
+            alert('2FA enabled successfully!');
+            localStorage.setItem('twoFactorEnabled', 'true');
+            isTwoFactorEnabled.value = true; // Update the state
+            isEnabling2FA.value = false; // Close the enabling section
         }
-        isTwoFactorEnabled.value = !isTwoFactorEnabled.value;
-        isEnabling2FA.value = false;
-      } else {
-        alert('Invalid secret key, please try again.');
+    } catch (error) {
+        console.error('Error enabling 2FA:', error);
+        if (error.response) {
+            console.error('Response data:', error.response.data); // Log the response data
+            alert(error.response.data.errors?.google2fa_secret[0] || 'An error occurred'); // Handle specific error messages
+        } else {
+            alert('An unexpected error occurred. Please try again.'); // General error handling
+        }
+    }
+};
+
+
+
+    const disableTwoFactorAuth = async () => {
+      try {
+        const response = await AuthApiServices.PostRequest('/disable-2fa', {
+          password: disablePassword.value,
+        });
+
+        if (response.data.message === '2-Factor Authentication successfully disabled.') {
+          alert('2FA has been successfully disabled.');
+          localStorage.setItem('twoFactorEnabled', 'false');
+          isTwoFactorEnabled.value = false; // Update state
+          isEnabling2FA.value = false; // Close section
+        }
+      } catch (error) {
+        console.error('Error disabling 2FA:', error); // Log any errors
+        if (error.response) {
+          console.error('Response data:', error.response.data);
+          alert(error.response.data.message || 'Failed to disable 2FA.');
+        } else {
+          alert('An unexpected error occurred. Please try again.');
+        }
       }
     };
 
@@ -169,7 +187,8 @@ export default {
       enteredSecret,
       saveProfile,
       toggleTwoFactorAuth,
-      verifySecret,
+      enableTwoFactorAuth,
+      disableTwoFactorAuth,
     };
   },
 };
