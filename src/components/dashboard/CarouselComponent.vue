@@ -1,9 +1,8 @@
 <template>
-  <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+  <div id="carouselExampleControls" class="carousel slide mt-0" data-bs-ride="carousel" data-bs-interval="3000">
     <div class="carousel-inner">
       <div class="carousel-item" :class="{ active: index === 0 }" v-for="(image, index) in images" :key="index">
-        <!-- Add responsive class for smaller screens -->
-        <img :src="getImageUrl(image)" class="d-block w-100 carousel-image" alt="slide image">
+        <img :src="getImageUrl(index)" class="d-block w-100 carousel-image" alt="slide image">
 
         <!-- First Image's Card (Fixed) -->
         <div class="card custom-card d-flex flex-column" v-if="index === 0">
@@ -13,7 +12,7 @@
           </div>
         </div>
 
-        <!-- Second Image's Card (Matches Attached Image) -->
+        
         <div class="card custom-card d-flex flex-column" v-else>
           <div class="card-body">
             <h2 class="card-title">Skills that drive you forward</h2>
@@ -27,12 +26,12 @@
       </div>
     </div>
 
-    <!-- Custom Carousel Controls (Smaller, Centered) -->
-    <button class="carousel-control-prev custom-arrow" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+    
+    <button class="carousel-control-prev custom-arrow" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </button>
-    <button class="carousel-control-next custom-arrow" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+    <button class="carousel-control-next custom-arrow" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
@@ -44,15 +43,39 @@ export default {
   name: 'CarouselComponent',
   data() {
     return {
-      images: [
+      largeScreenImages: [
         'dashboard-carousel-img1.jpg', 
         'dashboard-carousel-img2.jpg'
       ],
+      smallScreenImages: [
+        'dashboard-carousel-img-SmallScreen1.jpg', 
+        'dashboard-carousel-img-SmallScreen2.jpg'
+      ],
+      isSmallScreen: false,
     };
   },
+  computed: {
+    images() {
+      
+      return this.isSmallScreen ? this.smallScreenImages : this.largeScreenImages;
+    }
+  },
+  mounted() {
+    this.checkScreenSize();
+    window.addEventListener('resize', this.checkScreenSize);
+  },
+  beforeUnmount() { 
+    window.removeEventListener('resize', this.checkScreenSize);
+  },
   methods: {
-    getImageUrl(image) {
+    getImageUrl(index) {
+      
+      const image = this.images[index];
       return require(`@/assets/${image}`);
+    },
+    checkScreenSize() {
+      
+      this.isSmallScreen = window.innerWidth <= 768;
     }
   }
 };
@@ -76,7 +99,7 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive for smaller screens */
+
 @media (max-width: 768px) {
   .custom-card {
     position: relative;
@@ -96,6 +119,13 @@ export default {
   .carousel-image {
     height: auto;
   }
+
+  
+  .carousel-control-prev,
+  .carousel-control-next {
+    display: none;
+    visibility: hidden;
+  }
 }
 
 .card-text {
@@ -112,7 +142,7 @@ export default {
   color: #333;
 }
 
-/* Styling for buttons */
+
 .custom-btn {
   padding: 10px;
   border-radius: 0px;
