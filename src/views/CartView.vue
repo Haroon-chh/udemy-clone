@@ -1,13 +1,16 @@
-<!-- src/views/LoginView.vue -->
 <template>
-    <div class="login-view">
-      <CartComponent />
-    </div>
-  </template>
-  
-  <script setup>
-  import CartComponent from '../components/cart/CartComponent.vue';
-  </script>
+  <CartComponent />
+</template>
+
+<script>
+import CartComponent from '@/components/cart/CartComponent.vue';
+
+export default {
+  components: {
+    CartComponent,
+  },
+};
+</script>
   
   <style scoped>
   </style>

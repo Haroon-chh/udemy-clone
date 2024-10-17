@@ -51,6 +51,23 @@
             </button>
           </div>
         </div>
+         <!-- Modal for 2FA Verification -->
+         <div v-if="show2FAModal" class="modal show d-block" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Enter 2FA Code</h5>
+                <button type="button" class="btn-close" @click="show2FAModal = false"></button>
+              </div>
+              <div class="modal-body">
+                <input type="text" v-model="otp" maxlength="6" class="form-control" placeholder="6-digit code" />
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @click="verify2FA">Verify</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- Don't Have an Account & Organization Login -->
         <div class="mt-4 text-center">
@@ -68,19 +85,22 @@
 import { ref, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import SuccessPopup from '../SuccessPopup.vue'; // Adjust the path as necessary
-import ErrorPopup from '../ErrorPopup.vue'; // Adjust the path as necessary
+import SuccessPopup from '../SuccessPopup.vue'; // Adjust path if necessary
+import ErrorPopup from '../ErrorPopup.vue'; // Adjust path if necessary
 
 const SuccessPopupComponent = defineComponent(SuccessPopup);
 const ErrorPopupComponent = defineComponent(ErrorPopup);
 
 const email = ref('');
 const password = ref('');
+const otp = ref(''); // OTP input for 2FA
+
 const emailError = ref('');
 const passwordError = ref('');
 const router = useRouter();
 const store = useStore();
 
+const show2FAModal = ref(false); // 2FA modal visibility state
 const showSuccess = ref(false);
 const showError = ref(false);
 const successMessage = ref('');
@@ -111,22 +131,62 @@ const submitForm = async () => {
       password: password.value,
     });
 
+    console.log('Login response:', response); // Debugging
 
     if (response.success) {
-      successMessage.value = response.message;
-      showSuccess.value = true;
+      const is2FAEnabled = response.data?.['2fa'] === true; // Double-check evaluation
 
-      setTimeout(() => {
-        showSuccess.value = false;
-        router.push('/dashboard');
-      }, 2000);
+      if (is2FAEnabled) {
+        console.log('2FA is enabled, showing modal'); // Debug
+        show2FAModal.value = true; // Show the modal
+      } else {
+        successMessage.value = response.message;
+        showSuccess.value = true;
+
+        setTimeout(() => {
+          showSuccess.value = false;
+          router.push('/dashboard'); // Redirect if 2FA is not required
+        }, 2000);
+      }
     } else {
       throw new Error(response.message || 'Unexpected response format');
     }
   } catch (error) {
     console.error('Error during login:', error);
+
     errorMessage.value =
-      error.response?.data.errors?.credentials[0] || 'An error occurred. Please try again later.';
+      error.response?.data?.errors?.credentials?.[0] ||
+      'An error occurred. Please try again later.';
+    showError.value = true;
+
+    setTimeout(() => {
+      showError.value = false;
+    }, 5000);
+  }
+};
+
+
+const verify2FA = async () => {
+  try {
+    const response = await store.dispatch('verify2FA', { otp: otp.value });
+
+    if (response.success) {
+      show2FAModal.value = false; // Hide 2FA modal
+      successMessage.value = '2FA verified successfully!';
+      showSuccess.value = true;
+
+      setTimeout(() => {
+        showSuccess.value = false;
+        router.push('/dashboard'); // Redirect after successful 2FA verification
+      }, 2000);
+    } else {
+      throw new Error(response.message || 'Invalid 2FA code');
+    }
+  } catch (error) {
+    console.error('Error during 2FA verification:', error);
+    errorMessage.value =
+      error.response?.data?.errors?.one_time_password?.[0] ||
+      'Invalid 2FA code. Please try again.';
     showError.value = true;
 
     setTimeout(() => {
