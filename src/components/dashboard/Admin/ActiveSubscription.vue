@@ -136,7 +136,7 @@ export default {
   text-transform: uppercase;
   letter-spacing: 1.5px;
   background: linear-gradient(45deg, #3498db, #8e44ad);
-  -webkit-background-clip: text;
+  /* -webkit-background-clip: text; */
   -webkit-text-fill-color: transparent;
 }
 
