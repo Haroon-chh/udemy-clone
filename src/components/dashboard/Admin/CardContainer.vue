@@ -43,7 +43,8 @@ export default {
       { id: 3, title: 'Analytics', description: 'View site analytics, user trends.', icon: 'fas fa-chart-line', color: '#ff9800', link: null },
       { id: 4, title: 'Page Settings', description: 'Configure site settings and preferences.', icon: 'fas fa-cogs', color: '#9c27b0', link: {name:'PageSettings'} },
       { id: 5, title: 'Support Center', description: 'Access support resources and resolve issues.', icon: 'fas fa-headset', color: '#f44336', link: null },
-      { id: 6, title: 'Active Subscriptions', description: 'Check active subscriptions.', icon: 'fas fa-plus', color: '#337939', link: null },
+      { id: 6, title: 'Active Subscriptions', description: 'Check active subscriptions.', icon: 'fas fa-plus', color: '#337939', link: { name: 'active-subscriptions' } },
+      
     ]);
 
     return { cards };
