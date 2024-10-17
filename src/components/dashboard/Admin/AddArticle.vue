@@ -61,11 +61,12 @@ export default {
     const router = useRouter();
     const store = useStore();
     const htmlOutput = ref('');
+    const selectedImage = ref(null); // Reference to store the selected file
 
     const articleData = reactive({
       title: '',
       body: '',
-      image_path: '',  // Changed from image_url to image_path
+      image_path: '',
       user_id: '',
       course_id: '',
       status: 'draft',
@@ -100,19 +101,32 @@ export default {
       }
     };
 
+    // Handle image file selection
     const handleImageUpload = (event) => {
       const file = event.target.files[0];
       if (file) {
-        // Ensure the file name doesn't contain any unwanted characters
-        const sanitizedFileName = file.name.replace(/['"]/g, ''); // Removing any single or double quotes
-        articleData.image_path = `/src/assets/${sanitizedFileName}`;
-        console.log('Image path set to:', articleData.image_path);
+        selectedImage.value = file; // Store the file
       }
     };
 
+    const uploadImageToServer = async () => {
+      if (!selectedImage.value) return;
+
+      // Create FormData and append the file
+      const formData = new FormData();
+      formData.append('image', selectedImage.value);
+
+      try {
+        const response = await store.dispatch('admin/uploadImage', formData); // Make sure to implement this action in Vuex
+        return response.data.image_path; // Assuming backend returns the saved image path
+      } catch (error) {
+        console.error('Failed to upload image:', error);
+        throw error;
+      }
+    };
 
     const publishArticle = async () => {
-      if (!articleData.title || !articleData.course_id || !articleData.image_path || !articleData.user_id || !articleData.status) {
+      if (!articleData.title || !articleData.course_id || !articleData.user_id || !articleData.status) {
         alert('Please fill in all required fields.');
         return;
       }
@@ -126,7 +140,12 @@ export default {
         }
 
         try {
-          await store.dispatch('admin/createArticle', toRaw(articleData));  // Ensure image_path is sent to the backend
+          // If an image is selected, upload it to the server first
+          if (selectedImage.value) {
+            articleData.image_path = await uploadImageToServer();
+          }
+
+          await store.dispatch('admin/createArticle', toRaw(articleData));  // Send article data to the backend
           alert('Article published successfully!');
           goBackToDashboard();
         } catch (error) {
@@ -144,7 +163,15 @@ export default {
 
     onUnmounted(() => destroyQuillInstance());
 
-    return { quillEditor, articleData, publishArticle, goBackToDashboard, htmlOutput, convertToHtml, handleImageUpload };
+    return {
+      quillEditor,
+      articleData,
+      publishArticle,
+      goBackToDashboard,
+      htmlOutput,
+      convertToHtml,
+      handleImageUpload,
+    };
   },
 };
 </script>
