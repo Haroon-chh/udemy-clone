@@ -8,7 +8,8 @@
       <hr />
       <router-link to="/edit-profile" class="dropdown-link">Edit Profile</router-link>
       <router-link to="/subscriptions" class="dropdown-link">Subscriptions</router-link>
-      <router-link to="/settings" class="dropdown-link">Settings</router-link>
+      <router-link to="/purchase-courses" class="dropdown-link">Purchase Courses</router-link>
+
       <hr />
       <button @click="logout" class="btn btn-outline-danger btn-sm ms-2">Logout</button>
     </div>

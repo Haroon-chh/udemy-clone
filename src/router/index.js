@@ -16,6 +16,8 @@ import QuillEditorComponent from '@/components/dashboard/Admin/QuillEditorCompon
 import SubscriptionView from '@/views/SubscriptionView.vue'; // Import Subscription View
 import ActiveSubscription from '@/components/dashboard/Admin/ActiveSubscription.vue';
 import SiteSettings from '@/components/dashboard/Admin/SiteSettings.vue';
+import PurchaseCourses from '@/components/Profile/PurchaseCourses.vue';
+
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
@@ -127,6 +129,12 @@ const routes = [
     name: 'SiteSettings', 
     component: SiteSettings,
     meta: { title: 'Page Settings' },
+  },
+  {
+    path: '/purchase-courses', // Define the path for your PurchaseCourses page
+    name: 'PurchaseCourses',
+    component: PurchaseCourses,
+    meta: { title: 'Purchase Courses' },
   },
 ];
 
