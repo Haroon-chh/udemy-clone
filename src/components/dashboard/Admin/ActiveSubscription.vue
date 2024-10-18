@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h1 class="page-title">
-      <i class="fas fa-list-alt"></i> Active Subscriptions
+      <i class="fas fa-list-alt"></i> Active Subscription
     </h1>
 
     <!-- Loading Spinner -->
