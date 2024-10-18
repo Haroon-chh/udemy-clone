@@ -46,10 +46,10 @@ import { ref, onMounted, nextTick, watch } from 'vue';
 import { useStore } from 'vuex';
 import Quill from 'quill';
 import { useRoute } from 'vue-router';
-import AuthApiServices from '@/services/AuthApiServices'; // Import Auth API Service
 
 const Clipboard = Quill.import('modules/clipboard');
 
+// Custom Clipboard Class to handle pasting
 class CustomClipboard extends Clipboard {
   onPaste(event) {
     const clipboardEvent = event.clipboardData || window.clipboardData;
@@ -131,20 +131,12 @@ export default {
     };
 
     const updatePageContent = async () => {
-      try {
-        const pageId = store.state.PageSettingsStore.currentPage.id; // Get page ID from store
-        const response = await AuthApiServices.PostRequest(`/update-page/${pageId}`, {
-          body: cleanedContent.value,
-        });
+      const cleanedBody = cleanedContent.value;
+      const response = await store.dispatch('PageSettingsStore/updatePageContent', cleanedBody);
 
-        message.value = response.message || 'Page updated successfully!';
-        messageClass.value = 'alert-success';
-        console.log('Page updated successfully:', response);
-      } catch (error) {
-        message.value = 'Failed to update page. Please try again.';
-        messageClass.value = 'alert-danger';
-        console.error('Error updating page:', error);
-      }
+      message.value = response.message || 'Page updated successfully!';
+      messageClass.value = response.success ? 'alert-success' : 'alert-danger';
+      console.log('Page update response:', response);
     };
 
     onMounted(async () => {
@@ -173,6 +165,7 @@ export default {
   },
 };
 </script>
+
   
 <style scoped>
 .quill-editor-container {
