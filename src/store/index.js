@@ -1,10 +1,18 @@
 import { createStore } from 'vuex';
 import AuthApiServices from '@/services/AuthApiServices'; // Import your Auth API services
 import AdminStore from './AdminStore';
+import PageSettingsStore from './pageSettingsStore';
+import StudentStore from './StudentStore';
+import AddcartStore from './AddcartStore';
+import CategoriesStore from './CategoriesStore';
 
 export default createStore({
   modules: {
-      admin:  AdminStore,
+    AdminStore,
+    PageSettingsStore,
+    StudentStore,
+    AddcartStore,
+    CategoriesStore
   },
   state: {
     user: null,
@@ -69,7 +77,7 @@ export default createStore({
     async loginUser({ commit }, credentials) {
       try {
         const response = await AuthApiServices.PostRequest('/login', credentials);
-        console.log('Login API response:', response);
+        console.log('Login API response:', response); // Debug response
     
         if (response && response.message === 'OK' && response.data) {
           commit('setUser', response.data);
@@ -88,26 +96,18 @@ export default createStore({
           localStorage.setItem('logged_user', JSON.stringify(loggedUserData));
           commit('setLoggedUser', loggedUserData);
     
-          // Return the actual success message from the API response
-          return { success: true, message: 'Login successful!' };
-         } else {
+          return { success: true, data: response.data, message: 'Login successful!' }; // Include `data`
+        } else {
           return { success: false, message: response.message || 'Unexpected response format' };
         }
       } catch (error) {
         console.error('Error during login:', error);
     
-        // Handle error response structure
-        if (error.response && error.response.data) {
-          const apiMessage = error.response.data.message;
-          const credentialsError = error.response.data.errors?.credentials?.[0];
+        const apiMessage = error.response?.data?.message;
+        const credentialsError = error.response?.data?.errors?.credentials?.[0];
     
-          // Prioritize specific credential errors over the general message
-          const errorMessage = credentialsError || apiMessage || 'An error occurred. Please try again.';
-          return { success: false, message: errorMessage };
-        }
-    
-        // Fallback error message for unexpected errors
-        return { success: false, message: 'An error occurred. Please try again.' };
+        const errorMessage = credentialsError || apiMessage || 'An error occurred. Please try again.';
+        return { success: false, message: errorMessage };
       }
     },
     
@@ -121,6 +121,8 @@ export default createStore({
           localStorage.removeItem('access_token');
           localStorage.removeItem('authUser');
           localStorage.removeItem('logged_user');
+          localStorage.removeItem('cart');
+          localStorage.removeItem('isSubscribed')
     
           commit('clearUser');
           commit('setLoggedIn', false);
@@ -213,6 +215,23 @@ export default createStore({
         console.error('Error fetching user profile:', error);
       }
     },
+    async verify2FA(_, { otp }) {
+      try {
+        const response = await AuthApiServices.PostRequest('/verify-2fa', {
+          one_time_password: otp
+        });
+    
+        if (response.message === 'one_time_password verified successfully') {
+          return { success: true };
+        } else {
+          return { success: false, message: response.message || 'Invalid 2FA code' };
+        }
+      } catch (error) {
+        const message = error.response?.data?.errors?.one_time_password?.[0] || 'Invalid 2FA code';
+        return { success: false, message };
+      }
+    },
+    
     
     openDropdown({ commit }, dropdown) {
       commit('openDropdown', dropdown);
