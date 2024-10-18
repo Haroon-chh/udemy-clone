@@ -1,6 +1,5 @@
 <template>
   <div class="quill-editor-container">
-    <!-- Input Field -->
     <div class="input-with-copy">
       <input
         type="text"
@@ -9,34 +8,35 @@
         placeholder="Content to load in Quill"
         @input="updateQuillContent"
       />
+      <button 
+        @click="refreshPageContent" 
+        class="btn refresh-btn d-flex align-items-center justify-content-center"
+        title="Refresh Content"
+      >
+        <span class="material-icons">refresh</span>
+      </button>
     </div>
 
-    <!-- Quill Editor -->
-    <div id="editor"></div>
+    <div class="editor-toolbar">
+      <div id="editor"></div>
+    </div>
 
-    <!-- Reset Quill Button -->
-    <button @click="resetQuill" class="btn btn-danger mt-2">Reset</button>
+    <div class="button-group mt-3">
+      <button @click="showHtmlPreview" class="btn btn-primary me-2">
+        Show HTML Preview
+      </button>
+      <button @click="updatePageContent" class="btn btn-success">
+        Update Content
+      </button>
+    </div>
 
-    <!-- Show HTML Preview Button -->
-    <button @click="showHtmlPreview" class="btn btn-primary mt-2">
-      Show HTML Preview
-    </button>
-
-    <!-- Rendered HTML Preview -->
     <div class="html-preview mt-3" v-html="htmlPreview"></div>
 
-    <!-- Cleaned Content Field -->
     <div class="cleaned-content mt-3">
       <h5>Cleaned Content (Without &lt;p&gt;&lt;br&gt;&lt;/p&gt;):</h5>
       <textarea class="form-control" rows="5" readonly :value="cleanedContent"></textarea>
     </div>
 
-    <!-- Update Button -->
-    <button @click="updatePageContent" class="btn btn-success mt-3">
-      Update Content
-    </button>
-
-    <!-- Success/Error Message -->
     <div v-if="message" class="alert mt-3" :class="messageClass">{{ message }}</div>
   </div>
 </template>
@@ -47,9 +47,24 @@ import { useStore } from 'vuex';
 import Quill from 'quill';
 import { useRoute } from 'vue-router';
 
-const Clipboard = Quill.import('modules/clipboard');
+// Custom Blot for Div Elements
+const BlockEmbed = Quill.import('blots/block/embed');
+class DivBlot extends BlockEmbed {
+  static create(value) {
+    const node = super.create();
+    node.innerHTML = value;
+    return node;
+  }
+  static value(node) {
+    return node.innerHTML;
+  }
+}
+DivBlot.blotName = 'div';
+DivBlot.tagName = 'div';
+Quill.register(DivBlot);
 
-// Custom Clipboard Class to handle pasting
+// Custom Clipboard Configuration
+const Clipboard = Quill.import('modules/clipboard');
 class CustomClipboard extends Clipboard {
   onPaste(event) {
     const clipboardEvent = event.clipboardData || window.clipboardData;
@@ -61,7 +76,6 @@ class CustomClipboard extends Clipboard {
     }
   }
 }
-
 Quill.register('modules/clipboard', CustomClipboard);
 
 export default {
@@ -85,7 +99,7 @@ export default {
             [{ header: [1, 2, false] }],
             ['bold', 'italic', 'underline', 'strike'],
             [{ list: 'ordered' }, { list: 'bullet' }],
-            ['link', 'image'],
+            ['link', 'image', { script: 'sub' }, { script: 'super' }],
             [{ align: [] }],
             ['code-block', 'clean'],
           ],
@@ -97,10 +111,11 @@ export default {
         cleanedContent.value = removeEmptyParagraphs(rawContent.value);
       });
 
-      console.log('Quill editor initialized with custom clipboard.');
+      console.log('Quill editor initialized with custom clipboard and div blot.');
     };
 
     const loadPageContent = async () => {
+      resetQuill();
       const slug = route.params.slug;
       const pageData = await store.dispatch('PageSettingsStore/getPageBySlug', slug);
 
@@ -121,18 +136,23 @@ export default {
       console.log('Quill editor reset.');
     };
 
+    const refreshPageContent = async () => {
+      console.log('Refreshing page content...');
+      await loadPageContent();
+    };
+
     const showHtmlPreview = () => {
       htmlPreview.value = quill.root.innerHTML;
       console.log('HTML preview:', htmlPreview.value);
     };
 
-    const removeEmptyParagraphs = (html) => {
-      return html.replace(/<p><br><\/p>/g, '');
-    };
+    const removeEmptyParagraphs = (html) => html.replace(/<p><br><\/p>/g, '');
 
     const updatePageContent = async () => {
       const cleanedBody = cleanedContent.value;
-      const response = await store.dispatch('PageSettingsStore/updatePageContent', cleanedBody);
+      const finalContent = cleanedBody.replace(/<br\s*\/?>/g, ''); // Remove all <br> tags
+
+      const response = await store.dispatch('PageSettingsStore/updatePageContent', finalContent);
 
       message.value = response.message || 'Page updated successfully!';
       messageClass.value = response.success ? 'alert-success' : 'alert-danger';
@@ -145,12 +165,7 @@ export default {
       await loadPageContent();
     });
 
-    watch(
-      () => route.params.slug,
-      async () => {
-        await loadPageContent();
-      }
-    );
+    watch(() => route.params.slug, async () => await loadPageContent());
 
     return {
       rawContent,
@@ -158,7 +173,7 @@ export default {
       cleanedContent,
       message,
       messageClass,
-      resetQuill,
+      refreshPageContent,
       showHtmlPreview,
       updatePageContent,
     };
@@ -166,7 +181,8 @@ export default {
 };
 </script>
 
-  
+
+
 <style scoped>
 .quill-editor-container {
   max-width: 800px;
@@ -178,11 +194,8 @@ export default {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 10px;
-}
-
-input.form-control {
-  flex: 1;
+  margin-bottom: 15px;
+  position: relative;
 }
 
 #editor {
@@ -192,13 +205,38 @@ input.form-control {
   margin-top: 10px;
 }
 
-button {
-  width: 100%;
+.refresh-btn {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background-color: #f1f1f1;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
-.html-preview, .cleaned-content {
+.refresh-btn:hover {
+  background-color: #e0e0e0;
+  transform: scale(1.1);
+}
+
+.material-icons {
+  font-size: 20px;
+  color: #333;
+}
+
+.button-group button {
+  width: auto;
+}
+
+.html-preview,
+.cleaned-content {
   padding: 10px;
   background-color: #f9f9f9;
   border: 1px solid #ddd;
 }
+
 </style>
