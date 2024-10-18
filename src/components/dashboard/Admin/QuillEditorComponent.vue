@@ -1,50 +1,53 @@
 <template>
-    <div class="quill-editor-container">
-      <!-- Input Field -->
-      <div class="input-with-copy">
-        <input
-          type="text"
-          v-model="rawContent"
-          class="form-control"
-          placeholder="Content to load in Quill"
-          @input="updateQuillContent"
-        />
-      </div>
-  
-      <!-- Quill Editor -->
-      <div id="editor"></div>
-  
-      <!-- Reset Quill Button -->
-      <button @click="resetQuill" class="btn btn-danger mt-2">Reset</button>
-  
-      <!-- Show HTML Preview Button -->
-      <button @click="showHtmlPreview" class="btn btn-primary mt-2">
-        Show HTML Preview
-      </button>
-  
-      <!-- Rendered HTML Preview -->
-      <div class="html-preview mt-3" v-html="htmlPreview"></div>
-  
-      <!-- Cleaned Content Field -->
-      <div class="cleaned-content mt-3">
-        <h5>Cleaned Content (Without &lt;p&gt;&lt;br&gt;&lt;/p&gt;):</h5>
-        <textarea
-          class="form-control"
-          rows="5"
-          readonly
-          :value="cleanedContent"
-        ></textarea>
-      </div>
+  <div class="quill-editor-container">
+    <!-- Input Field -->
+    <div class="input-with-copy">
+      <input
+        type="text"
+        v-model="rawContent"
+        class="form-control"
+        placeholder="Content to load in Quill"
+        @input="updateQuillContent"
+      />
     </div>
-  </template>
-  
-  <script>
-  import { ref, onMounted, nextTick, watch } from 'vue';
+
+    <!-- Quill Editor -->
+    <div id="editor"></div>
+
+    <!-- Reset Quill Button -->
+    <button @click="resetQuill" class="btn btn-danger mt-2">Reset</button>
+
+    <!-- Show HTML Preview Button -->
+    <button @click="showHtmlPreview" class="btn btn-primary mt-2">
+      Show HTML Preview
+    </button>
+
+    <!-- Rendered HTML Preview -->
+    <div class="html-preview mt-3" v-html="htmlPreview"></div>
+
+    <!-- Cleaned Content Field -->
+    <div class="cleaned-content mt-3">
+      <h5>Cleaned Content (Without &lt;p&gt;&lt;br&gt;&lt;/p&gt;):</h5>
+      <textarea class="form-control" rows="5" readonly :value="cleanedContent"></textarea>
+    </div>
+
+    <!-- Update Button -->
+    <button @click="updatePageContent" class="btn btn-success mt-3">
+      Update Content
+    </button>
+
+    <!-- Success/Error Message -->
+    <div v-if="message" class="alert mt-3" :class="messageClass">{{ message }}</div>
+  </div>
+</template>
+
+<script>
+import { ref, onMounted, nextTick, watch } from 'vue';
 import { useStore } from 'vuex';
 import Quill from 'quill';
 import { useRoute } from 'vue-router';
+import AuthApiServices from '@/services/AuthApiServices'; // Import Auth API Service
 
-// Extend Quill's Clipboard to customize paste behavior
 const Clipboard = Quill.import('modules/clipboard');
 
 class CustomClipboard extends Clipboard {
@@ -53,7 +56,7 @@ class CustomClipboard extends Clipboard {
     if (clipboardEvent) {
       event.preventDefault();
       const text = clipboardEvent.getData('text/plain');
-      const html = text.replace(/\n/g, '<br>'); // Replace newlines with <br>
+      const html = text.replace(/\n/g, '<br>');
       this.quill.clipboard.dangerouslyPasteHTML(0, html);
     }
   }
@@ -69,13 +72,15 @@ export default {
     const rawContent = ref('');
     const htmlPreview = ref('');
     const cleanedContent = ref('');
+    const message = ref('');
+    const messageClass = ref('');
     let quill = null;
 
     const initializeQuill = () => {
       quill = new Quill('#editor', {
         theme: 'snow',
         modules: {
-          clipboard: true, // Use custom clipboard
+          clipboard: true,
           toolbar: [
             [{ header: [1, 2, false] }],
             ['bold', 'italic', 'underline', 'strike'],
@@ -101,10 +106,8 @@ export default {
 
       if (pageData) {
         const formattedBody = pageData.body.replace(/\n/g, '<br>');
-
         await nextTick();
         rawContent.value = formattedBody;
-
         quill.clipboard.dangerouslyPasteHTML(0, formattedBody);
         console.log('Page content loaded:', formattedBody);
       }
@@ -124,7 +127,24 @@ export default {
     };
 
     const removeEmptyParagraphs = (html) => {
-      return html.replace(/<p><br><\/p>/g, ''); // Remove <p><br></p> tags
+      return html.replace(/<p><br><\/p>/g, '');
+    };
+
+    const updatePageContent = async () => {
+      try {
+        const pageId = store.state.PageSettingsStore.currentPage.id; // Get page ID from store
+        const response = await AuthApiServices.PostRequest(`/update-page/${pageId}`, {
+          body: cleanedContent.value,
+        });
+
+        message.value = response.message || 'Page updated successfully!';
+        messageClass.value = 'alert-success';
+        console.log('Page updated successfully:', response);
+      } catch (error) {
+        message.value = 'Failed to update page. Please try again.';
+        messageClass.value = 'alert-danger';
+        console.error('Error updating page:', error);
+      }
     };
 
     onMounted(async () => {
@@ -144,12 +164,14 @@ export default {
       rawContent,
       htmlPreview,
       cleanedContent,
+      message,
+      messageClass,
       resetQuill,
       showHtmlPreview,
+      updatePageContent,
     };
   },
 };
-
 </script>
   
 <style scoped>
