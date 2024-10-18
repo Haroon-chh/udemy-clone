@@ -40,14 +40,19 @@
         <!-- Input to enter the secret key -->
         <div class="form-group">
           <label for="secret">{{ isTwoFactorEnabled ? 'Enter Password to Disable' : 'Enter One Time Password' }}</label>
-          <input type="text" id="secret" v-model="enteredSecret" placeholder="Enter one time password" />
+          
+          <div v-if="!isTwoFactorEnabled">
+            <input type="text" id="secret" v-model="enteredSecret" placeholder="Enter one time password" />
+          </div>
+          
+          <div v-else>
+            <label for="password">Enter Password to Disable 2FA</label>
+            <input type="password" id="password" v-model="disablePassword" placeholder="Enter your password" required />
+          </div>
+
         </div>
         
-        <!-- Update Template -->
-<div class="form-group" v-if="isTwoFactorEnabled">
-  <label for="password">Enter Password to Disable 2FA</label>
-  <input type="password" id="password" v-model="disablePassword" placeholder="Enter your password" required />
-</div>
+
 <button @click="isTwoFactorEnabled ? disableTwoFactorAuth() : enableTwoFactorAuth()" class="btn btn-success small-button">{{ isTwoFactorEnabled ? 'Disable 2FA' : 'Verify and Enable 2FA' }}</button>
 
       </div>
@@ -152,28 +157,41 @@ export default {
 
 
 
-    const disableTwoFactorAuth = async () => {
-      try {
-        const response = await AuthApiServices.PostRequest('/disable-2fa', {
-          password: disablePassword.value,
-        });
+const disableTwoFactorAuth = async () => {
+  try {
+    const response = await AuthApiServices.PostRequest('/disable-2fa', {
+      password: disablePassword.value, // Make sure this is set correctly
+    });
 
-        if (response.data.message === '2-Factor Authentication successfully disabled.') {
-          alert('2FA has been successfully disabled.');
-          localStorage.setItem('twoFactorEnabled', 'false');
-          isTwoFactorEnabled.value = false; // Update state
-          isEnabling2FA.value = false; // Close section
-        }
-      } catch (error) {
-        console.error('Error disabling 2FA:', error); // Log any errors
-        if (error.response) {
-          console.error('Response data:', error.response.data);
-          alert(error.response.data.message || 'Failed to disable 2FA.');
-        } else {
-          alert('An unexpected error occurred. Please try again.');
-        }
-      }
-    };
+    console.log('API Response:', response); // Log the response to check the structure
+
+    // Handle success response
+    if (response.message === "2-Factor Authentication successfully disabled.") {
+      alert('2FA has been successfully disabled.');
+      localStorage.setItem('twoFactorEnabled', 'false');
+      isTwoFactorEnabled.value = false; // Update state
+      isEnabling2FA.value = false; // Close section
+    }
+  } catch (error) {
+    console.error('Error disabling 2FA:', error); // Log the full error for debugging
+
+    if (error.response) {
+      // Log the full response to understand what went wrong
+      console.error('Response data:', error.response.data);
+
+      // Handle specific error messages
+      alert(
+        error.response.data.errors?.password?.[0] ||
+        error.response.data.message ||
+        'An error occurred while disabling 2FA. Please try again.'
+      );
+    } else {
+      // General error handling
+      alert('An unexpected error occurred. Please try again.');
+    }
+  }
+};
+
 
     return {
       username,
@@ -185,6 +203,7 @@ export default {
       qrCodeDataURL,
       disableQrCodeDataURL,
       enteredSecret,
+      disablePassword,
       saveProfile,
       toggleTwoFactorAuth,
       enableTwoFactorAuth,
