@@ -78,7 +78,7 @@ export default {
     const disableQrCodeDataURL = ref('');
     const enteredSecret = ref('');
     const generatedSecret = ref('');
-    const disablePassword = ref(''); // New ref for the password input
+    const disablePassword = ref('');
 
     const userInitials = computed(() => {
       return user.value?.name
