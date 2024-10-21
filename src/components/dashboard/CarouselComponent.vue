@@ -1,7 +1,9 @@
 <template>
   <div id="carouselExampleControls" class="carousel slide mt-0" data-bs-ride="carousel" data-bs-interval="3000">
+  <div id="carouselExampleControls" class="carousel slide mt-0" data-bs-ride="carousel" data-bs-interval="3000">
     <div class="carousel-inner">
       <div class="carousel-item" :class="{ active: index === 0 }" v-for="(image, index) in images" :key="index">
+        <img :src="getImageUrl(index)" class="d-block w-100 carousel-image" alt="slide image">
         <img :src="getImageUrl(index)" class="d-block w-100 carousel-image" alt="slide image">
 
         <!-- First Image's Card (Fixed) -->
@@ -31,6 +33,7 @@
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </button>
+    <button class="carousel-control-next custom-arrow" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
     <button class="carousel-control-next custom-arrow" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
