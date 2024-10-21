@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <div>
+    
       <div class="hero-section position-relative">
         <!-- Image -->
         <img 
@@ -9,19 +9,19 @@
           alt="Instructor" 
           class="img-fluid w-100 hero-image"
         >
-    
+      </div>
         <!-- Overlay Text Content -->
         <div class="hero-content text-dark">
           <h1 class="fw-bold mb-3">Come teach with us</h1>
           <p class="mb-4">Become an instructor and change lives — including your own</p>
           <button class="btn btn-dark w-100">Get started</button>
         </div>
-      </div>
-    </div>
+      
+    
     
 
     <!-- Reasons Section -->
-    <div class="reasons-section py-5">
+    <div class="reasons-section py-5 mt-0">
       <div class="container text-center">
         <h2 class="fw-bold mb-5">So many reasons to start</h2>
         <div class="row justify-content-between">
@@ -47,9 +47,13 @@
       </div>
     </div>
 
-    <!-- Stats Section -->
-    <div class="container-fluid text-center text-white py-1" style="background-color: #5C2CCB;">
-      <div class="row g-4 mx-3 my-2">
+    <div class="container-fluid text-center text-white py-1 stats-section" style="background-color: #5C2CCB;">
+      <!-- Left control button -->
+      <button class="carousel-control-prev" onclick="scrollLeft()">
+        &#10094; <!-- Left arrow -->
+      </button>
+    
+      <div class="row g-4 mx-3 my-2 stat-carousel">
         <!-- Stat 1 -->
         <div class="col-12 col-md mb-4 d-flex flex-column align-items-center">
           <h2 class="fw-bold">73M</h2>
@@ -76,10 +80,16 @@
           <p>Enterprise customers</p>
         </div>
       </div>
+    
+      <!-- Right control button -->
+      <button class="carousel-control-next" onclick="scrollRight()">
+        &#10095; <!-- Right arrow -->
+      </button>
     </div>
+    
 
     <!-- How to Begin Section -->
-    <div class="container mt-5">
+    <div class="container mt-5 ">
       <h2 class="text-center mb-4">How to Begin</h2>
 
       <!-- Navigation Tabs for Large Screens -->
@@ -227,7 +237,7 @@
                 <h5 class="fw-bold mb-2">John Doe</h5>
                 <p class="fw-normal mb-2">Software Engineering</p>
                 <blockquote class="blockquote">
-                  “Teaching lets me share my passion for coding and problem-solving with people from all over the world.”
+                  “Teaching lets me share my passion for coding and problem-solving people over the world.”
                 </blockquote>
               </div>
             </div>
@@ -240,7 +250,7 @@
                 <h5 class="fw-bold mb-2">Jane Smith</h5>
                 <p class="fw-normal mb-2">Web Development</p>
                 <blockquote class="blockquote">
-                  “Seeing students grow their skills and confidence is the most rewarding part of my job.”
+                  “Seeing students grow their skills and confidence is the most most rewarding part of my job.”
                 </blockquote>
               </div>
             </div>
@@ -338,40 +348,57 @@
 </template>
 
 <script>
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+
 export default {
-  data() {
-    return {
-      activeTab: 'plan', // Set the default active tab
-      images: [
-        require('@/assets/frank.jpg'), // Update with your image paths
-        require('@/assets/merry.jpg'),
-        require('@/assets/paul.jpg'),
-      ],
-      currentSlide: 0,
+  setup() {
+    // Reactive state variables
+    const activeTab = ref('plan');
+    const images = [
+      require('@/assets/frank.jpg'), // Update with your image paths
+      require('@/assets/merry.jpg'),
+      require('@/assets/paul.jpg'),
+    ];
+    const currentSlide = ref(0);
+
+    // Function to set the active tab
+    const setActiveTab = (tab) => {
+      activeTab.value = tab;
     };
-  },
-  mounted() {
-    const carousel = document.querySelector("#carouselExample");
-    carousel.addEventListener("slid.bs.carousel", this.updateSlide);
-  },
-  beforeUnmount() {
-    const carousel = document.querySelector("#carouselExample");
-    carousel.removeEventListener("slid.bs.carousel", this.updateSlide);
-  },
-  methods: {
-    setActiveTab(tab) {
-      this.activeTab = tab;
-    },
-    toggleAccordion(tab) {
-      if (this.activeTab === tab) {
-        this.activeTab = null;
+
+    // Function to toggle the accordion
+    const toggleAccordion = (tab) => {
+      if (activeTab.value === tab) {
+        activeTab.value = null;
       } else {
-        this.activeTab = tab;
+        activeTab.value = tab;
       }
-    },
-    updateSlide(event) {
-      this.currentSlide = event.to;
-    },
+    };
+
+    // Function to update the current slide
+    const updateSlide = (event) => {
+      currentSlide.value = event.to;
+    };
+
+    // Lifecycle hooks
+    onMounted(() => {
+      const carousel = document.querySelector("#carouselExample");
+      carousel.addEventListener("slid.bs.carousel", updateSlide);
+    });
+
+    onBeforeUnmount(() => {
+      const carousel = document.querySelector("#carouselExample");
+      carousel.removeEventListener("slid.bs.carousel", updateSlide);
+    });
+
+    // Return state and methods to the template
+    return {
+      activeTab,
+      images,
+      currentSlide,
+      setActiveTab,
+      toggleAccordion,
+    };
   },
 };
 </script>
@@ -381,7 +408,6 @@ export default {
   height: 100vh; /* Full screen height */
   overflow: hidden;
   position: relative;
-  
 }
 
 .hero-image {
@@ -411,6 +437,7 @@ button {
   overflow: hidden; /* Prevents content overflow */
 }
 @media (max-width: 768px) {
+ 
   .hero-image {
     height: auto; /* Allows natural height */
     width: 100%;
@@ -419,7 +446,7 @@ button {
   }
   .hero-content {
       padding: 20px;
-      margin-top: 80px;
+      margin-top: 130px;
       text-align: left;
   }
 
@@ -561,5 +588,32 @@ button {
     
   }
  
+}
+@media (max-width: 768px) {
+  .stats-section .row {
+    flex-direction: row;
+    flex-wrap: wrap; /* Allow items to wrap to the next line if needed */
+    justify-content: center; /* Center the content */
+    text-align: center;
+  }
+
+  .stats-section h2 {
+    font-size: 1.2rem; /* Adjust font size for smaller screens */
+  }
+
+  .stats-section p {
+    font-size: 0.8rem;
+  }
+
+  .stats-section .col-md {
+    flex: 0 0 45%; /* Set the width of each stat block to take about half of the screen */
+    margin-bottom: 1rem; /* Add spacing between items */
+  }
+
+  /* Specific rule for the 16,000+ Enterprise customers */
+  .stats-section .col-12.col-md:nth-child(5) {
+    margin-top: 20px;
+    flex: 0 0 100%; /* Make the last item full width on mobile */
+  }
 }
 </style>

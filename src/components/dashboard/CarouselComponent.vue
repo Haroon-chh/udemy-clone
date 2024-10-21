@@ -39,47 +39,61 @@
 </template>
 
 <script>
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+
 export default {
   name: 'CarouselComponent',
-  data() {
+  setup() {
+    // Reactive state variables
+    const largeScreenImages = ref([
+      'dashboard-carousel-img1.jpg', 
+      'dashboard-carousel-img2.jpg'
+    ]);
+    const smallScreenImages = ref([
+      'dashboard-carousel-img-SmallScreen1.jpg', 
+      'dashboard-carousel-img-SmallScreen2.jpg'
+    ]);
+    const isSmallScreen = ref(false);
+
+    // Computed property to select the right set of images based on screen size
+    const images = computed(() => {
+      return isSmallScreen.value ? smallScreenImages.value : largeScreenImages.value;
+    });
+
+    // Method to get image URL
+    const getImageUrl = (index) => {
+      const image = images.value[index];
+      return require(`@/assets/${image}`);
+    };
+
+    // Method to check the screen size
+    const checkScreenSize = () => {
+      isSmallScreen.value = window.innerWidth <= 768;
+    };
+
+    // Lifecycle hooks for adding and removing event listeners
+    onMounted(() => {
+      checkScreenSize();
+      window.addEventListener('resize', checkScreenSize);
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener('resize', checkScreenSize);
+    });
+
+    // Return state and methods to the template
     return {
-      largeScreenImages: [
-        'dashboard-carousel-img1.jpg', 
-        'dashboard-carousel-img2.jpg'
-      ],
-      smallScreenImages: [
-        'dashboard-carousel-img-SmallScreen1.jpg', 
-        'dashboard-carousel-img-SmallScreen2.jpg'
-      ],
-      isSmallScreen: false,
+      largeScreenImages,
+      smallScreenImages,
+      isSmallScreen,
+      images,
+      getImageUrl,
+      checkScreenSize,
     };
   },
-  computed: {
-    images() {
-      
-      return this.isSmallScreen ? this.smallScreenImages : this.largeScreenImages;
-    }
-  },
-  mounted() {
-    this.checkScreenSize();
-    window.addEventListener('resize', this.checkScreenSize);
-  },
-  beforeUnmount() { 
-    window.removeEventListener('resize', this.checkScreenSize);
-  },
-  methods: {
-    getImageUrl(index) {
-      
-      const image = this.images[index];
-      return require(`@/assets/${image}`);
-    },
-    checkScreenSize() {
-      
-      this.isSmallScreen = window.innerWidth <= 768;
-    }
-  }
 };
 </script>
+
 
 <style scoped>
 .carousel {
