@@ -21,7 +21,7 @@
               <span class="discount">{{ course.discounted_price }}</span>
             </p>
           </div>
-          <button @click="$router.push({ name: 'CourseDetails', params: { slug: course.slug } })" class="btn-details">View Details</button>
+          <button @click="$router.push({ name: 'PurchaseCourseDetails', params: { slug: course.slug } })" class="btn-details">View Details</button>
         </div>
       </div>
     </div>

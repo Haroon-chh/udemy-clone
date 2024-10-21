@@ -17,6 +17,7 @@ import SubscriptionView from '@/views/SubscriptionView.vue'; // Import Subscript
 import ActiveSubscription from '@/components/dashboard/Admin/ActiveSubscription.vue';
 import SiteSettings from '@/components/dashboard/Admin/SiteSettings.vue';
 import PurchaseCourses from '@/components/Profile/PurchaseCourses.vue';
+import PurchaseCourseDetailView from '../views/PurchaseCourseDetailView.vue';
 
 
 const routes = [
@@ -93,6 +94,12 @@ const routes = [
     path: '/course/:slug',
     name: 'CourseDetails',
     component: CourseDetailsView,
+    meta: { title: 'Course Details' },
+  },
+  {
+    path: '/purchase-course-details/:slug',
+    name: 'PurchaseCourseDetails',
+    component: PurchaseCourseDetailView,
     meta: { title: 'Course Details' },
   },
   {
