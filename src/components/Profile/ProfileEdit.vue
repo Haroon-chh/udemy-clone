@@ -33,15 +33,20 @@
 
       <!-- Show QR Code and input when enabling or disabling 2FA -->
       <div v-if="isEnabling2FA">
-        <!-- <h4>{{ isTwoFactorEnabled ? 'Enter Secret Key to Disable 2FA' : 'Scan QR Code to Enable 2FA' }}</h4>
-        <img v-if="!isTwoFactorEnabled && qrCodeDataURL" :src="qrCodeDataURL" alt="QR Code" class="qr-code" />
-        <img v-if="isTwoFactorEnabled && disableQrCodeDataURL" :src="disableQrCodeDataURL" alt="QR Code" class="qr-code" /> -->
-
-
-
         <h4>{{ isTwoFactorEnabled ? 'Enter Secret Key to Disable 2FA' : 'Scan QR Code to Enable 2FA' }}</h4>
+        <div v-if="!isTwoFactorEnabled" class="qr-code-wrapper">
         <img v-if="!isTwoFactorEnabled && qrCodeDataURL" :src="qrCodeDataURL" alt="QR Code" class="qr-code" />
-        <img v-if="isTwoFactorEnabled && disableQrCodeDataURL" :src="disableQrCodeDataURL" alt="QR Code" class="qr-code" />
+
+        <!-- This div will be used to animate the scanning line -->
+        <div v-if="!isTwoFactorEnabled">
+        <div class="qr-scan-line"></div>
+         <!-- The four border parts -->
+          <div class="border-top"></div>
+          <div class="border-bottom"></div>
+          <div class="border-left"></div>
+          <div class="border-right"></div>
+        </div>
+        </div>
 
         <!-- Input to enter the secret key -->
         <div class="form-group">
@@ -228,12 +233,81 @@ const disableTwoFactorAuth = async () => {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.qr-code {
-  margin: 20px auto;
-  display: block;
+/* QR code Styling start from here */
+.qr-code-wrapper {
+  position: relative;
+  display: inline-block;
   width: 200px;
   height: 200px;
+  margin: 20px auto;
 }
+
+.qr-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 7px;
+  background-color: rgba(0, 255, 0, 0.6); 
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0% {
+    top: 0;
+  }
+  50% {
+    top: 100%;
+  }
+  100% {
+    top: 0;
+  }
+}
+
+.qr-code {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.border-top,
+.border-bottom,
+.border-left,
+.border-right {
+  position: absolute;
+  background-color: grey; 
+}
+
+.border-left,
+.border-right {
+  top: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.border-left {
+  left: -20px;
+}
+
+.border-right {
+  right: -20px;
+}
+
+.border-top,
+.border-bottom {
+  left: 0;
+  width: 100%;
+  height: 4px;
+}
+
+.border-top {
+  top: -20px; 
+}
+
+.border-bottom {
+  bottom: -20px;
+}
+/* QR Code styling End here */
 
 .form-group {
   margin-top: 15px;
