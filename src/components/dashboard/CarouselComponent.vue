@@ -1,9 +1,7 @@
 <template>
   <div id="carouselExampleControls" class="carousel slide mt-0" data-bs-ride="carousel" data-bs-interval="3000">
-  <div id="carouselExampleControls" class="carousel slide mt-0" data-bs-ride="carousel" data-bs-interval="3000">
     <div class="carousel-inner">
       <div class="carousel-item" :class="{ active: index === 0 }" v-for="(image, index) in images" :key="index">
-        <img :src="getImageUrl(index)" class="d-block w-100 carousel-image" alt="slide image">
         <img :src="getImageUrl(index)" class="d-block w-100 carousel-image" alt="slide image">
 
         <!-- First Image's Card (Fixed) -->
@@ -14,7 +12,7 @@
           </div>
         </div>
 
-        
+        <!-- Second Image's Card (Matches Attached Image) -->
         <div class="card custom-card d-flex flex-column" v-else>
           <div class="card-body">
             <h2 class="card-title">Skills that drive you forward</h2>
@@ -28,12 +26,11 @@
       </div>
     </div>
 
-    
+    <!-- Custom Carousel Controls (Smaller, Centered) -->
     <button class="carousel-control-prev custom-arrow" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </button>
-    <button class="carousel-control-next custom-arrow" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
     <button class="carousel-control-next custom-arrow" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
@@ -42,61 +39,47 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-
 export default {
   name: 'CarouselComponent',
-  setup() {
-    // Reactive state variables
-    const largeScreenImages = ref([
-      'dashboard-carousel-img1.jpg', 
-      'dashboard-carousel-img2.jpg'
-    ]);
-    const smallScreenImages = ref([
-      'dashboard-carousel-img-SmallScreen1.jpg', 
-      'dashboard-carousel-img-SmallScreen2.jpg'
-    ]);
-    const isSmallScreen = ref(false);
-
-    // Computed property to select the right set of images based on screen size
-    const images = computed(() => {
-      return isSmallScreen.value ? smallScreenImages.value : largeScreenImages.value;
-    });
-
-    // Method to get image URL
-    const getImageUrl = (index) => {
-      const image = images.value[index];
-      return require(`@/assets/${image}`);
-    };
-
-    // Method to check the screen size
-    const checkScreenSize = () => {
-      isSmallScreen.value = window.innerWidth <= 768;
-    };
-
-    // Lifecycle hooks for adding and removing event listeners
-    onMounted(() => {
-      checkScreenSize();
-      window.addEventListener('resize', checkScreenSize);
-    });
-
-    onBeforeUnmount(() => {
-      window.removeEventListener('resize', checkScreenSize);
-    });
-
-    // Return state and methods to the template
+  data() {
     return {
-      largeScreenImages,
-      smallScreenImages,
-      isSmallScreen,
-      images,
-      getImageUrl,
-      checkScreenSize,
+      largeScreenImages: [
+        'dashboard-carousel-img1.jpg', 
+        'dashboard-carousel-img2.jpg'
+      ],
+      smallScreenImages: [
+        'dashboard-carousel-img-SmallScreen1.jpg', 
+        'dashboard-carousel-img-SmallScreen2.jpg'
+      ],
+      isSmallScreen: false,
     };
   },
+  computed: {
+    images() {
+      // Return the correct set of images based on screen size
+      return this.isSmallScreen ? this.smallScreenImages : this.largeScreenImages;
+    }
+  },
+  mounted() {
+    this.checkScreenSize();
+    window.addEventListener('resize', this.checkScreenSize);
+  },
+  beforeUnmount() { // Replacing beforeDestroy with beforeUnmount
+    window.removeEventListener('resize', this.checkScreenSize);
+  },
+  methods: {
+    getImageUrl(index) {
+      // Return the appropriate image URL based on the screen size
+      const image = this.images[index];
+      return require(`@/assets/${image}`);
+    },
+    checkScreenSize() {
+      // Update the flag for small screens
+      this.isSmallScreen = window.innerWidth <= 768; // Small screens are 768px and below
+    }
+  }
 };
 </script>
-
 
 <style scoped>
 .carousel {
@@ -116,7 +99,7 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-
+/* Responsive for smaller screens */
 @media (max-width: 768px) {
   .custom-card {
     position: relative;
@@ -137,7 +120,7 @@ export default {
     height: auto;
   }
 
-  
+  /* Hide carousel control buttons on small screens */
   .carousel-control-prev,
   .carousel-control-next {
     display: none;
@@ -159,7 +142,7 @@ export default {
   color: #333;
 }
 
-
+/* Styling for buttons */
 .custom-btn {
   padding: 10px;
   border-radius: 0px;
