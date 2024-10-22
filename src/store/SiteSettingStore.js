@@ -15,13 +15,26 @@ const SiteSettingStore = {
     },
   },
   actions: {
-    async createSiteSetting({ commit }, payload) {
+    async updateSiteSetting({ commit }, updatedFields) {
       try {
-        const response = await AuthApiServices.PostRequest('/create-site-setting', payload);
+        const formData = new FormData();
+
+        // Add only the updated fields to the formData
+        if (updatedFields.site_title) formData.append('site_title', updatedFields.site_title);
+        if (updatedFields.logo_path) formData.append('logo_path', updatedFields.logo_path); // Ensure a file exists before appending
+        if (updatedFields.copyright) formData.append('copyright', updatedFields.copyright);
+
+        // Log the FormData contents
+        formData.forEach((value, key) => {
+          console.log(`${key}:`, value);
+        });
+
+        const response = await AuthApiServices.PostRequest('/update-site-setting', formData);
         commit('setSiteSettings', response.data);
         return response;
       } catch (error) {
-        console.error('Error creating site settings:', error);
+        // Log the full error response from the backend
+        console.error('Error updating site settings:', error.response?.data || error.message);
         throw error;
       }
     },

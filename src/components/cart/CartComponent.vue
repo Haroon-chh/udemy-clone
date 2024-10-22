@@ -25,6 +25,11 @@
           </div>
         </div>
       </div>
+
+      <!-- Purchase Button -->
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-success btn-custom" @click="purchaseCourses">Purchase</button>
+      </div>
     </div>
   </div>
 </template>
@@ -50,6 +55,30 @@ export default {
       const event = new Event('storage');
       localStorage.setItem('cart', JSON.stringify(cart)); // Trigger storage update
       window.dispatchEvent(event); // Dispatch the event to update navbar cart count
+    },
+    async purchaseCourses() {
+      try {
+        const cartItems = this.cartItems.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+        }));
+
+        // Make the purchase request
+        const response = await this.$store.dispatch('purchaseCartItems', cartItems);
+        console.log('Purchase Response:', response);
+
+        if (response.success) {
+          alert('Purchase successful!');
+          this.$store.commit('setCart', []); // Clear the cart after successful purchase
+          this.updateCartCount(); // Update cart count after purchase
+        } else {
+          alert('Purchase failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error purchasing courses:', error);
+        alert('An error occurred during purchase.');
+      }
     },
   },
   mounted() {

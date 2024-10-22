@@ -68,15 +68,42 @@ export default {
   border-radius: 15px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   cursor: pointer;
   text-decoration: none;
   color: inherit;
+  position: relative;
 }
 
-.admin-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+/* Hover Effects (Not for Mobile) */
+@media (min-width: 768px) {
+  .admin-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    background-color: #f9f9f9;
+  }
+
+  .admin-card:hover .admin-card-icon {
+    transform: rotate(360deg) scale(1.5);
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .admin-card-title,
+  .admin-card-description {
+    opacity: 1;
+    transition: opacity 0.6s ease-in-out;
+  }
+
+  .admin-card:hover .admin-card-title,
+  .admin-card:hover .admin-card-description {
+    opacity: 0.2;
+  }
+
+  .admin-card:hover .admin-card-title,
+  .admin-card:hover .admin-card-description {
+    opacity: 1;
+    transition: opacity 0.6s ease-in-out 0.3s; /* Delay reappearance */
+  }
 }
 
 /* Card Content */
@@ -100,15 +127,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s;
-}
-
-.admin-card-icon i {
-  font-size: 2.5rem;
-}
-
-.admin-card:hover .admin-card-icon {
-  opacity: 0.9;
+  transition: transform 0.6s ease, background-color 0.3s ease;
 }
 
 /* Card Titles */
