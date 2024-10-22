@@ -148,9 +148,9 @@ export default {
 }
 
 .office img {
-  width: 100%;
-  height: 200px;
+  width: 100% !important;
+  height: 200px !important;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 10px !important;
 }
 </style>
