@@ -48,18 +48,17 @@ const AuthApiServices = {
   async PostRequest(endpoint, data) {
     try {
       const response = await axios.post(`${baseURL}${endpoint}`, data, {
-        headers: {
-          ...this.getAuthHeaders(),
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: this.getAuthHeaders(), // Pass authorization headers
       });
-      return response.data;
+      return response.data; // Return the response data
     } catch (error) {
-      console.error('POST request failed:', error.response?.data || error.message);
+      console.error('POST request failed:', error);
+      if (error.response) {
+        throw new Error(error.response.data.message || 'POST request failed');
+      }
       throw error;
     }
   },
-  
 
   // Generic PUT request
   async PutRequest(endpoint, data) {

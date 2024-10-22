@@ -29,7 +29,7 @@
 
             <p class="text-center text-muted">Click to update logo</p>
 
-            <!-- Website Name -->
+            <!-- Website Name (optional) -->
             <div class="mb-4">
               <label for="websiteName" class="form-label">Site Title</label>
               <input
@@ -37,12 +37,11 @@
                 id="websiteName"
                 class="form-control form-control-lg custom-input"
                 v-model="siteSettings.websiteName"
-                placeholder="Enter Site Title"
-                required
+                placeholder="Enter Site Title (optional)"
               />
             </div>
 
-            <!-- Copyright -->
+            <!-- Copyright (optional) -->
             <div class="mb-4">
               <label for="setting1" class="form-label">Copyright</label>
               <input
@@ -50,8 +49,7 @@
                 id="setting1"
                 class="form-control form-control-lg custom-input"
                 v-model="siteSettings.setting1"
-                placeholder="Enter Copyright"
-                required
+                placeholder="Enter Copyright (optional)"
               />
             </div>
 
@@ -80,6 +78,7 @@ export default {
 
     const previewLogo = ref(null);
 
+    // Handle logo file change
     const onLogoChange = (event) => {
       const file = event.target.files[0];
       if (file) {
@@ -88,33 +87,26 @@ export default {
       }
     };
 
+    // Save settings and allow partial updates
     const saveSettings = async () => {
   try {
-    const formData = new FormData();
-    formData.append('site_title', siteSettings.websiteName);
-    formData.append('logo_path', siteSettings.logo);  // Ensure the file is valid and being sent
-    formData.append('copyright', siteSettings.setting1);
+    const updatedFields = {};
 
-    // Log the form data entries for verification
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
+    updatedFields.site_title = siteSettings.websiteName || "Default Title";
+    updatedFields.logo_path = siteSettings.logo || new File(["dummy"], "dummy.png", { type: "image/png" }); // Provide a default file
+    updatedFields.copyright = siteSettings.setting1 || "Default Copyright";
 
-    // Dispatch the action to the store
-    const response = await store.dispatch('SiteSettingStore/createSiteSetting', formData);
+    // Log the fields that are being sent
+    console.log("Updated fields:", updatedFields);
+
+    // Dispatch the action with the updated fields
+    const response = await store.dispatch('SiteSettingStore/updateSiteSetting', updatedFields);
     alert(response.message);
   } catch (error) {
     console.error('Error saving site settings:', error.response?.data || error.message);
-
-    // Log detailed error info
-    if (error.response?.data?.errors) {
-      console.log('Backend validation errors:', error.response.data.errors);
-    }
-
     alert('Failed to save settings.');
   }
 };
-
 
 
     return {
@@ -138,14 +130,12 @@ export default {
   margin-left: 20px;
 }
 
-/* Adjust the card size on larger screens */
 .settings-card {
-  width: 100%; /* Full width on mobile */
-  max-width: 35rem; /* Smaller width on larger screens */
+  width: 100%;
+  max-width: 35rem;
   background-color: rgba(255, 255, 255, 0.9);
 }
 
-/* Video background for larger screens only */
 .video-background {
   width: 100%;
   height: 100%;
@@ -162,7 +152,6 @@ export default {
   color: #999;
 }
 
-/* Custom input styling */
 .custom-input {
   border: 2px solid #5a2ee3;
   border-radius: 8px;
@@ -181,10 +170,9 @@ p.text-muted {
   color: #666;
 }
 
-/* Make settings box responsive */
 @media (max-width: 992px) {
   .settings-card {
-    width: 100%; /* Full width on mobile */
+    width: 100%;
   }
 }
 </style>

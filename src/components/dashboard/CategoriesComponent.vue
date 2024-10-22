@@ -18,9 +18,9 @@
     </nav>
 
     <!-- Course Categories -->
-    <div v-if="courseCategories && courseCategories.length > 0" class="course-categories d-flex justify-content-start mb-4" style="overflow-x: auto; padding-left: 15px;">
+    <div v-if="courseCategories && courseCategories.course_categories && courseCategories.course_categories.length > 0" class="course-categories d-flex justify-content-start mb-4" style="overflow-x: auto; padding-left: 15px;">
       <button
-        v-for="courseCategory in courseCategories"
+        v-for="courseCategory in courseCategories.course_categories"
         :key="courseCategory.id"
         @click="fetchCourses(courseCategory.id)"
         :class="['btn-course-category', { active: selectedCourseCategoryId === courseCategory.id }]">
@@ -58,7 +58,7 @@
       </div>
       <div class="scroll-arrow right-arrow" @click="scroll('right')">&#x203A;</div>
     </div>
-    
+
     <!-- Courses Display without Scroller if less than or equal to 4 -->
     <div v-if="courses.length <= 4" class="courses d-flex flex-wrap justify-content-center">
       <div
@@ -82,7 +82,7 @@
         </div>
       </div>
     </div>
-    
+
     <div v-if="courses.length === 0" class="text-center mt-3">No courses found</div>
   </div>
 </template>
@@ -101,12 +101,15 @@ export default {
       'getSelectedCourseCategoryId'
     ]),
     categories() {
+      console.log('Categories:', this.getCategories);
       return this.getCategories;
     },
     courseCategories() {
+      console.log('Course Categories:', this.getCourseCategories);
       return this.getCourseCategories;
     },
     courses() {
+      console.log('Courses:', this.getCourses);
       return this.getCourses;
     },
     selectedCategoryId() {
