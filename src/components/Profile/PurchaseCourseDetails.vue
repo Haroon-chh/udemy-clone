@@ -17,7 +17,7 @@
             <i class="feature-icon"></i> {{ item }}
           </li>
         </ul>
-        <div class="course-pricing">
+        <!-- <div class="course-pricing">
           <p class="price">
             <span class="original-price">${{ course.price }}</span>
             <span class="discounted-price">${{ course.discounted_price }}</span>
@@ -25,8 +25,8 @@
           <p class="duration">
             <i class="fas fa-clock duration-icon"></i> {{ course.duration }} hours
           </p>
-        </div>
-        <button class="enroll-button">Purchased</button>
+        </div> -->
+        <!-- <button class="enroll-button">Purchased</button> -->
       </div>
     </div>
 
