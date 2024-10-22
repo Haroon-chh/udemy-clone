@@ -18,12 +18,15 @@ export default {
   },
   mutations: {
     setCategories(state, categories) {
+      console.log('Mutation setCategories:', categories); // Log the mutation
       state.categories = categories;
     },
     setCourseCategories(state, courseCategories) {
+      console.log('Mutation setCourseCategories:', courseCategories); // Log the mutation
       state.courseCategories = courseCategories;
     },
     setCourses(state, courses) {
+      console.log('Mutation setCourses:', courses); // Log the mutation
       state.courses = courses;
     },
     setSelectedCategoryId(state, categoryId) {
@@ -41,6 +44,7 @@ export default {
         commit('setCategories', response?.data || []);
         
         if (response?.data.length > 0) {
+          console.log('Fetching course categories for first category');
           this.dispatch('CategoriesStore/fetchCourseCategories', response.data[0].id);
         }
       } catch (error) {
@@ -55,27 +59,34 @@ export default {
         commit('setSelectedCategoryId', categoryId);
         commit('setCourseCategories', response?.data || []);
 
-        if (response?.data.length > 0) {
-          this.dispatch('CategoriesStore/fetchCourses', response.data[0].id);
+        if (response?.data.course_categories && response?.data.course_categories.length > 0) {
+          console.log('Fetching courses for first course category');
+          this.dispatch('CategoriesStore/fetchCourses', response.data.course_categories[0].id);
         } else {
           commit('setCourses', []);  // Clear courses if no course categories exist
         }
       } catch (error) {
         console.error(`Error fetching course categories for category ID ${categoryId}:`, error);
         commit('setCourseCategories', []);
-        commit('setCourses', []);
+        commit('setCourses', []);  // Clear courses if an error occurs
       }
     },
 
     async fetchCourses({ commit }, courseCategoryId) {
       try {
+        console.log(`Fetching courses for course category ID ${courseCategoryId}`);  // Log course category ID
         const response = await AuthApiServices.GetRequest(`/course-categories/${courseCategoryId}/course`);
         console.log(`Courses for course category ID ${courseCategoryId}:`, response?.data);  // Log fetched courses
         commit('setSelectedCourseCategoryId', courseCategoryId);
-        commit('setCourses', response?.data || []);
+        
+        // Check if the response contains the 'data' key
+        const courses = response?.data || []; 
+        console.log('Fetched courses:', courses); // Log the fetched courses
+       
+        commit('setCourses', courses); // Set courses to the state
       } catch (error) {
         console.error(`Error fetching courses for course category ID ${courseCategoryId}:`, error);
-        commit('setCourses', []);
+        commit('setCourses', []);  // Clear courses if an error occurs
       }
     },
   },

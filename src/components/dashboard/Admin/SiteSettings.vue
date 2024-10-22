@@ -1,13 +1,13 @@
 <template>
   <div class="container-fluid d-flex justify-content-center align-items-center min-vh-100 site-settings-container">
-    <div class="row w-100">
+    <div class="row w-100 justify-content-center">
       <!-- Video on larger screens only -->
-      <div class="col-lg-6 d-none d-lg-block">
+      <div class="col-lg-5 d-none d-lg-block">
         <video autoplay muted loop class="video-background" src="@/assets/settings.mp4"></video>
       </div>
 
       <!-- Settings box -->
-      <div class="col-lg-6 d-flex justify-content-center">
+      <div class="col-lg-5 d-flex justify-content-center">
         <div class="card p-5 shadow-lg settings-card">
           <h2 class="mb-4 text-center">Site Settings</h2>
           <form @submit.prevent="saveSettings">
@@ -29,7 +29,7 @@
 
             <p class="text-center text-muted">Click to update logo</p>
 
-            <!-- Website Name -->
+            <!-- Website Name (optional) -->
             <div class="mb-4">
               <label for="websiteName" class="form-label">Site Title</label>
               <input
@@ -37,12 +37,11 @@
                 id="websiteName"
                 class="form-control form-control-lg custom-input"
                 v-model="siteSettings.websiteName"
-                placeholder="Enter Site Title"
-                required
+                placeholder="Enter Site Title (optional)"
               />
             </div>
 
-            <!-- Setting 1 -->
+            <!-- Copyright (optional) -->
             <div class="mb-4">
               <label for="setting1" class="form-label">Copyright</label>
               <input
@@ -50,8 +49,7 @@
                 id="setting1"
                 class="form-control form-control-lg custom-input"
                 v-model="siteSettings.setting1"
-                placeholder="Enter Copyright"
-                required
+                placeholder="Enter Copyright (optional)"
               />
             </div>
 
@@ -65,11 +63,13 @@
 
 <script>
 import { ref, reactive } from "vue";
-import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap
+import { useStore } from 'vuex';
 
 export default {
   name: "SiteSettingsComponent",
   setup() {
+    const store = useStore();
+
     const siteSettings = reactive({
       logo: null,
       websiteName: "",
@@ -87,15 +87,27 @@ export default {
       }
     };
 
-    // Save settings (for now, just console log the values)
-    const saveSettings = () => {
-      console.log("Settings saved:", {
-        logo: siteSettings.logo,
-        websiteName: siteSettings.websiteName,
-        setting1: siteSettings.setting1,
-      });
-      alert("Site settings saved locally!");
-    };
+    // Save settings and allow partial updates
+    const saveSettings = async () => {
+  try {
+    const updatedFields = {};
+
+    updatedFields.site_title = siteSettings.websiteName || "Default Title";
+    updatedFields.logo_path = siteSettings.logo || new File(["dummy"], "dummy.png", { type: "image/png" }); // Provide a default file
+    updatedFields.copyright = siteSettings.setting1 || "Default Copyright";
+
+    // Log the fields that are being sent
+    console.log("Updated fields:", updatedFields);
+
+    // Dispatch the action with the updated fields
+    const response = await store.dispatch('SiteSettingStore/updateSiteSetting', updatedFields);
+    alert(response.message);
+  } catch (error) {
+    console.error('Error saving site settings:', error.response?.data || error.message);
+    alert('Failed to save settings.');
+  }
+};
+
 
     return {
       siteSettings,
@@ -118,12 +130,12 @@ export default {
   margin-left: 20px;
 }
 
-/* Ensure the card width is maintained on large screens */
 .settings-card {
-  width: 45rem; /* Increase width for larger screens */
+  width: 100%;
+  max-width: 35rem;
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
-/* Video background for larger screens only */
 .video-background {
   width: 100%;
   height: 100%;
@@ -140,7 +152,6 @@ export default {
   color: #999;
 }
 
-/* Custom input styling */
 .custom-input {
   border: 2px solid #5a2ee3;
   border-radius: 8px;
@@ -159,10 +170,9 @@ p.text-muted {
   color: #666;
 }
 
-/* Make settings box responsive */
 @media (max-width: 992px) {
   .settings-card {
-    width: 100%; /* Full width on mobile */
+    width: 100%;
   }
 }
 </style>
