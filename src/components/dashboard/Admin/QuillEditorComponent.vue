@@ -167,7 +167,11 @@ export default {
         },
       });
 
+      // Ensure the editor is focused when initialized
+      quill.focus();
+
       quill.on('text-change', () => {
+        // Update the content without clearing the editor content on backspace
         rawContent.value = quill.root.innerHTML;
         cleanedContent.value = removeEmptyParagraphs(rawContent.value);
       });
@@ -183,6 +187,7 @@ export default {
         await nextTick();
         rawContent.value = formattedBody;
         quill.clipboard.dangerouslyPasteHTML(0, formattedBody);
+        quill.focus(); // Ensure editor is focused after loading content
       }
     };
 
@@ -219,7 +224,6 @@ export default {
 
       try {
         const response = await AuthApiServices.PostRequest('/create-page', data);
-
         showMessage(response.message, response.success ? 'alert-success' : 'alert-danger');
 
         if (response.success) {
@@ -233,7 +237,7 @@ export default {
     const showMessage = (msg, className) => {
       message.value = msg;
       messageClass.value = className;
-      
+
       // Hide the message after 2 seconds
       setTimeout(() => {
         message.value = '';
@@ -266,6 +270,7 @@ export default {
   },
 };
 </script>
+
 
 
 
