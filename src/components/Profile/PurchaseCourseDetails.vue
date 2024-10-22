@@ -1,7 +1,7 @@
 <template>
   <div class="course-details-container">
     <div class="course-card">
-      <div class="image-container">
+      <div class="image-container" v-if="course && course.thumbnail_url">
         <img
           class="course-thumbnail"
           :src="course.thumbnail_url"
@@ -9,7 +9,7 @@
           ref="thumbnail"
         />
       </div>
-      <div class="content">
+      <div class="content" v-if="course">
         <h1 class="course-title">{{ course.title }}</h1>
         <p class="course-description">{{ course.description }}</p>
         <ul class="course-features">
@@ -17,21 +17,11 @@
             <i class="feature-icon"></i> {{ item }}
           </li>
         </ul>
-        <!-- <div class="course-pricing">
-          <p class="price">
-            <span class="original-price">${{ course.price }}</span>
-            <span class="discounted-price">${{ course.discounted_price }}</span>
-          </p>
-          <p class="duration">
-            <i class="fas fa-clock duration-icon"></i> {{ course.duration }} hours
-          </p>
-        </div> -->
-        <!-- <button class="enroll-button">Purchased</button> -->
       </div>
     </div>
 
     <!-- Articles Section -->
-    <div class="articles-section">
+    <div class="articles-section" v-if="articles.length">
       <h2 class="text-center">Related Articles</h2>
       <div class="articles-list">
         <div v-for="article in articles" :key="article.id" class="article-card">
@@ -52,9 +42,10 @@
   </div>
 </template>
 
+
 <script>
-import { ref, onMounted } from 'vue';
-import ApiServices from '@/services/ApiServices';
+import { onMounted, computed } from 'vue';
+import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
 import SuccessPopup from '@/components/SuccessPopup.vue'; // Import SuccessPopup
 import ErrorPopup from '@/components/ErrorPopup.vue'; // Import ErrorPopup
@@ -66,134 +57,41 @@ export default {
     ErrorPopup, // Register ErrorPopup
   },
   setup() {
-    const course = ref({});
-    const courseDetails = ref([]);
-    const isAdded = ref(false); // To track if the course is already added
-    const showSuccessPopup = ref(false); // For "Course added to cart" message
-    const showErrorPopup = ref(false); // For "Already in cart" message
-    const popupMessage = ref(''); // Message to display in the popup
+    const store = useStore();
     const route = useRoute();
-    const articles = ref([]);
+    const slug = route.params.slug;
 
-    const fetchCourseDetails = async () => {
-      try {
-        const slug = route.params.slug;
-        const response = await ApiServices.GetRequest(`/courses/${slug}`);
-        course.value = response.data || {};
-
-        courseDetails.value = [
-          { icon: 'bi bi-play-circle', description: `${course.value.videoHours || 0} hours on-demand video` },
-          { icon: 'bi bi-code-slash', description: `${course.value.codingExercises || 0} coding exercises` },
-          { icon: 'bi bi-file-earmark-text', description: `${course.value.articles || 0} articles` },
-          { icon: 'bi bi-cloud-arrow-down', description: `${course.value.downloadableResources || 0} downloadable resources` },
-          { icon: 'bi bi-phone', description: `Access on mobile and TV` },
-          { icon: 'bi bi-trophy', description: `Certificate of completion` },
-        ];
-
-        checkIfAddedToCart(course.value.id);
-      } catch (error) {
-        console.error('Error fetching course details:', error);
-      }
-    };
-
-    const checkIfAddedToCart = (courseId) => {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      isAdded.value = cart.some(item => item.id === courseId);
-    };
-
-    const addToCart = (course) => {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      if (isAdded.value) {
-        popupMessage.value = 'This course is already in your cart!';
-        showPopup('error');
-      } else {
-        cart.push(course);
-        localStorage.setItem('cart', JSON.stringify(cart));
-        isAdded.value = true;
-        popupMessage.value = 'Course added to cart!';
-        showPopup('success');
-        animateToCart();
-        updateCartCount();
-      }
-    };
-
-    const showPopup = (type) => {
-      if (type === 'success') {
-        showSuccessPopup.value = true;
-        setTimeout(() => {
-          showSuccessPopup.value = false;
-        }, 3000); // Hide success popup after 3 seconds
-      } else if (type === 'error') {
-        showErrorPopup.value = true;
-        setTimeout(() => {
-          showErrorPopup.value = false;
-        }, 3000); // Hide error popup after 3 seconds
-      }
-    };
-
-    const animateToCart = () => {
-      const thumbnail = document.querySelector('.course-thumbnail');
-      const cartIcon = document.querySelector('.material-icons.shopping_cart');
-
-      if (thumbnail && cartIcon) {
-        const thumbnailRect = thumbnail.getBoundingClientRect();
-        const cartIconRect = cartIcon.getBoundingClientRect();
-
-        const clone = thumbnail.cloneNode(true);
-        document.body.appendChild(clone);
-        clone.style.position = 'absolute';
-        clone.style.top = `${thumbnailRect.top}px`;
-        clone.style.left = `${thumbnailRect.left}px`;
-        clone.style.width = `${thumbnailRect.width}px`;
-        clone.style.transition = 'all 1s ease-in-out';
-        clone.style.zIndex = 1000;
-
-        setTimeout(() => {
-          clone.style.top = `${cartIconRect.top}px`;
-          clone.style.left = `${cartIconRect.left}px`;
-          clone.style.width = '20px';
-          clone.style.height = '20px';
-          clone.style.opacity = '0';
-
-          setTimeout(() => {
-            document.body.removeChild(clone);
-          }, 1000);
-        }, 100);
-      }
-    };
-
-    const updateCartCount = () => {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      const event = new Event('storage'); // This triggers a localStorage update
-      localStorage.setItem('cart', JSON.stringify(cart)); // Update localStorage
-      window.dispatchEvent(event); // Dispatch the event
-    };
-        // Fetch related articles
-    const fetchArticles = async () => {
-      try {
-        const slug = route.params.slug;
-        const response = await ApiServices.GetRequest(`/courses/${slug}/articles`);
-        articles.value = response.data || [];
-      } catch (error) {
-        console.error('Error fetching articles:', error);
-      }
-    };
-    
+    const course = computed(() => store.getters['PurchaseStore/getCourse']);
+    const articles = computed(() => store.getters['PurchaseStore/getArticles']);
+    const isAdded = computed(() => store.getters['PurchaseStore/isCourseAdded']);
+    const showSuccessPopup = computed(() => store.getters['PurchaseStore/isSuccessPopupVisible']);
+    const showErrorPopup = computed(() => store.getters['PurchaseStore/isErrorPopupVisible']);
+    const popupMessage = computed(() => store.getters['PurchaseStore/getPopupMessage']);
 
     onMounted(() => {
-      fetchCourseDetails();
-      fetchArticles();
+      store.dispatch('PurchaseStore/fetchCourseDetails', slug).then(() => {
+        // Only attempt to check the cart if course data is available
+        if (course.value && course.value.id) {
+          store.dispatch('PurchaseStore/checkIfAddedToCart', course.value.id);
+        }
+      });
+      store.dispatch('PurchaseStore/fetchArticles', slug);
     });
+
+    const addToCart = () => {
+      if (course.value) {
+        store.dispatch('PurchaseStore/addToCart', course.value);
+      }
+    };
 
     return {
       course,
       articles,
-      courseDetails,
-      addToCart,
       isAdded,
       showSuccessPopup,
       showErrorPopup,
       popupMessage,
+      addToCart,
     };
   },
 };
