@@ -27,41 +27,60 @@
     <!-- Two-Factor Authentication Section -->
     <div class="two-factor-section">
       <p>Two-Factor Authentication</p>
-      <button @click="toggleTwoFactorAuth" class="btn btn-primary small-button">
-        {{ isTwoFactorEnabled ? 'Disable' : 'Enable' }} 2FA
-      </button>
+      <div class="toggle-container">
+        <span class="toggle-label">{{ isTwoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA' }}</span>
+        <button
+          @click="handleToggleTwoFactorAuth"
+          :class="['btn', 'small-toggle-button', isEnabling2FA ? 'toggle-on' : 'toggle-off']"
+        ></button>
+      </div>
 
       <!-- Show QR Code and input when enabling or disabling 2FA -->
       <div v-if="isEnabling2FA">
         <h4>{{ isTwoFactorEnabled ? 'Enter Secret Key to Disable 2FA' : 'Scan QR Code to Enable 2FA' }}</h4>
-        <img v-if="!isTwoFactorEnabled && qrCodeDataURL" :src="qrCodeDataURL" alt="QR Code" class="qr-code" />
-        <img v-if="isTwoFactorEnabled && disableQrCodeDataURL" :src="disableQrCodeDataURL" alt="QR Code" class="qr-code" />
+        <div v-if="!isTwoFactorEnabled" class="qr-code-wrapper">
+          <img v-if="qrCodeDataURL" :src="qrCodeDataURL" alt="QR Code" class="qr-code" />
 
-        <!-- Input to enter the secret key -->
-        <div class="form-group">
-          <label for="secret">{{ isTwoFactorEnabled ? 'Enter Password to Disable' : 'Enter One Time Password' }}</label>
-          
-          <div v-if="!isTwoFactorEnabled">
-            <input type="text" id="secret" v-model="enteredSecret" placeholder="Enter one time password" />
-          </div>
-          
-          <div v-else>
-            <label for="password">Enter Password to Disable 2FA</label>
-            <input type="password" id="password" v-model="disablePassword" placeholder="Enter your password" required />
-          </div>
-
+          <!-- This div will be used to animate the scanning line -->
+          <div class="qr-scan-line"></div>
+          <div class="border-top"></div>
+          <div class="border-bottom"></div>
+          <div class="border-left"></div>
+          <div class="border-right"></div>
         </div>
-        
 
-<button @click="isTwoFactorEnabled ? disableTwoFactorAuth() : enableTwoFactorAuth()" class="btn btn-success small-button">{{ isTwoFactorEnabled ? 'Disable 2FA' : 'Verify and Enable 2FA' }}</button>
+        <!-- Input for OTP or password based on 2FA status -->
+        <div class="form-group">
+          <label for="secret">
+            {{ isTwoFactorEnabled ? 'Enter Password to Disable' : 'Enter One Time Password' }}
+          </label>
+          <input
+            v-if="!isTwoFactorEnabled"
+            type="text"
+            id="secret"
+            v-model="enteredSecret"
+            placeholder="Enter one time password"
+          />
+          <input
+            v-if="isTwoFactorEnabled"
+            type="password"
+            id="password"
+            v-model="disablePassword"
+            placeholder="Enter your password"
+            required
+          />
+        </div>
 
+        <button @click="isTwoFactorEnabled ? disableTwoFactorAuth() : enableTwoFactorAuth()" class="btn btn-success small-button">
+          {{ isTwoFactorEnabled ? 'Disable 2FA' : 'Verify and Enable 2FA' }}
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import AuthApiServices from '@/services/AuthApiServices.js';
 import QRCode from 'qrcode';
@@ -75,10 +94,9 @@ export default {
     const isTwoFactorEnabled = ref(false);
     const isEnabling2FA = ref(false);
     const qrCodeDataURL = ref('');
-    const disableQrCodeDataURL = ref('');
     const enteredSecret = ref('');
-    const generatedSecret = ref('');
-    const disablePassword = ref(''); // New ref for the password input
+    const disablePassword = ref('');
+    let qrCodeRefreshTimer = null;
 
     const userInitials = computed(() => {
       return user.value?.name
@@ -92,8 +110,24 @@ export default {
 
     onMounted(() => {
       username.value = user.value?.name || '';
+
+      // Retrieve and set the 2FA status from localStorage
       const twoFactorStatus = localStorage.getItem('twoFactorEnabled');
       isTwoFactorEnabled.value = twoFactorStatus === 'true';
+
+      // Set an interval to refresh the QR code every 60 seconds
+      if (!isTwoFactorEnabled.value) {
+        qrCodeRefreshTimer = setInterval(() => {
+          toggleTwoFactorAuth();
+        }, 60000);
+      }
+    });
+
+    onUnmounted(() => {
+      // Clear the interval when the component is unmounted
+      if (qrCodeRefreshTimer) {
+        clearInterval(qrCodeRefreshTimer);
+      }
     });
 
     const saveProfile = async () => {
@@ -106,92 +140,61 @@ export default {
       }
     };
 
+    const handleToggleTwoFactorAuth = () => {
+      isEnabling2FA.value = !isEnabling2FA.value;
+
+      // Call API only when enabling 2FA
+      if (!isTwoFactorEnabled.value && isEnabling2FA.value) {
+        toggleTwoFactorAuth(); // Call the API to generate the secret key
+      }
+    };
+
     const toggleTwoFactorAuth = async () => {
-      isEnabling2FA.value = true;
-      generatedSecret.value = '';
-
-      if (!isTwoFactorEnabled.value) {
-        try {
-          const response = await AuthApiServices.GetRequest('/generate-secret-key');
-          const secretKey = response.data.google2fa_secret;
-          generatedSecret.value = secretKey;
-
-          const otpauthUrl = `otpauth://totp/UdemyCloneApp?secret=${secretKey}&issuer=UdemyCloneApp`;
-          const qrCodeURL = await QRCode.toDataURL(otpauthUrl);
-          qrCodeDataURL.value = qrCodeURL;
-
-          console.log('Generated Secret Key:', generatedSecret.value);
-        } catch (err) {
-          console.error('Error generating secret key or QR code:', err);
-        }
-      } else {
-        // Logic to handle disabling 2FA, if required
+      try {
+        const response = await AuthApiServices.GetRequest('/generate-secret-key');
+        const secretKey = response.data.google2fa_secret;
+        const otpauthUrl = `otpauth://totp/UdemyCloneApp?secret=${secretKey}&issuer=UdemyCloneApp`;
+        qrCodeDataURL.value = await QRCode.toDataURL(otpauthUrl);
+      } catch (err) {
+        console.error('Error generating secret key or QR code:', err);
       }
     };
 
     const enableTwoFactorAuth = async () => {
-    try {
-        console.log('Entered Secret:', enteredSecret.value); // Log the entered secret
+      try {
         const response = await AuthApiServices.PostRequest('/enable-2fa', {
-            one_time_password: enteredSecret.value,
+          one_time_password: enteredSecret.value,
         });
+        if (response.message === '2-Factor Authentication successfully enabled.') {
+          alert('2FA enabled successfully!');
+          isTwoFactorEnabled.value = true;
+          isEnabling2FA.value = false;
 
-        console.log('API Response:', response); // Log the response to check the structure
-
-        if (response.message === "2-Factor Authentication successfully enabled.") {
-            alert('2FA enabled successfully!');
-            localStorage.setItem('twoFactorEnabled', 'true');
-            isTwoFactorEnabled.value = true; // Update the state
-            isEnabling2FA.value = false; // Close the enabling section
+          // Save 2FA status in localStorage
+          localStorage.setItem('twoFactorEnabled', 'true');
         }
-    } catch (error) {
+      } catch (error) {
         console.error('Error enabling 2FA:', error);
-        if (error.response) {
-            console.error('Response data:', error.response.data); // Log the response data
-            alert(error.response.data.errors?.google2fa_secret[0] || 'An error occurred'); // Handle specific error messages
-        } else {
-            alert('An unexpected error occurred. Please try again.'); // General error handling
+      }
+    };
+
+    const disableTwoFactorAuth = async () => {
+      try {
+        const response = await AuthApiServices.PostRequest('/disable-2fa', {
+          password: disablePassword.value,
+        });
+        if (response.message === '2-Factor Authentication successfully disabled.') {
+          alert('2FA has been successfully disabled.');
+          isTwoFactorEnabled.value = false;
+          isEnabling2FA.value = false;
+
+          // Remove 2FA status from localStorage
+          localStorage.setItem('twoFactorEnabled', 'false');
         }
-    }
-};
-
-
-
-const disableTwoFactorAuth = async () => {
-  try {
-    const response = await AuthApiServices.PostRequest('/disable-2fa', {
-      password: disablePassword.value, // Make sure this is set correctly
-    });
-
-    console.log('API Response:', response); // Log the response to check the structure
-
-    // Handle success response
-    if (response.message === "2-Factor Authentication successfully disabled.") {
-      alert('2FA has been successfully disabled.');
-      localStorage.setItem('twoFactorEnabled', 'false');
-      isTwoFactorEnabled.value = false; // Update state
-      isEnabling2FA.value = false; // Close section
-    }
-  } catch (error) {
-    console.error('Error disabling 2FA:', error); // Log the full error for debugging
-
-    if (error.response) {
-      // Log the full response to understand what went wrong
-      console.error('Response data:', error.response.data);
-
-      // Handle specific error messages
-      alert(
-        error.response.data.errors?.password?.[0] ||
-        error.response.data.message ||
-        'An error occurred while disabling 2FA. Please try again.'
-      );
-    } else {
-      // General error handling
-      alert('An unexpected error occurred. Please try again.');
-    }
-  }
-};
-
+      } catch (error) {
+        console.error('Error disabling 2FA:', error);
+      }
+    };
 
     return {
       username,
@@ -201,11 +204,10 @@ const disableTwoFactorAuth = async () => {
       isTwoFactorEnabled,
       isEnabling2FA,
       qrCodeDataURL,
-      disableQrCodeDataURL,
       enteredSecret,
       disablePassword,
       saveProfile,
-      toggleTwoFactorAuth,
+      handleToggleTwoFactorAuth,
       enableTwoFactorAuth,
       disableTwoFactorAuth,
     };
@@ -223,12 +225,135 @@ const disableTwoFactorAuth = async () => {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.qr-code {
+/* QR code Styling start from here */
+.qr-code-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;    
+  width: 220px; 
+  height: 220px;
   margin: 20px auto;
-  display: block;
-  width: 200px;
-  height: 200px;
 }
+
+.qr-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 7px;
+  background-color: rgba(0, 255, 0, 0.6); 
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0% {
+    top: 0;
+  }
+  50% {
+    top: 100%;
+  }
+  100% {
+    top: 0;
+  }
+}
+
+.qr-code {
+  width: 200px; 
+  height: 200px;
+  display: block;
+}
+
+.border-top,
+.border-bottom,
+.border-left,
+.border-right {
+  position: absolute;
+  background-color: grey;
+}
+
+.border-left,
+.border-right {
+  top: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.border-left {
+  left: -10px; 
+}
+
+.border-right {
+  right: -10px;
+}
+
+.border-top,
+.border-bottom {
+  left: 0;
+  width: 100%;
+  height: 4px;
+}
+
+.border-top {
+  top: -10px; 
+}
+
+.border-bottom {
+  bottom: -10px; 
+}
+
+/* QR Code styling End here */
+
+/* Toggle button */
+.toggle-container {
+  display: flex;
+  align-items: center;
+}
+
+.toggle-label {
+  margin-right: 10px; 
+  font-size: 14px;
+  color: #333;
+}
+
+.small-toggle-button {
+  width: 50px;
+  height: 25px;
+  background-color: grey;
+  border-radius: 50px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.small-toggle-button::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.small-toggle-button.toggle-on {
+  background-color: green;
+}
+
+.small-toggle-button.toggle-on::before {
+  transform: translateX(25px);
+}
+
+.small-toggle-button.toggle-off {
+  background-color: grey;
+}
+
+.small-toggle-button.toggle-off::before {
+  transform: translateX(0px);
+}
+
 
 .form-group {
   margin-top: 15px;
