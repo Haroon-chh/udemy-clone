@@ -3,6 +3,10 @@
     <h1 class="display-5 fw-bold">Shopping Cart</h1>
     <p class="mt-2 mb-4 text-muted">{{ cartItems.length }} Courses in Cart</p>
 
+    <!-- Success and Error Popups -->
+    <SuccessPopup :show="showSuccess" :message="successMessage" />
+    <ErrorPopup :show="showError" :message="errorMessage" />
+
     <div v-if="cartItems.length === 0" class="card p-5 text-center">
       <img src="@/assets/empty-shopping-cart-v2.png" class="img-fluid mb-4 mx-auto cart-image" alt="Empty Cart" />
       <p class="mb-4">Your cart is empty. Keep shopping to find a course!</p>
@@ -35,8 +39,23 @@
 </template>
 
 <script>
+import SuccessPopup from '@/components/SuccessPopup.vue'; // Import SuccessPopup
+import ErrorPopup from '@/components/ErrorPopup.vue';     // Import ErrorPopup
+
 export default {
   name: 'CartComponent',
+  components: {
+    SuccessPopup,
+    ErrorPopup
+  },
+  data() {
+    return {
+      showSuccess: false,
+      successMessage: '',
+      showError: false,
+      errorMessage: ''
+    };
+  },
   computed: {
     cartItems() {
       return this.$store.getters.getCartItems;
@@ -69,17 +88,31 @@ export default {
         console.log('Purchase Response:', response);
 
         if (response.success) {
-          alert('Purchase successful!');
+          this.showSuccessPopup('Purchase successful!');
           this.$store.commit('setCart', []); // Clear the cart after successful purchase
           this.updateCartCount(); // Update cart count after purchase
         } else {
-          alert('Purchase failed. Please try again.');
+          this.showErrorPopup('Purchase failed. Please try again.');
         }
       } catch (error) {
         console.error('Error purchasing courses:', error);
-        alert('An error occurred during purchase.');
+        this.showErrorPopup('An error occurred during purchase.');
       }
     },
+    showSuccessPopup(message) {
+      this.successMessage = message;
+      this.showSuccess = true;
+      setTimeout(() => {
+        this.showSuccess = false;
+      }, 3000); // Auto-hide after 3 seconds
+    },
+    showErrorPopup(message) {
+      this.errorMessage = message;
+      this.showError = true;
+      setTimeout(() => {
+        this.showError = false;
+      }, 3000); // Auto-hide after 3 seconds
+    }
   },
   mounted() {
     this.$store.dispatch('fetchCartItems'); // Fetch cart items from local storage
