@@ -18,137 +18,168 @@
     </nav>
 
     <!-- Course Categories -->
-    <div v-if="courseCategories && courseCategories.length > 0" class="course-categories d-flex justify-content-center mb-4">
+    <div v-if="courseCategories && courseCategories.course_categories && courseCategories.course_categories.length > 0" class="course-categories d-flex justify-content-start mb-4" style="overflow-x: auto; padding-left: 15px;">
       <button
-        v-for="courseCategory in courseCategories"
+        v-for="courseCategory in courseCategories.course_categories"
         :key="courseCategory.id"
         @click="fetchCourses(courseCategory.id)"
         :class="['btn-course-category', { active: selectedCourseCategoryId === courseCategory.id }]">
         <div class="category-content">
           <span class="category-title">{{ courseCategory.title }}</span>
-          <span v-if="courseCategory.learners" class="learners-count">{{ courseCategory.learners }} learners</span>
         </div>
       </button>
     </div>
     <div v-else class="text-center mt-3">Select a category to see course categories</div>
 
-    <!-- Courses Display -->
-    <div v-if="courses && courses.length > 0" class="courses d-flex flex-wrap justify-content-center">
-      <div v-for="course in courses" :key="course.id" class="course-card" @click="$router.push({ name: 'CourseDetails', params: { slug: course.slug } })">
-        <img :src="course.thumbnail_url" alt="Course thumbnail" class="course-thumbnail" />
+    <!-- Courses Display with Scroller and Arrows -->
+    <div class="course-scroller-container" v-if="courses.length > 4">
+      <div class="scroll-arrow left-arrow" @click="scroll('left')">&#x2039;</div>
+      <div class="courses d-flex" ref="courseScroller">
+        <div
+          v-for="course in courses"
+          :key="course.id"
+          class="course-card"
+          @click="$router.push({ name: 'CourseDetails', params: { slug: course.slug } })"
+        >
+          <div class="course-thumbnail-wrapper">
+            <img
+              v-if="course.thumbnail"
+              :src="course.thumbnail"
+              alt="Course thumbnail"
+              class="course-thumbnail"
+            />
+            <div v-else class="no-thumbnail">No Image</div>
+          </div>
+          <div class="course-details">
+            <h4>{{ course.title }}</h4>
+            <p>{{ course.description }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="scroll-arrow right-arrow" @click="scroll('right')">&#x203A;</div>
+    </div>
+
+    <!-- Courses Display without Scroller if less than or equal to 4 -->
+    <div v-if="courses.length <= 4" class="courses d-flex flex-wrap justify-content-center">
+      <div
+        v-for="course in courses"
+        :key="course.id"
+        class="course-card"
+        @click="$router.push({ name: 'CourseDetails', params: { slug: course.slug } })"
+      >
+        <div class="course-thumbnail-wrapper">
+          <img
+            v-if="course.thumbnail"
+            :src="course.thumbnail"
+            alt="Course thumbnail"
+            class="course-thumbnail"
+          />
+          <div v-else class="no-thumbnail">No Image</div>
+        </div>
         <div class="course-details">
           <h4>{{ course.title }}</h4>
           <p>{{ course.description }}</p>
-          <p class="price">
-            <span class="discounted-price">${{ course.discounted_price }}</span>
-            <span class="original-price">${{ course.price }}</span>
-          </p>
         </div>
       </div>
     </div>
-    <div v-else class="text-center mt-3">Course doesn't exist</div>
+
+    <div v-if="courses.length === 0" class="text-center mt-3">No courses found</div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import ApiServices from '@/services/ApiServices';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'CategoriesComponent',
-  setup() {
-    const router = useRouter();
-    const categories = ref([]);
-    const courseCategories = ref([]);
-    const courses = ref([]);
-    const selectedCategoryId = ref(null);
-    const selectedCourseCategoryId = ref(null);
-
-    const fetchCategories = async () => {
-      try {
-        const response = await ApiServices.GetRequest('/categories');
-        categories.value = response?.data || [];
-
-        if (categories.value.length > 0) {
-          fetchCourseCategories(categories.value[0].id);
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
-    };
-
-    const fetchCourseCategories = async (categoryId) => {
-      selectedCategoryId.value = categoryId;
-      try {
-        const response = await ApiServices.GetRequest(`/categories/${categoryId}/course-categories`);
-        courseCategories.value = response?.data || [];
-
-        if (courseCategories.value.length > 0) {
-          fetchCourses(courseCategories.value[0].id);
-        } else {
-          courses.value = [];
-        }
-      } catch (error) {
-        console.error('Error fetching course categories:', error);
-        courseCategories.value = [];
-        courses.value = [];
-      }
-    };
-
-    const fetchCourses = async (courseCategoryId) => {
-      selectedCourseCategoryId.value = courseCategoryId;
-      try {
-        const response = await ApiServices.GetRequest(`/course-categories/${courseCategoryId}/course`);
-        courses.value = response?.data || [];
-      } catch (error) {
-        console.error('Error fetching courses:', error);
-        courses.value = [];
-      }
-    };
-
-    const goToCourseDetails = (slug) => {
-      router.push({ name: 'CourseDetails', params: { slug } });
-    };
-
-    onMounted(() => {
-      fetchCategories();
-    });
-
-    return {
-      categories,
-      courseCategories,
-      courses,
-      selectedCategoryId,
-      selectedCourseCategoryId,
-      fetchCourseCategories,
-      fetchCourses,
-      goToCourseDetails,
-    };
+  computed: {
+    ...mapGetters('CategoriesStore', [
+      'getCategories',
+      'getCourseCategories',
+      'getCourses',
+      'getSelectedCategoryId',
+      'getSelectedCourseCategoryId'
+    ]),
+    categories() {
+      console.log('Categories:', this.getCategories);
+      return this.getCategories;
+    },
+    courseCategories() {
+      console.log('Course Categories:', this.getCourseCategories);
+      return this.getCourseCategories;
+    },
+    courses() {
+      console.log('Courses:', this.getCourses);
+      return this.getCourses;
+    },
+    selectedCategoryId() {
+      return this.getSelectedCategoryId;
+    },
+    selectedCourseCategoryId() {
+      return this.getSelectedCourseCategoryId;
+    }
   },
+  methods: {
+    ...mapActions('CategoriesStore', ['fetchCategories', 'fetchCourseCategories', 'fetchCourses']),
+    scroll(direction) {
+      const scrollAmount = 300;
+      const courseScroller = this.$refs.courseScroller;
+
+      if (direction === 'left') {
+        courseScroller.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      } else {
+        courseScroller.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    }
+  },
+  mounted() {
+    this.fetchCategories();
+  }
 };
 </script>
 
-
 <style scoped>
-h2{
+h2 {
   font-family: 'Suisse Works', serif;
   font-weight: bold;
   font-size: 50px;
+  margin-bottom: 1rem;
 }
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.categories-nav, .course-categories {
+.categories-nav {
   display: flex;
   gap: 1rem;
-  overflow-x: auto;
   white-space: nowrap;
+  padding-left: 15px;
 }
 
-.btn-category, .btn-course-category {
+.course-categories {
+  display: flex;
+  gap: 1rem;
+  white-space: nowrap;
+  padding-left: 15px;
+  margin-left: 30%;
+}
+
+.btn-category {
+  background-color: #f1f3f4;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-course-category {
   background-color: #f1f3f4;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -159,57 +190,60 @@ h2{
   align-items: center;
   cursor: pointer;
   position: relative;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, color 0.3s;
 }
 
-.btn-category.active, .btn-course-category.active {
+.btn-category.active,
+.btn-course-category.active {
   background-color: #333;
   color: white;
 }
 
-.category-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.category-title {
-  font-weight: bold;
-  margin-bottom: 0.25rem;
-}
-
-.learners-count {
-  font-size: 0.75rem;
-  color: #555;
-}
-
-.btn-category:hover, .btn-course-category:hover {
+.btn-category:hover,
+.btn-course-category:hover {
   background-color: #ddd;
+  color: black;
 }
 
-/* Courses */
-.courses {
+.course-thumbnail-wrapper {
+  width: 100%;
+  height: 150px;
   display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
+  background-color: #eaeaea;
+}
+
+.course-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-thumbnail {
+  width: 100%;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
 }
 
 .course-card {
-  width: 300px;
+  width: 240px;
+  min-width: 240px;
   border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   background-color: white;
   text-align: left;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  margin: 0 1rem;
 }
 
-.course-thumbnail {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
+.course-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .course-details {
@@ -226,18 +260,87 @@ h2{
   color: #555;
 }
 
-.price {
-  margin-top: 1rem;
+/* Scroller arrows */
+.course-scroller-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 1rem 0;
+  max-width: 960px; /* Adjust this to ensure the width is smaller */
+  margin: 0 auto;
 }
 
-.discounted-price {
-  color: red;
-  font-weight: bold;
+.courses {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
 }
 
-.original-price {
-  text-decoration: line-through;
-  color: #999;
-  margin-left: 0.5rem;
+.scroll-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: black;
+  color: white;
+  border-radius: 50%;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.left-arrow {
+  left: 0;
+}
+
+.right-arrow {
+  right: 0;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .course-card {
+    width: 220px;
+    min-width: 220px;
+  }
+
+  .course-scroller-container {
+    max-width: 720px;
+  }
+  .course-categories {
+  margin-left: 0%;
+}
+}
+
+/* Add these mobile-specific styles to ensure horizontal scrolling on mobile */
+@media (max-width: 768px) {
+  .courses {
+    display: flex;
+    flex-wrap: nowrap; /* Ensure cards don't wrap */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    gap: 1rem; /* Adjust gap between cards */
+    padding: 0 1rem; /* Add some padding for mobile view */
+    scroll-behavior: smooth;
+  }
+
+  .course-card {
+    width: 85%; /* Make cards take up most of the width on mobile */
+    min-width: 85%; /* Ensure they maintain that width */
+    max-width: 85%; /* Prevent exceeding the width */
+  }
+
+  .scroll-arrow {
+    display: none; /* Hide scroll arrows on mobile as we'll use swipe to scroll */
+  }
+  .course-categories {
+  margin-left: 0%;
+}
 }
 </style>

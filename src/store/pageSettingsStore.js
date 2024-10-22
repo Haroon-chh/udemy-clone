@@ -33,6 +33,7 @@ const PageSettingsStore = {
         console.error('Error fetching pages:', error);
       }
     },
+
     async getPageBySlug({ commit }, slug) {
       try {
         console.log(`Fetching page by slug: ${slug}`);
@@ -49,6 +50,19 @@ const PageSettingsStore = {
       } catch (error) {
         console.error('Error fetching page:', error);
         return null;
+      }
+    },
+
+    async updatePageContent({ state }, body) {
+      try {
+        const pageId = state.currentPage.id;
+        const response = await AuthApiServices.PostRequest(`/update-page/${pageId}`, { body });
+
+        console.log('Page updated successfully:', response);
+        return { success: true, message: response.message || 'Page updated successfully!' };
+      } catch (error) {
+        console.error('Error updating page:', error);
+        return { success: false, message: 'Failed to update page. Please try again.' };
       }
     },
   },

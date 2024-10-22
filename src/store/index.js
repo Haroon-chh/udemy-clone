@@ -4,13 +4,17 @@ import AdminStore from './AdminStore';
 import PageSettingsStore from './pageSettingsStore';
 import StudentStore from './StudentStore';
 import AddcartStore from './AddcartStore';
+import CategoriesStore from './CategoriesStore';
+import SiteSettingStore from './SiteSettingStore';
 
 export default createStore({
   modules: {
     AdminStore,
-     PageSettingsStore,
-      StudentStore,
-    AddcartStore
+    PageSettingsStore,
+    StudentStore,
+    AddcartStore,
+    CategoriesStore,
+    SiteSettingStore
   },
   state: {
     user: null,

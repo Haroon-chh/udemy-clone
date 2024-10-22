@@ -1,7 +1,6 @@
-<!-- src/components/dashboard/Admin/ViewArticles.vue -->
 <template>
     <div class="articles-container">
-      <h2>Published Articles</h2>
+      <h2 class="articles-title">Published Articles</h2>
   
       <div v-if="articles.length === 0" class="no-articles">
         <p>No articles found.</p>
@@ -9,9 +8,12 @@
   
       <div v-else class="articles-list">
         <div v-for="article in articles" :key="article.id" class="article-card">
-          <img :src="article.image_url" alt="Article Image" class="article-image">
-          <h3>{{ article.title }}</h3>
-          <p v-html="article.body"></p>
+          <img :src="article.image_url" alt="Article Image" class="article-image" />
+          <div class="article-content">
+            <h3 class="article-title">{{ article.title }}</h3>
+            <p class="article-body" v-html="truncateText(article.body)"></p>
+            <router-link :to="'/articles/' + article.slug" class="read-more">Read more</router-link>
+          </div>
         </div>
       </div>
     </div>
@@ -25,15 +27,24 @@
     name: 'ViewArticles',
     setup() {
       const store = useStore();
-      
-      const articles = computed(() => store.getters['admin/allArticles']);
+  
+      const articles = computed(() => store.getters['AdminStore/allArticles']);
+  
+      const truncateText = (text, length = 150) => {
+        return text.length > length ? text.substring(0, length) + '...' : text;
+      };
   
       onMounted(async () => {
-        await store.dispatch('admin/fetchArticles');  // Fetch articles when the component mounts
+        try {
+          await store.dispatch('AdminStore/fetchArticles');
+        } catch (error) {
+          console.error('Error fetching articles:', error);
+        }
       });
   
       return {
         articles,
+        truncateText,
       };
     },
   };
@@ -41,41 +52,101 @@
   
   <style scoped>
   .articles-container {
-    padding: 20px;
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .articles-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #1e3a8a;
   }
   
   .no-articles {
     text-align: center;
-    font-size: 18px;
+    font-size: 1.2rem;
+    color: #6c757d;
+    margin-top: 20px;
   }
   
   .articles-list {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    justify-content: space-between;
   }
   
   .article-card {
     background-color: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
-    width: 300px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: calc(33.333% - 20px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .article-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   }
   
   .article-image {
     width: 100%;
-    height: 150px;
+    height: 200px;
     object-fit: cover;
-    border-radius: 8px;
+    border-bottom: 2px solid #1e3a8a;
   }
   
-  .article-card h3 {
-    margin: 15px 0 10px;
+  .article-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
   }
   
-  .article-card p {
+  .article-title {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .article-body {
     color: #555;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  
+  .read-more {
+    font-size: 1rem;
+    color: #1e40af;
+    font-weight: bold;
+    text-decoration: none;
+    align-self: flex-start;
+    margin-top: auto;
+    transition: color 0.3s ease;
+  }
+  
+  .read-more:hover {
+    color: #2563eb;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .articles-list {
+      flex-direction: column;
+      gap: 20px;
+    }
+  
+    .article-card {
+      width: 100%;
+    }
   }
   </style>
-  
