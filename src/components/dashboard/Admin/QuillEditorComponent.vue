@@ -1,5 +1,14 @@
 <template>
   <div class="quill-editor-container">
+    <!-- Button to open modal -->
+    <button 
+      class="btn btn-primary float-end mb-3" 
+      @click="isCreatePageModalVisible = true"
+    >
+      Add New Page
+    </button>
+
+    <!-- Existing Content Editor -->
     <div class="input-with-copy">
       <input
         type="text"
@@ -21,6 +30,69 @@
       <div id="editor"></div>
     </div>
 
+    <!-- Modal for adding new page -->
+    <div 
+      v-if="isCreatePageModalVisible" 
+      class="modal fade show d-block" 
+      id="createPageModal" 
+      tabindex="-1" 
+      role="dialog" 
+      aria-labelledby="createPageModalLabel" 
+      aria-hidden="true"
+      style="background-color: rgba(0, 0, 0, 0.5);"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="createPageModalLabel">Create New Page</h5>
+            <button 
+              type="button" 
+              class="close" 
+              @click="isCreatePageModalVisible = false"
+            >
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="pageTitle">Page Title</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                v-model="newPageTitle"
+                placeholder="Enter page title"
+              />
+            </div>
+            <div class="form-group mt-3">
+              <label for="pageBody">Page Body</label>
+              <textarea 
+                class="form-control" 
+                v-model="newPageBody" 
+                placeholder="Enter page content"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              @click="isCreatePageModalVisible = false"
+            >
+              Close
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-primary" 
+              @click="createNewPage"
+            >
+              Add Page
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HTML Preview and Cleaned Content -->
     <div class="button-group mt-3">
       <button @click="showHtmlPreview" class="btn btn-primary me-2">
         Show HTML Preview
@@ -41,42 +113,13 @@
   </div>
 </template>
 
+
 <script>
 import { ref, onMounted, nextTick, watch } from 'vue';
 import { useStore } from 'vuex';
 import Quill from 'quill';
 import { useRoute } from 'vue-router';
-
-// Custom Blot for Div Elements
-const BlockEmbed = Quill.import('blots/block/embed');
-class DivBlot extends BlockEmbed {
-  static create(value) {
-    const node = super.create();
-    node.innerHTML = value;
-    return node;
-  }
-  static value(node) {
-    return node.innerHTML;
-  }
-}
-DivBlot.blotName = 'div';
-DivBlot.tagName = 'div';
-Quill.register(DivBlot);
-
-// Custom Clipboard Configuration
-const Clipboard = Quill.import('modules/clipboard');
-class CustomClipboard extends Clipboard {
-  onPaste(event) {
-    const clipboardEvent = event.clipboardData || window.clipboardData;
-    if (clipboardEvent) {
-      event.preventDefault();
-      const text = clipboardEvent.getData('text/plain');
-      const html = text.replace(/\n/g, '<br>');
-      this.quill.clipboard.dangerouslyPasteHTML(0, html);
-    }
-  }
-}
-Quill.register('modules/clipboard', CustomClipboard);
+import AuthApiServices from '@/services/AuthApiServices';
 
 export default {
   name: 'QuillEditorComponent',
@@ -88,13 +131,15 @@ export default {
     const cleanedContent = ref('');
     const message = ref('');
     const messageClass = ref('');
+    const newPageTitle = ref(''); // New page title
+    const newPageBody = ref(''); // New page body
+    const isCreatePageModalVisible = ref(false); // Control modal visibility
     let quill = null;
 
     const initializeQuill = () => {
       quill = new Quill('#editor', {
         theme: 'snow',
         modules: {
-          clipboard: true,
           toolbar: [
             [{ header: [1, 2, false] }],
             ['bold', 'italic', 'underline', 'strike'],
@@ -110,8 +155,6 @@ export default {
         rawContent.value = quill.root.innerHTML;
         cleanedContent.value = removeEmptyParagraphs(rawContent.value);
       });
-
-      console.log('Quill editor initialized with custom clipboard and div blot.');
     };
 
     const loadPageContent = async () => {
@@ -124,7 +167,6 @@ export default {
         await nextTick();
         rawContent.value = formattedBody;
         quill.clipboard.dangerouslyPasteHTML(0, formattedBody);
-        console.log('Page content loaded:', formattedBody);
       }
     };
 
@@ -133,17 +175,14 @@ export default {
       rawContent.value = '';
       htmlPreview.value = '';
       cleanedContent.value = '';
-      console.log('Quill editor reset.');
     };
 
     const refreshPageContent = async () => {
-      console.log('Refreshing page content...');
       await loadPageContent();
     };
 
     const showHtmlPreview = () => {
       htmlPreview.value = quill.root.innerHTML;
-      console.log('HTML preview:', htmlPreview.value);
     };
 
     const removeEmptyParagraphs = (html) => html.replace(/<p><br><\/p>/g, '');
@@ -153,10 +192,27 @@ export default {
       const finalContent = cleanedBody.replace(/<br\s*\/?>/g, ''); // Remove all <br> tags
 
       const response = await store.dispatch('PageSettingsStore/updatePageContent', finalContent);
-
       message.value = response.message || 'Page updated successfully!';
       messageClass.value = response.success ? 'alert-success' : 'alert-danger';
-      console.log('Page update response:', response);
+    };
+
+    const createNewPage = async () => {
+      const data = {
+        title: newPageTitle.value,
+        body: newPageBody.value,
+      };
+
+      try {
+        const response = await AuthApiServices.PostRequest('/create-page', data);
+
+        alert(response.message); // Show the response message in an alert
+
+        if (response.success) {
+          isCreatePageModalVisible.value = false; // Close modal on success
+        }
+      } catch (error) {
+        alert('Error creating page');
+      }
     };
 
     onMounted(async () => {
@@ -173,12 +229,18 @@ export default {
       cleanedContent,
       message,
       messageClass,
+      newPageTitle,
+      newPageBody,
+      isCreatePageModalVisible, // Control modal visibility
       refreshPageContent,
       showHtmlPreview,
       updatePageContent,
+      createNewPage,
     };
   },
 };
+
+
 </script>
 
 
