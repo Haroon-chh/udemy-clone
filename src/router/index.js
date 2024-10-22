@@ -18,7 +18,7 @@ import ActiveSubscription from '@/components/dashboard/Admin/ActiveSubscription.
 import SiteSettings from '@/components/dashboard/Admin/SiteSettings.vue';
 import PurchaseCourses from '@/components/Profile/PurchaseCourses.vue';
 import PurchaseCourseDetailView from '../views/PurchaseCourseDetailView.vue';
-
+import ArticleDetailsView from '@/views/ArticleDetailsView.vue';
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
@@ -142,6 +142,12 @@ const routes = [
     name: 'PurchaseCourses',
     component: PurchaseCourses,
     meta: { title: 'Purchase Courses' },
+  },
+  {
+    path: '/articles/:slug', // Add route for article details
+    name: 'ArticleDetails',
+    component: ArticleDetailsView,
+    meta: { title: 'Article Details' },
   },
 ];
 
