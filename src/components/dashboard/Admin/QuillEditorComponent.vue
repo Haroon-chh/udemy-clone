@@ -109,10 +109,10 @@
       <textarea class="form-control" rows="5" readonly :value="cleanedContent"></textarea>
     </div>
 
+    <!-- Message box -->
     <div v-if="message" class="alert mt-3" :class="messageClass">{{ message }}</div>
   </div>
 </template>
-
 
 <script>
 import { ref, onMounted, nextTick, watch } from 'vue';
@@ -120,6 +120,22 @@ import { useStore } from 'vuex';
 import Quill from 'quill';
 import { useRoute } from 'vue-router';
 import AuthApiServices from '@/services/AuthApiServices';
+
+// Custom Blot for Div Elements
+const BlockEmbed = Quill.import('blots/block/embed');
+class DivBlot extends BlockEmbed {
+  static create(value) {
+    const node = super.create();
+    node.innerHTML = value;
+    return node;
+  }
+  static value(node) {
+    return node.innerHTML;
+  }
+}
+DivBlot.blotName = 'div';
+DivBlot.tagName = 'div';
+Quill.register(DivBlot); // Register the custom blot with Quill
 
 export default {
   name: 'QuillEditorComponent',
@@ -192,8 +208,7 @@ export default {
       const finalContent = cleanedBody.replace(/<br\s*\/?>/g, ''); // Remove all <br> tags
 
       const response = await store.dispatch('PageSettingsStore/updatePageContent', finalContent);
-      message.value = response.message || 'Page updated successfully!';
-      messageClass.value = response.success ? 'alert-success' : 'alert-danger';
+      showMessage(response.message || 'Page updated successfully!', response.success ? 'alert-success' : 'alert-danger');
     };
 
     const createNewPage = async () => {
@@ -205,14 +220,25 @@ export default {
       try {
         const response = await AuthApiServices.PostRequest('/create-page', data);
 
-        alert(response.message); // Show the response message in an alert
+        showMessage(response.message, response.success ? 'alert-success' : 'alert-danger');
 
         if (response.success) {
           isCreatePageModalVisible.value = false; // Close modal on success
         }
       } catch (error) {
-        alert('Error creating page');
+        showMessage('Error creating page', 'alert-danger');
       }
+    };
+
+    const showMessage = (msg, className) => {
+      message.value = msg;
+      messageClass.value = className;
+      
+      // Hide the message after 2 seconds
+      setTimeout(() => {
+        message.value = '';
+        messageClass.value = '';
+      }, 2000);
     };
 
     onMounted(async () => {
@@ -239,9 +265,9 @@ export default {
     };
   },
 };
-
-
 </script>
+
+
 
 
 
