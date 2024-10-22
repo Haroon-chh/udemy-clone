@@ -173,7 +173,7 @@ export default {
       try {
         const slug = route.params.slug;
         const response = await ApiServices.GetRequest(`/courses/${slug}/articles`);
-        articles.value = response.data.articles || [];
+        articles.value = response.data || [];
       } catch (error) {
         console.error('Error fetching articles:', error);
       }
