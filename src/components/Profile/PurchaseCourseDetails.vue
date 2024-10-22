@@ -1,125 +1,52 @@
 <template>
-  <div>
-    <div class="course-details-container">
-      <div class="course-card">
-        <div class="image-container">
-          <img
-            class="course-thumbnail"
-            :src="course.thumbnail_url"
-            alt="Course Thumbnail"
-            ref="thumbnail"
-          />
-        </div>
-        <div class="content">
-          <h1 class="course-title">{{ course.title }}</h1>
-          <p class="course-description">{{ course.description }}</p>
-          <ul class="course-features">
-            <li v-for="(item, index) in course.short_description" :key="index">
-              <i class="feature-icon"></i> {{ item }}
-            </li>
-          </ul>
-          <div class="course-pricing">
-            <p class="price">
-              <span class="original-price">${{ course.price }}</span>
-              <span class="discounted-price">${{ course.discounted_price }}</span>
-            </p>
-            <p class="duration">
-              <i class="fas fa-clock duration-icon"></i> {{ course.duration }} hours
-            </p>
-          </div>
-          <!-- Buy Button -->
-          <button class="enroll-button" @click="addToCart(course)">Buy</button>
-        </div>
+  <div class="course-details-container">
+    <div class="course-card">
+      <div class="image-container">
+        <img
+          class="course-thumbnail"
+          :src="course.thumbnail_url"
+          alt="Course Thumbnail"
+          ref="thumbnail"
+        />
+      </div>
+      <div class="content">
+        <h1 class="course-title">{{ course.title }}</h1>
+        <p class="course-description">{{ course.description }}</p>
+        <ul class="course-features">
+          <li v-for="(item, index) in course.short_description" :key="index">
+            <i class="feature-icon"></i> {{ item }}
+          </li>
+        </ul>
+        <!-- <div class="course-pricing">
+          <p class="price">
+            <span class="original-price">${{ course.price }}</span>
+            <span class="discounted-price">${{ course.discounted_price }}</span>
+          </p>
+          <p class="duration">
+            <i class="fas fa-clock duration-icon"></i> {{ course.duration }} hours
+          </p>
+        </div> -->
+        <!-- <button class="enroll-button">Purchased</button> -->
       </div>
     </div>
 
-    <div class="learning-points">
-      <h2 class="learning-points-title">What you'll learn</h2>
-      <div class="learning-points-content">
-        <div class="learning-points-column">
-          <ul class="list-unstyled">
-            <li class="mb-3">
-              <i class="bi bi-check2"></i>
-              Build 16 web development projects for your portfolio, ready to apply for junior developer jobs.
-            </li>
-            <li class="mb-3">
-              <i class="bi bi-check2"></i>
-              After the course, you will be able to build ANY website you want.
-            </li>
-            <li class="mb-3">
-              <i class="bi bi-check2"></i>
-              Work as a freelance web developer.
-            </li>
-            <li class="mb-3">
-              <i class="bi bi-check2"></i>
-              Master backend development with Node.
-            </li>
-          </ul>
-        </div>
-        <div class="learning-points-column">
-          <ul class="list-unstyled">
-            <li class="mb-3">
-              <i class="bi bi-check2"></i>
-              Learn the latest technologies, including Javascript, React, Node, and even Web3 development.
-            </li>
-            <li class="mb-3">
-              <i class="bi bi-check2"></i>
-              Build fully-fledged websites and web apps for your startup or business.
-            </li>
-            <li class="mb-3">
-              <i class="bi bi-check2"></i>
-              Master frontend development with React.
-            </li>
-            <li class="mb-3">
-              <i class="bi bi-check2"></i>
-              Learn professional developer best practices.
-            </li>
-          </ul>
+    <!-- Articles Section -->
+    <div class="articles-section">
+      <h2 class="text-center">Related Articles</h2>
+      <div class="articles-list">
+        <div v-for="article in articles" :key="article.id" class="article-card">
+          <h3>{{ article.title }}</h3>
+          <img v-if="article.image_url" :src="article.image_url" alt="Article Image" />
+          <router-link :to="`/articles/${article.slug}`" class="read-more">
+            Read more
+          </router-link>
         </div>
       </div>
     </div>
-     <div class="container py-5">
-    <!-- Requirements Section -->
-    <div class="requirements-section my-5">
-      <h2 class="learning-points-title">Requirements</h2>
-      <ul class="requirements-list text-center">
-        <li>No programming experience needed - I'll teach you everything you need to know</li>
-        <li>A computer with access to the internet</li>
-        <li>No paid software required</li>
-        <li>I'll walk you through, step-by-step how to get all the software installed and set up</li>
-      </ul>
-    </div>
-
-    <!-- Description Section -->
-    <div class="description-section my-5">
-      <h2 class="learning-points-title" >Description</h2>
-      <p>
-        Welcome to the Complete Web Development Bootcamp, <strong>the only course you need</strong> 
-        to learn to code and become a full-stack web developer. 
-        With 150,000+ ratings and a 4.8 average, my Web Development course is 
-        one of the <strong>HIGHEST RATED</strong> courses in the history of Udemy!
-      </p>
-    </div>
-  </div>
-   <div class="container py-5">
-    <div class="row text-center">
-      <div class="col-12">
-        <h2 class="learning-points-title" >This course includes:</h2>
-      </div>
-      <div class="col-lg-4 col-md-6 my-3" v-for="(item, index) in courseDetails" :key="index">
-        <div class="d-flex align-items-center justify-content-center">
-          <i :class="item.icon"></i>
-          <div class="ps-3">
-            <p>{{ item.description }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
     <!-- Success Popup for "Course added to cart" -->
     <SuccessPopup v-if="showSuccessPopup" :show="showSuccessPopup" :message="popupMessage" />
-
+    
     <!-- Error Popup for "Already in cart" message -->
     <ErrorPopup v-if="showErrorPopup" :show="showErrorPopup" :message="popupMessage" />
   </div>
@@ -146,6 +73,7 @@ export default {
     const showErrorPopup = ref(false); // For "Already in cart" message
     const popupMessage = ref(''); // Message to display in the popup
     const route = useRoute();
+    const articles = ref([]);
 
     const fetchCourseDetails = async () => {
       try {
@@ -240,13 +168,26 @@ export default {
       localStorage.setItem('cart', JSON.stringify(cart)); // Update localStorage
       window.dispatchEvent(event); // Dispatch the event
     };
+        // Fetch related articles
+    const fetchArticles = async () => {
+      try {
+        const slug = route.params.slug;
+        const response = await ApiServices.GetRequest(`/courses/${slug}/articles`);
+        articles.value = response.data || [];
+      } catch (error) {
+        console.error('Error fetching articles:', error);
+      }
+    };
+    
 
     onMounted(() => {
       fetchCourseDetails();
+      fetchArticles();
     });
 
     return {
       course,
+      articles,
       courseDetails,
       addToCart,
       isAdded,
@@ -258,23 +199,31 @@ export default {
 };
 </script>
 
-<style scoped>
 
+<style scoped>
 .course-details-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 1rem;
-  min-height: 100vh;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  /* box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); */
+  font-family: 'Arial', sans-serif;
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
 }
 
 .course-card {
   display: flex;
   background: #ffffff;
-  border-radius: 15px;
+  border-radius: 12px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  max-width: 1000px;
-  width: 100%;
   overflow: hidden;
   transition: transform 0.3s, box-shadow 0.3s;
 }
@@ -291,8 +240,9 @@ export default {
 
 .course-thumbnail {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .content {
@@ -304,16 +254,16 @@ export default {
 }
 
 .course-title {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #1e3a8a;
+  font-size: 2.5rem;
+  color: #2c3e50;
   margin-bottom: 1rem;
+  text-align: center;
 }
 
 .course-description {
-  font-size: 1rem;
+  font-size: 1.125rem;
   line-height: 1.6;
-  color: #4b5563;
+  color: #34495e;
   margin-bottom: 1.5rem;
 }
 
@@ -326,8 +276,8 @@ export default {
 .course-features li {
   display: flex;
   align-items: center;
-  font-size: 0.95rem;
-  color: #374151;
+  font-size: 1rem;
+  color: #34495e;
   margin: 0.5rem 0;
 }
 
@@ -344,9 +294,8 @@ export default {
 }
 
 .price {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: #1f2937;
-  margin-bottom: 0.5rem;
 }
 
 .original-price {
@@ -358,7 +307,6 @@ export default {
 .discounted-price {
   color: #ef4444;
   font-weight: bold;
-  font-size: 1.4rem;
 }
 
 .duration {
@@ -390,86 +338,84 @@ export default {
   background: linear-gradient(135deg, #1e40af, #2563eb);
 }
 
-/* Learning Points Section */
-.learning-points {
-  padding: 2rem;
-  border-radius: 15px;
+.articles-section {
   margin-top: 2rem;
 }
 
-.learning-points-title {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #1e3a8a;
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.learning-points-content {
+.articles-list {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
 }
 
-.learning-points-column {
+.article-card {
   width: 48%;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.learning-points-column ul {
-  padding: 0;
+.article-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
 }
 
-.bi {
-  color: green;
+.article-card img {
+  max-width: 100%;
+  border-radius: 8px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .course-card {
+.read-more {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+  .course-details-container {
+    padding: 1rem;
+  }
+
+  .course-title {
+    font-size: 2rem;
+  }
+
+  .course-description {
+    font-size: 1rem;
+  }
+
+  .course-features li {
+    font-size: 0.9rem;
+  }
+
+  .price {
+    font-size: 1.2rem;
+  }
+
+  .enroll-button {
+    width: 100%;
+  }
+
+  .articles-list {
     flex-direction: column;
   }
 
-  .learning-points-content {
-    flex-direction: column;
-  }
-
-  .learning-points-column {
+  .article-card {
     width: 100%;
   }
 }
-
-i {
-  font-size: 2rem;
-}
-
-p {
-  margin-bottom: 0;
-  font-size: 1.2rem;
-}
-
-.requirements-section h2 {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.requirements-list {
-  list-style-type: none;
-  padding-left: 20px;
-  font-size: 1.1rem;
-}
-
-.requirements-list li {
-  margin-bottom: 10px;
-}
-
-.description-section h2 {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.description-section p {
-  font-size: 1.2rem;
-  line-height: 1.6;
-}
 </style>
+
+
+
+
+
+
+
+
+
