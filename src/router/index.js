@@ -149,7 +149,7 @@ const routes = [
     path: '/articles/:slug', // Add route for article details
     name: 'ArticleDetails',
     component: ArticleDetailsView,
-    meta: { title: 'Article Details', roles: ['student'] },  //student
+    meta: { title: 'Article Details', roles: ['student','admin'] },  //student
   },
 ];
 
