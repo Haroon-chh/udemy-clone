@@ -1,38 +1,35 @@
 import store from "../store";
 
 const RouteGuard = (to, from, next) => {
-  const publicPages = ['/login', '/registration', '/forgot-password', '/reset-password'];
-  // const adminPages = ['/dashboard', '/view-results', '/add-staff', '/delete-user', '/assign-quiz'];
-  // const studentPages = ['/dashboard', '/view-grades', '/submit-assignments', '/dashboard/attempt-quiz'];
-  // const managerPages = ['/dashboard', '/view-reports', '/manage-staff'];
+  // Define public pages that don't require authentication
+  const publicPages = ['/login', '/signup', '/about', '/ContactUs', '/cart', '/teaching'];
 
+  // Get the logged-in user's role (assuming the role is available in Vuex store)
+  const userRole = store.getters.getUserRole; 
+
+  // Check if the route is public (no authentication required)
   const authRequired = !publicPages.includes(to.path);
-  const userRole = store.getters.getUserRole;
 
-  // If the route requires auth and there's no user role, redirect to login
+  // If the route requires authentication and the user is not logged in, redirect to login
   if (authRequired && !userRole) {
     return next('/login');
   }
 
-  // If user has a role and tries to access a public page, redirect to dashboard
+  // If user is logged in and tries to access a public page, redirect to dashboard
   if (userRole && publicPages.includes(to.path)) {
     return next('/dashboard');
   }
 
-  // Role-based access control (commented out for now)
-  /*
-  if (userRole) {
-    if (userRole === 'admin' && !adminPages.includes(to.path) && !to.path.startsWith('/dashboard/')) {
-      return next('/dashboard');
-    } else if (userRole === 'student' && !studentPages.includes(to.path) && !to.path.startsWith('/dashboard/attempt-quiz')) {
-      return next('/dashboard');
-    } else if (userRole === 'manager' && !managerPages.includes(to.path) && !to.path.startsWith('/dashboard/')) {
-      return next('/dashboard');
-    }
-  }
-  */
+  // Check if the route has specific roles defined in its meta field
+  const routeRoles = to.meta.roles || [];  // Get allowed roles for the route (if any)
 
-  // If none of the above conditions are met, allow navigation
+  // If roles are specified, verify if the user's role matches one of the allowed roles
+  if (routeRoles.length && !routeRoles.includes(userRole)) {
+    // If the user's role is not allowed, redirect to the dashboard
+    return next('/dashboard');
+  }
+
+  // If no role restrictions or user has the required role, allow navigation
   next();
 };
 
