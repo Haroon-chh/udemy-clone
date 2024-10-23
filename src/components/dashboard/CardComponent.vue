@@ -5,7 +5,6 @@
       <div class="card-body">
         <h5 class="card-title">{{ card.title }}</h5>
         <p class="card-text text-muted">{{ card.instructor }}</p>
-        <!-- Ratings, Price, and Bestseller Tag -->
         <div class="d-flex align-items-center mb-2">
           <span class="text-warning">★★★★</span>
           <strong class="ms-1">{{ card.rating }}</strong>
@@ -19,7 +18,6 @@
       </div>
     </div>
 
-    <!-- Hover Dialog -->
     <div v-if="isDialogVisible" :class="['hover-dialog', dialogPositionClass]">
       <div class="arrow" :class="dialogPositionClass"></div>
       <div class="d-flex justify-content-between align-items-start mb-2">

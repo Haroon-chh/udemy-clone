@@ -10,21 +10,15 @@
         <span class="me-2 text-success">✔️</span>{{ point }}
       </li>
     </ul>
-    <p class="text-muted mb-2">{{ card.hours }} total hours • All Levels • Subtitles</p>
-    <button class="btn btn-primary w-100">Add to cart</button>
+    <p class="text-muted">{{ card.description }}</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'DialogComponent',
   props: {
     card: {
       type: Object,
-      required: true
-    },
-    dialogPositionClass: {
-      type: String,
       required: true
     }
   }
