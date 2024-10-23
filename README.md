@@ -56,3 +56,76 @@ vue-axios@3.5.2
 vue-router@4.4.5
 vue@3.5.11
 vuex@4.1.0
+```
+
+## Setup Instructions
+
+Follow these steps to set up the project locally:
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone <repository-url>
+   cd udemy-clone
+   ```
+
+2. **Install dependencies**:
+
+   Ensure you have Node.js installed. You can check your version by running:
+
+   ```bash
+   node -v
+   ```
+
+   Then install the required packages:
+
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server**:
+
+   After the installation is complete, start the development server:
+
+   ```bash
+   npm run serve
+   ```
+
+   This command will launch the application, and you can access it in your browser at `http://localhost:8080` (or another port if specified).
+
+4. **Build for production**:
+
+   If you want to build the project for production, run:
+
+   ```bash
+   npm run build
+   ```
+
+   This will create a `dist` directory with the production build of your application.
+
+## Environment Variables
+
+To manage environment variables, create a `.env` file in the root of the project and include any necessary configurations, such as API keys or server URLs.
+
+Example `.env` file:
+
+```plaintext
+VUE_APP_API_URL=http://localhost:8000/api
+```
+
+## Contribution Guidelines
+
+1. **Fork the repository**: Create your own copy of the repository.
+2. **Create a feature branch**: Use a descriptive name for your branch (e.g., `feature/user-auth`).
+3. **Commit your changes**: Make sure to include clear commit messages.
+4. **Push to your branch**: Push your changes to your forked repository.
+5. **Create a pull request**: Submit a pull request for review.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+
+## Acknowledgments
+
+- Inspired by the Udemy platform.
+- Built using Vue.js, Bootstrap, and various open-source libraries.
