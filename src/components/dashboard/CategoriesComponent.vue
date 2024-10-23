@@ -7,20 +7,20 @@
     </div>
 
     <!-- Main Categories Navigation -->
-    <nav class="nav categories-nav justify-content-center mb-4">
-      <button
-        v-for="category in categories"
-        :key="category.id"
-        @click="fetchCourseCategories(category.id)"
-        :class="['btn-category', { active: selectedCategoryId === category.id }]">
-        {{ category.title }}
-      </button>
-    </nav>
+<nav class="nav categories-nav justify-content-center mb-4">
+  <span
+    v-for="category in categories"
+    :key="category.id"
+    @click="fetchCourseCategories(category.id)"
+    :class="['category-option', { active: selectedCategoryId === category.id }]">
+    {{ category.title }}
+  </span>
+</nav>
 
     <!-- Course Categories -->
-    <div v-if="courseCategories && courseCategories.length > 0" class="course-categories d-flex justify-content-start mb-4" style="overflow-x: auto; padding-left: 15px;">
+    <div v-if="courseCategories && courseCategories.course_categories && courseCategories.course_categories.length > 0" class="course-categories d-flex justify-content-start mb-4" style="overflow-x: auto; padding-left: 15px;">
       <button
-        v-for="courseCategory in courseCategories"
+        v-for="courseCategory in courseCategories.course_categories"
         :key="courseCategory.id"
         @click="fetchCourses(courseCategory.id)"
         :class="['btn-course-category', { active: selectedCourseCategoryId === courseCategory.id }]">
@@ -58,7 +58,7 @@
       </div>
       <div class="scroll-arrow right-arrow" @click="scroll('right')">&#x203A;</div>
     </div>
-    
+
     <!-- Courses Display without Scroller if less than or equal to 4 -->
     <div v-if="courses.length <= 4" class="courses d-flex flex-wrap justify-content-center">
       <div
@@ -82,7 +82,7 @@
         </div>
       </div>
     </div>
-    
+
     <div v-if="courses.length === 0" class="text-center mt-3">No courses found</div>
   </div>
 </template>
@@ -101,12 +101,15 @@ export default {
       'getSelectedCourseCategoryId'
     ]),
     categories() {
+      console.log('Categories:', this.getCategories);
       return this.getCategories;
     },
     courseCategories() {
+      console.log('Course Categories:', this.getCourseCategories);
       return this.getCourseCategories;
     },
     courses() {
+      console.log('Courses:', this.getCourses);
       return this.getCourses;
     },
     selectedCategoryId() {
@@ -149,7 +152,7 @@ h2 {
 }
 
 .categories-nav {
-  display: flex;
+  display: inline-flex; /* Changed to inline-flex */
   gap: 1rem;
   white-space: nowrap;
   padding-left: 15px;
@@ -162,7 +165,31 @@ h2 {
   padding-left: 15px;
   margin-left: 30%;
 }
+.category-option {
+  cursor: pointer;
+  padding: 0.75rem 0.4rem;
+  font-size: 1rem;
+  color: #333;
+  transition: color 0.3s;
+  position:relative;
+}
 
+.category-option:hover {
+  color: #000;
+}
+
+.category-option.active {
+  color: #333;
+  font-weight: bold;
+  border-bottom: 2px solid #333; 
+}
+
+.categories-nav {
+  display: inline-flex;
+  gap: 1rem;
+  white-space: nowrap;
+  padding-left: 15px;
+}
 .btn-category {
   background-color: #f1f3f4;
   border: none;
@@ -225,10 +252,10 @@ h2 {
 }
 
 .course-card {
-  width: 240px;
+  width: 280px;
   min-width: 240px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   background-color: white;
@@ -272,8 +299,8 @@ h2 {
 .courses {
   display: flex;
   gap: 1.5rem;
-  overflow-x: auto;
-  scroll-behavior: smooth;
+  overflow-x: hidden; 
+  
 }
 
 .scroll-arrow {

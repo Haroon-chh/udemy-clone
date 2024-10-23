@@ -40,15 +40,15 @@ const AdminStore = {
         const endpoint = '/create-article';  // API endpoint for creating an article
         const response = await AuthApiServices.PostRequest(endpoint, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',  // Ensure the correct headers for file uploads
+            'Content-Type': 'multipart/form-data',  // Ensure correct headers for file uploads
           },
         });
         return response;  // Return the response to the component
       } catch (error) {
         console.error('Error creating article:', error);
-        throw error;  // Rethrow the error to handle in the component
+        throw error;  // Rethrow error to handle in the component
       }
-    },
+    },    
 
     /**
      * Upload an image to the server (separate from the article creation).

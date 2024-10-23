@@ -16,6 +16,9 @@ import QuillEditorComponent from '@/components/dashboard/Admin/QuillEditorCompon
 import SubscriptionView from '@/views/SubscriptionView.vue'; // Import Subscription View
 import ActiveSubscription from '@/components/dashboard/Admin/ActiveSubscription.vue';
 import SiteSettings from '@/components/dashboard/Admin/SiteSettings.vue';
+import PurchaseCourses from '@/components/Profile/PurchaseCourses.vue';
+import PurchaseCourseDetailView from '../views/PurchaseCourseDetailView.vue';
+import ArticleDetailsView from '@/views/ArticleDetailsView.vue';
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
@@ -94,6 +97,12 @@ const routes = [
     meta: { title: 'Course Details' },
   },
   {
+    path: '/purchase-course-details/:slug',
+    name: 'PurchaseCourseDetails',
+    component: PurchaseCourseDetailView,
+    meta: { title: 'Course Details' },
+  },
+  {
     path: '/page-settings',
     name: 'PageSettings',  // Match exactly with what you're using in $router.push
     component: PageSettingView,
@@ -127,6 +136,18 @@ const routes = [
     name: 'SiteSettings', 
     component: SiteSettings,
     meta: { title: 'Page Settings' },
+  },
+  {
+    path: '/purchase-courses', // Define the path for your PurchaseCourses page
+    name: 'PurchaseCourses',
+    component: PurchaseCourses,
+    meta: { title: 'Purchase Courses' },
+  },
+  {
+    path: '/articles/:slug', // Add route for article details
+    name: 'ArticleDetails',
+    component: ArticleDetailsView,
+    meta: { title: 'Article Details' },
   },
 ];
 

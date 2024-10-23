@@ -78,6 +78,44 @@
         </div>
       </div>
     </div>
+     <div class="container py-5">
+    <!-- Requirements Section -->
+    <div class="requirements-section my-5">
+      <h2 class="learning-points-title">Requirements</h2>
+      <ul class="requirements-list text-center">
+        <li>No programming experience needed - I'll teach you everything you need to know</li>
+        <li>A computer with access to the internet</li>
+        <li>No paid software required</li>
+        <li>I'll walk you through, step-by-step how to get all the software installed and set up</li>
+      </ul>
+    </div>
+
+    <!-- Description Section -->
+    <div class="description-section my-5">
+      <h2 class="learning-points-title" >Description</h2>
+      <p>
+        Welcome to the Complete Web Development Bootcamp, <strong>the only course you need</strong> 
+        to learn to code and become a full-stack web developer. 
+        With 150,000+ ratings and a 4.8 average, my Web Development course is 
+        one of the <strong>HIGHEST RATED</strong> courses in the history of Udemy!
+      </p>
+    </div>
+  </div>
+   <div class="container py-5">
+    <div class="row text-center">
+      <div class="col-12">
+        <h2 class="learning-points-title" >This course includes:</h2>
+      </div>
+      <div class="col-lg-4 col-md-6 my-3" v-for="(item, index) in courseDetails" :key="index">
+        <div class="d-flex align-items-center justify-content-center">
+          <i :class="item.icon"></i>
+          <div class="ps-3">
+            <p>{{ item.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
     <!-- Success Popup for "Course added to cart" -->
     <SuccessPopup v-if="showSuccessPopup" :show="showSuccessPopup" :message="popupMessage" />
