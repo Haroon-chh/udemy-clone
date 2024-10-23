@@ -33,7 +33,8 @@
           </div>
           
           <!-- Login Button -->
-          <button type="submit" class="btn login-btn w-100 rounded-0">Log In</button>
+<!-- Login Button -->
+            <button type="submit" class="btn login-btn w-100 rounded-0" :disabled="loginDisabled">Log In</button>
         </form>
 
         <!-- Other Log In Options -->
@@ -51,8 +52,9 @@
             </button>
           </div>
         </div>
-         <!-- Modal for 2FA Verification -->
-         <div v-if="show2FAModal" class="modal show d-block" tabindex="-1">
+
+        <!-- Modal for 2FA Verification -->
+        <div v-if="show2FAModal" class="modal show d-block" tabindex="-1">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
@@ -105,6 +107,7 @@ const showSuccess = ref(false);
 const showError = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
+const loginDisabled = ref(false); // State to disable the login button
 
 const validateEmail = (email) => {
   const re = /\S+@\S+\.\S+/;
@@ -131,13 +134,10 @@ const submitForm = async () => {
       password: password.value,
     });
 
-    console.log('Login response:', response); // Debugging
-
     if (response.success) {
       const is2FAEnabled = response.data?.['2fa'] === true; // Double-check evaluation
 
       if (is2FAEnabled) {
-        console.log('2FA is enabled, showing modal'); // Debug
         show2FAModal.value = true; // Show the modal
       } else {
         successMessage.value = response.message;
@@ -152,19 +152,22 @@ const submitForm = async () => {
       throw new Error(response.message || 'Unexpected response format');
     }
   } catch (error) {
-    console.error('Error during login:', error);
-
     errorMessage.value =
       error.response?.data?.errors?.credentials?.[0] ||
       'An error occurred. Please try again later.';
     showError.value = true;
+    
+    // Disable the login button for 10 seconds after an error
+    loginDisabled.value = true;
+    setTimeout(() => {
+      loginDisabled.value = false;
+    }, 10000);
 
     setTimeout(() => {
       showError.value = false;
     }, 5000);
   }
 };
-
 
 const verify2FA = async () => {
   try {
@@ -183,7 +186,6 @@ const verify2FA = async () => {
       throw new Error(response.message || 'Invalid 2FA code');
     }
   } catch (error) {
-    console.error('Error during 2FA verification:', error);
     errorMessage.value =
       error.response?.data?.errors?.one_time_password?.[0] ||
       'Invalid 2FA code. Please try again.';
@@ -195,9 +197,6 @@ const verify2FA = async () => {
   }
 };
 
-function socialLogin(provider) {
-  alert(`Log in with ${provider} clicked`);
-}
 </script>
 
 
