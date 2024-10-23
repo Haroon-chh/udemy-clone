@@ -51,8 +51,9 @@
             </button>
           </div>
         </div>
-         <!-- Modal for 2FA Verification -->
-         <div v-if="show2FAModal" class="modal show d-block" tabindex="-1">
+
+        <!-- Modal for 2FA Verification -->
+        <div v-if="show2FAModal" class="modal show d-block" tabindex="-1">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
@@ -131,13 +132,10 @@ const submitForm = async () => {
       password: password.value,
     });
 
-    console.log('Login response:', response); // Debugging
-
     if (response.success) {
       const is2FAEnabled = response.data?.['2fa'] === true; // Double-check evaluation
 
       if (is2FAEnabled) {
-        console.log('2FA is enabled, showing modal'); // Debug
         show2FAModal.value = true; // Show the modal
       } else {
         successMessage.value = response.message;
@@ -152,8 +150,6 @@ const submitForm = async () => {
       throw new Error(response.message || 'Unexpected response format');
     }
   } catch (error) {
-    console.error('Error during login:', error);
-
     errorMessage.value =
       error.response?.data?.errors?.credentials?.[0] ||
       'An error occurred. Please try again later.';
@@ -183,7 +179,6 @@ const verify2FA = async () => {
       throw new Error(response.message || 'Invalid 2FA code');
     }
   } catch (error) {
-    console.error('Error during 2FA verification:', error);
     errorMessage.value =
       error.response?.data?.errors?.one_time_password?.[0] ||
       'Invalid 2FA code. Please try again.';
@@ -195,9 +190,7 @@ const verify2FA = async () => {
   }
 };
 
-function socialLogin(provider) {
-  alert(`Log in with ${provider} clicked`);
-}
+
 </script>
 
 
