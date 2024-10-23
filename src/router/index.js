@@ -127,7 +127,7 @@ const routes = [
     meta: { title: 'Subscriptions' , roles: ['admin']}, //admin
   },
   {
-    path: '/active-subscriptions',  // Add this new route under dashboard
+    path: '/active-subscriptions', 
     name: 'active-subscriptions',
     component: ActiveSubscription,
     meta: { title: 'Active Subscriptions' , roles: ['admin']}, //admin
