@@ -18,9 +18,11 @@
           <button class="btn p-0 me-3" type="button">
             <span class="material-icons">search</span>
           </button>
+          <router-link to="/cart">
           <button class="btn p-0" type="button">
             <span class="material-icons">shopping_cart</span>
           </button>
+        </router-link>
         </div>
       </div>
 
@@ -130,14 +132,12 @@
           </li>
 
           <!-- Cart Icon - Dropdown on Hover -->
-          <li class="nav-item dropdown ms-3" @mouseover="openDropdown('cartDropdown')" @mouseleave="closeDropdown('cartDropdown')">
-            <a class="nav-link" href="#">
-              <span class="material-icons">shopping_cart</span>
-            </a>
-            <ul class="dropdown-menu mt-3 px-4 py-2" :class="{ show: isOpen.cartDropdown }">
-              <p>Your cart is empty</p>
-              <p class=""><a class="text-decoration-none" style="font-size:small; color: purple;" href="#">Keep Shopping</a></p>
-            </ul>
+          <li class="nav-item ms-3 mt-2">
+            <router-link to="/cart">
+              <button class="btn p-0" type="button">
+                <span class="material-icons">shopping_cart</span>
+              </button>
+            </router-link>
           </li>
 
                 <!-- Check for logged in state from Vuex -->

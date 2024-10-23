@@ -17,7 +17,7 @@ const AuthApiServices = {
     if (accessToken) {
       return {
         Authorization: `Bearer ${accessToken}`, // Ensure access_token is passed
-        'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
         'ngrok-skip-browser-warning': 'true', // Handle ngrok bypass
       };
     }
