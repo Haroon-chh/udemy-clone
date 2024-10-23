@@ -1,3 +1,4 @@
+
 <template>
   <div class="profile-edit-container">
     <div class="profile-header">
@@ -76,6 +77,10 @@
         </button>
       </div>
     </div>
+
+    <!-- Success and Error Popups -->
+    <SuccessPopup :show="showSuccess" :message="successMessage" />
+    <ErrorPopup :show="showError" :message="errorMessage" />
   </div>
 </template>
 
@@ -84,9 +89,18 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import AuthApiServices from '@/services/AuthApiServices.js';
 import QRCode from 'qrcode';
+import SuccessPopup from '@/components/SuccessPopup.vue';  // Added for success
+import ErrorPopup from '@/components/ErrorPopup.vue';      // Added for error
 
 export default {
   name: 'ProfileEdit',
+
+  // Register SuccessPopup and ErrorPopup components here
+  components: {
+    SuccessPopup,  // Added to register SuccessPopup
+    ErrorPopup,    // Added to register ErrorPopup
+  },
+
   setup() {
     const store = useStore();
     const user = computed(() => store.getters.getLoggedUser);
@@ -97,6 +111,12 @@ export default {
     const enteredSecret = ref('');
     const disablePassword = ref('');
     let qrCodeRefreshTimer = null;
+
+    // Success and Error states for popups
+    const showSuccess = ref(false);                    // Added for success popup visibility
+    const showError = ref(false);                      // Added for error popup visibility
+    const successMessage = ref('');                    // Added for success message
+    const errorMessage = ref('');                      // Added for error message
 
     const userInitials = computed(() => {
       return user.value?.name
@@ -133,10 +153,14 @@ export default {
     const saveProfile = async () => {
       try {
         await store.dispatch('updateUserProfile', { name: username.value });
-        alert('Profile updated successfully!');
+        successMessage.value = 'Profile updated successfully!';   // Replaced alert with success message
+        showSuccess.value = true;                                 // Show success popup
+        setTimeout(() => (showSuccess.value = false), 3000);      // Hide after 3 seconds
       } catch (error) {
         console.error('Error updating profile:', error);
-        alert('Failed to update profile. Please try again.');
+        errorMessage.value = 'Failed to update profile. Please try again.';  // Replaced alert with error message
+        showError.value = true;                                               // Show error popup
+        setTimeout(() => (showError.value = false), 5000);                    // Hide after 5 seconds
       }
     };
 
@@ -166,15 +190,18 @@ export default {
           one_time_password: enteredSecret.value,
         });
         if (response.message === '2-Factor Authentication successfully enabled.') {
-          alert('2FA enabled successfully!');
+          successMessage.value = '2FA enabled successfully!';        // Replaced alert with success message
+          showSuccess.value = true;                                  // Show success popup
           isTwoFactorEnabled.value = true;
           isEnabling2FA.value = false;
-
-          // Save 2FA status in localStorage
+          setTimeout(() => (showSuccess.value = false), 3000);       // Hide after 3 seconds
           localStorage.setItem('twoFactorEnabled', 'true');
         }
       } catch (error) {
         console.error('Error enabling 2FA:', error);
+        errorMessage.value = 'Failed to enable 2FA. Try again.';    // Replaced alert with error message
+        showError.value = true;                                     // Show error popup
+        setTimeout(() => (showError.value = false), 5000);          // Hide after 5 seconds
       }
     };
 
@@ -184,15 +211,18 @@ export default {
           password: disablePassword.value,
         });
         if (response.message === '2-Factor Authentication successfully disabled.') {
-          alert('2FA has been successfully disabled.');
+          successMessage.value = '2FA has been successfully disabled.';   // Replaced alert with success message
+          showSuccess.value = true;                                       // Show success popup
           isTwoFactorEnabled.value = false;
           isEnabling2FA.value = false;
-
-          // Remove 2FA status from localStorage
+          setTimeout(() => (showSuccess.value = false), 3000);            // Hide after 3 seconds
           localStorage.setItem('twoFactorEnabled', 'false');
         }
       } catch (error) {
         console.error('Error disabling 2FA:', error);
+        errorMessage.value = 'Failed to disable 2FA. Try again.';         // Replaced alert with error message
+        showError.value = true;                                           // Show error popup
+        setTimeout(() => (showError.value = false), 5000);                // Hide after 5 seconds
       }
     };
 
@@ -210,10 +240,15 @@ export default {
       handleToggleTwoFactorAuth,
       enableTwoFactorAuth,
       disableTwoFactorAuth,
+      showSuccess,        // Added for success popup visibility
+      showError,          // Added for error popup visibility
+      successMessage,     // Added for success message
+      errorMessage,       // Added for error message
     };
   },
 };
 </script>
+
 
 <style scoped>
 .profile-edit-container {
@@ -434,3 +469,5 @@ input {
   font-size: 1.2em;
 }
 </style>
+
+
