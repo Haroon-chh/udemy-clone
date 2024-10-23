@@ -33,7 +33,8 @@
           </div>
           
           <!-- Login Button -->
-          <button type="submit" class="btn login-btn w-100 rounded-0">Log In</button>
+<!-- Login Button -->
+            <button type="submit" class="btn login-btn w-100 rounded-0" :disabled="loginDisabled">Log In</button>
         </form>
 
         <!-- Other Log In Options -->
@@ -106,6 +107,7 @@ const showSuccess = ref(false);
 const showError = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
+const loginDisabled = ref(false); // State to disable the login button
 
 const validateEmail = (email) => {
   const re = /\S+@\S+\.\S+/;
@@ -154,13 +156,18 @@ const submitForm = async () => {
       error.response?.data?.errors?.credentials?.[0] ||
       'An error occurred. Please try again later.';
     showError.value = true;
+    
+    // Disable the login button for 10 seconds after an error
+    loginDisabled.value = true;
+    setTimeout(() => {
+      loginDisabled.value = false;
+    }, 10000);
 
     setTimeout(() => {
       showError.value = false;
     }, 5000);
   }
 };
-
 
 const verify2FA = async () => {
   try {
@@ -189,7 +196,6 @@ const verify2FA = async () => {
     }, 5000);
   }
 };
-
 
 </script>
 
