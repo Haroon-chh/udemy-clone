@@ -250,7 +250,21 @@ h2 {
   font-size: 1.2rem;
   color: #888;
 }
-ies course fixed
+
+.course-card {
+  width: 280px;
+  min-width: 240px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  background-color: white;
+  text-align: left;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  margin: 0 1rem;
+}
+
 .course-card:hover {
   transform: translateY(-10px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
