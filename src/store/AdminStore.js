@@ -50,6 +50,27 @@ const AdminStore = {
       }
     },    
 
+    async fetchArticleById(_, articleId) {
+      try {
+        const response = await AuthApiServices.GetRequest(`/article/${articleId}`);
+        return response.data.article;
+      } catch (error) {
+        console.error('Error fetching article:', error);
+        throw error;
+      }
+    },
+
+    async deleteArticle(_, articleId) {
+      try {
+        const endpoint = `/articles/${articleId}/delete`;
+        const response = await AuthApiServices.PostRequest(endpoint);
+        return response;
+      } catch (error) {
+        console.error('Error deleting article:', error);
+        throw error;
+      }
+    },
+
     /**
      * Upload an image to the server (separate from the article creation).
      * Sends the image data in FormData format.
@@ -73,16 +94,7 @@ const AdminStore = {
      * Delete an article by its ID.
      * Sends a request to delete the specified article.
      */
-    async deleteArticle(_, articleId) {
-      try {
-        const endpoint = `/articles/${articleId}/delete`;  // API endpoint for deleting an article
-        const response = await AuthApiServices.PostRequest(endpoint);
-        return response;
-      } catch (error) {
-        console.error('Error deleting article:', error);
-        throw error;  // Rethrow the error to handle in the component
-      }
-    },
+    
 
     /**
      * Update an article with new data.
@@ -90,15 +102,16 @@ const AdminStore = {
      */
     async updateArticle(_, articleData) {
       try {
-        const endpoint = `/articles/${articleData.id}/update`;  // API endpoint for updating an article
+        const endpoint = `/update-article/${articleData.id}`;  // Use PUT request for article update
         const plainArticleData = toRaw(articleData);  // Convert reactive article data to a plain object
-        const response = await AuthApiServices.PostRequest(endpoint, plainArticleData);
+        const response = await AuthApiServices.PutRequest(endpoint, plainArticleData);  // Use PUT request here
         return response;
       } catch (error) {
         console.error('Error updating article:', error);
         throw error;  // Rethrow the error to handle in the component
       }
     },
+    
   },
 };
 
