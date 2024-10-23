@@ -6,6 +6,7 @@ import StudentStore from './StudentStore';
 import AddcartStore from './AddcartStore';
 import CategoriesStore from './CategoriesStore';
 import SiteSettingStore from './SiteSettingStore';
+import PurchaseStore from './PurchaseStore';
 
 export default createStore({
   modules: {
@@ -14,7 +15,8 @@ export default createStore({
     StudentStore,
     AddcartStore,
     CategoriesStore,
-    SiteSettingStore
+    SiteSettingStore,
+    PurchaseStore
   },
   state: {
     user: null,
