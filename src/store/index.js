@@ -8,6 +8,7 @@ import CategoriesStore from './CategoriesStore';
 import SiteSettingStore from './SiteSettingStore';
 import PurchaseStore from './PurchaseStore';
 import CommentStore from './CommentStore';
+import ArticleStore from './ArticleStore';
 
 export default createStore({
   modules: {
@@ -18,7 +19,8 @@ export default createStore({
     CategoriesStore,
     SiteSettingStore,
     PurchaseStore,
-    CommentStore
+    CommentStore,
+    ArticleStore
   },
   state: {
     user: null,

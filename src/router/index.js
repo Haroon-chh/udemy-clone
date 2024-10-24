@@ -19,8 +19,6 @@ import SiteSettings from '@/components/dashboard/Admin/SiteSettings.vue';
 import PurchaseCourses from '@/components/Profile/PurchaseCourses.vue';
 import PurchaseCourseDetailView from '../views/PurchaseCourseDetailView.vue';
 import ArticleDetailsView from '@/views/ArticleDetailsView.vue';
-import RouteGuard from '@/services/RouteGuard';  // Import the route guard
-
 
 const routes = [
   { path: '/', redirect: '/dashboard' },
@@ -28,19 +26,19 @@ const routes = [
     path: '/dashboard',
     name: 'dashboard',
     component: DashboardView,
-    meta: { title: 'Dashboard' },  //public
+    meta: { title: 'Dashboard' },
     children: [
       {
         path: 'add-article',
         name: 'add-article',
         component: AddArticle,
-        meta: { title: 'Add Article', roles: ['admin'] },  //admin
+        meta: { title: 'Add Article' },
       },
       {
         path: 'view-articles',
         name: 'view-articles',
         component: ViewArticles,
-        meta: { title: 'View Articles', roles: ['admin'] },  //admin
+        meta: { title: 'View Articles' },
       },
     ],
   },
@@ -48,73 +46,73 @@ const routes = [
     path: '/signup',
     name: 'signup',
     component: SignupView,
-    meta: { title: 'SignUp' }, //public
+    meta: { title: 'SignUp' },
   },
   {
     path: '/about',
     name: 'about',
     component: AboutUsView,
-    meta: { title: 'About Us' }, //public
+    meta: { title: 'About Us' },
   },
   {
     path: '/login',
     name: 'login',
     component: LoginView,
-    meta: { title: 'Login' },  //public
+    meta: { title: 'Login' },
   },
   {
     path: '/ContactUs',
     name: 'ContactUs',
     component: ContactUsView,
-    meta: { title: 'Contact Us' }, //public
+    meta: { title: 'Contact Us' },
   },
   {
     path: '/cart',
     name: 'cart',
     component: CartView,
-    meta: { title: 'Cart' }, //public
+    meta: { title: 'Cart' },
   },
   {
     path: '/teaching',
     name: 'teaching',
     component: TeachUdemyView,
-    meta: { title: 'Teach with us' }, //public
+    meta: { title: 'Teach with us' },
   },
   {
     path: '/edit-profile',
     name: 'edit-profile',
     component: EditProfile,
-    meta: { title: 'Edit Profile', roles: ['admin', 'student'] }, //admin,student
+    meta: { title: 'Edit Profile' },
   },
   {
     path: '/change-password',
     name: 'change-password',
     component: ChangePassword,
-    meta: { title: 'Change Password', roles: ['admin', 'student'] }, //admin,student
+    meta: { title: 'Change Password' },
   },
   {
     path: '/course/:slug',
     name: 'CourseDetails',
     component: CourseDetailsView,
-    meta: { title: 'Course Details', roles: ['student'] },  //student
+    meta: { title: 'Course Details' },
   },
   {
     path: '/purchase-course-details/:slug',
     name: 'PurchaseCourseDetails',
     component: PurchaseCourseDetailView,
-    meta: { title: 'Course Details', roles: ['student'] }, //student
+    meta: { title: 'Course Details' },
   },
   {
     path: '/page-settings',
     name: 'PageSettings',  // Match exactly with what you're using in $router.push
     component: PageSettingView,
-    meta: { title: 'Page Settings' , roles: ['admin']}, //admin
+    meta: { title: 'Page Settings' },
     children: [
       {
         path: ':slug',
         name: 'PageEditor',
         component: QuillEditorComponent,
-        meta: { title: 'Page Editor', roles: ['admin'] }, //admin
+        meta: { title: 'Page Editor' },
         props: true,
       },
     ],
@@ -124,32 +122,32 @@ const routes = [
     path: '/subscriptions', // Add the subscription route
     name: 'subscriptions',
     component: SubscriptionView,
-    meta: { title: 'Subscriptions' , roles: ['admin']}, //admin
+    meta: { title: 'Subscriptions' },
   },
   {
-    path: '/active-subscriptions', 
+    path: '/active-subscriptions',  // Add this new route under dashboard
     name: 'active-subscriptions',
     component: ActiveSubscription,
-    meta: { title: 'Active Subscriptions' , roles: ['admin']}, //admin
+    meta: { title: 'Active Subscriptions' },
   },
 
   {
     path: '/site-settings',
     name: 'SiteSettings', 
     component: SiteSettings,
-    meta: { title: 'Site Settings', roles: ['admin'] }, //admin
+    meta: { title: 'Page Settings' },
   },
   {
     path: '/purchase-courses', // Define the path for your PurchaseCourses page
     name: 'PurchaseCourses',
     component: PurchaseCourses,
-    meta: { title: 'Purchase Courses', roles: ['student'] }, //student
+    meta: { title: 'Purchase Courses' },
   },
   {
     path: '/articles/:slug', // Add route for article details
     name: 'ArticleDetails',
     component: ArticleDetailsView,
-    meta: { title: 'Article Details', roles: ['student'] },  //student
+    meta: { title: 'Article Details' },
   },
 ];
 
@@ -157,13 +155,10 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
 router.beforeEach((to, from, next) => {
-  // Set the page title based on route meta or fallback to default
   document.title = to.meta.title || 'Udemy Clone';
-
-  // Route guard logic
-  RouteGuard(to, from, next);
+  next();
 });
-
 
 export default router;
