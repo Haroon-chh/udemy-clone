@@ -2,7 +2,7 @@ import store from "../store";
 
 const RouteGuard = (to, from, next) => {
   // Define public pages that don't require authentication
-  const publicPages = ['/login', '/signup', '/about', '/ContactUs', '/cart', '/teaching'];
+  const publicPages = ['/login', '/signup', '/about', '/ContactUs', '/cart', '/teaching','/dashboard'];
 
   // Get the logged-in user's role (assuming the role is available in Vuex store)
   const userRole = store.getters.getUserRole; 
@@ -15,10 +15,10 @@ const RouteGuard = (to, from, next) => {
     return next('/login');
   }
 
-  // If user is logged in and tries to access a public page, redirect to dashboard
-  if (userRole && publicPages.includes(to.path)) {
-    return next('/dashboard');
-  }
+  // // If user is logged in and tries to access a public page, redirect to dashboard
+  // if (userRole && publicPages.includes(to.path)) {
+  //   return next('/dashboard');
+  // }
 
   // Check if the route has specific roles defined in its meta field
   const routeRoles = to.meta.roles || [];  // Get allowed roles for the route (if any)

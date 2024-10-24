@@ -8,6 +8,8 @@ import CategoriesStore from './CategoriesStore';
 import SiteSettingStore from './SiteSettingStore';
 import PurchaseStore from './PurchaseStore';
 import CommentStore from './CommentStore';
+import dynamicPage from './dynamicPage'; // Adjust path as needed
+
 import ArticleStore from './ArticleStore';
 
 export default createStore({
@@ -20,6 +22,7 @@ export default createStore({
     SiteSettingStore,
     PurchaseStore,
     CommentStore,
+    dynamicPage,
     ArticleStore
   },
   state: {

@@ -19,66 +19,23 @@
 </template>
 
 <script>
-import { ref, onMounted, nextTick } from 'vue';
-import AuthApiServices from '@/services/AuthApiServices'; // Adjust the path as needed
+import { computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
 
 export default {
   name: 'PageContent',
   setup() {
-    const pageData = ref({});
-    const errorMessage = ref('');
-    const offices = ref([]);
-    const slug = 'contact-with-us'; // Hardcoded slug
+    const store = useStore();
 
-    const fetchPageContent = async () => {
-  try {
-    const response = await AuthApiServices.GetRequest(`/get-page-by-slug/${slug}`);
-    if (response && response.data) {
-      // Replace the image path dynamically
-      pageData.value.body = response.data.body.replace(
-        '@/assets/contactperson.png',
-        require('@/assets/contactperson.png')
-      );
-      await nextTick(); // Ensure DOM updates
-    } else {
-      throw new Error(response.message || 'Failed to fetch page content.');
-    }
-  } catch (error) {
-    console.error('Error fetching page content:', error);
-    errorMessage.value = error.message;
-  }
-};
+    // Fetch page content on component mount
+    onMounted(() => {
+      store.dispatch('dynamicPage/fetchPageContent');
+    });
 
-
-    // Office data array
-    offices.value = [
-      {
-        location: 'San Francisco, CA',
-        image: 'https://about.udemy.com/wp-content/uploads/2021/07/dublin-1-460x350.jpeg',
-      },
-      {
-        location: 'Denver, CO',
-        image: 'https://about.udemy.com/wp-content/uploads/2021/07/denver-460x350.jpeg',
-      },
-      {
-        location: 'Dublin, Ireland',
-        image: 'https://about.udemy.com/wp-content/uploads/2021/07/san-francisco-460x350.jpeg',
-      },
-      {
-        location: 'Ankara, Türkiye',
-        image: 'https://about.udemy.com/wp-content/uploads/2021/07/ankara-1-450x350.jpeg',
-      },
-      {
-        location: 'Austin, TX',
-        image: 'https://about.udemy.com/wp-content/uploads/2023/04/Austin-480x350.png',
-      },
-      {
-        location: 'Melbourne, Australia',
-        image: 'https://about.udemy.com/wp-content/uploads/2023/04/Melbourne-480x350.png',
-      },
-    ];
-
-    onMounted(fetchPageContent);
+    // Use computed properties to access Vuex store data
+    const pageData = computed(() => store.getters['dynamicPage/getPageData']);
+    const errorMessage = computed(() => store.getters['dynamicPage/getErrorMessage']);
+    const offices = computed(() => store.getters['dynamicPage/getOffices']);
 
     return {
       pageData,
@@ -88,6 +45,8 @@ export default {
   },
 };
 </script>
+
+
 
 <style scoped>
 .dynamic-page-container {
