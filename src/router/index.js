@@ -124,7 +124,7 @@ const routes = [
     path: '/subscriptions', // Add the subscription route
     name: 'subscriptions',
     component: SubscriptionView,
-    meta: { title: 'Subscriptions' , roles: ['admin']}, //admin
+    meta: { title: 'Subscriptions' , roles: ['student']}, //admin
   },
   {
     path: '/active-subscriptions', 
