@@ -7,6 +7,9 @@ import AddcartStore from './AddcartStore';
 import CategoriesStore from './CategoriesStore';
 import SiteSettingStore from './SiteSettingStore';
 import PurchaseStore from './PurchaseStore';
+import CommentStore from './CommentStore';
+import dynamicPage from './dynamicPage'; // Adjust path as needed
+
 
 export default createStore({
   modules: {
@@ -16,7 +19,9 @@ export default createStore({
     AddcartStore,
     CategoriesStore,
     SiteSettingStore,
-    PurchaseStore
+    PurchaseStore,
+    CommentStore,
+    dynamicPage
   },
   state: {
     user: null,
