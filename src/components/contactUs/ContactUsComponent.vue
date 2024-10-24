@@ -28,7 +28,7 @@ export default {
     const pageData = ref({});
     const errorMessage = ref('');
     const offices = ref([]);
-    const slug = 'contact-with-us'; // Hardcoded slug
+    const slug = 'contact-us'; // Hardcoded slug
 
     const fetchPageContent = async () => {
   try {
