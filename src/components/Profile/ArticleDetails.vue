@@ -1,19 +1,19 @@
 <template>
   <div class="article-details-container">
     <!-- Display article title -->
-    <h1>{{ article.title }}</h1>
+    <h1 v-if="article">{{ article.title }}</h1>
 
     <!-- Display article image if available -->
-    <div class="image-container">
-      <img v-if="article.image_url" :src="article.image_url" alt="Article Image" />
+    <div class="image-container" v-if="article && article.image_url">
+      <img :src="article.image_url" alt="Article Image" />
     </div>
 
     <!-- Display article body -->
-    <p class="article-body">{{ article.body }}</p>
+    <p class="article-body" v-if="article">{{ article.body }}</p>
 
     <!-- Display additional article details -->
     <transition name="fade">
-      <div class="article-details" v-if="Object.keys(article).length">
+      <div class="article-details" v-if="article">
         <h2>Article Details</h2>
         <ul>
           <li>
@@ -31,51 +31,145 @@
         </ul>
       </div>
     </transition>
+
+    <!-- Show Comments Button -->
+    <button @click="toggleComments" class="show-comments-button">
+      {{ showComments ? 'Hide Comments' : 'Show Comments' }}
+    </button>
+
+    <!-- Comments Section -->
+    <div class="comments-section" v-if="showComments && comments.length">
+      <h2>Comments</h2>
+      <div v-for="comment in visibleComments" :key="comment.id" class="comment-item">
+        <div class="comment-header">
+          <div class="user-avatar">
+            <img :src="getUserAvatar(comment.user_id)" alt="User Avatar" />
+          </div>
+          <div class="comment-content">
+            <strong>{{ comment.user_id }}</strong>
+            <p>{{ comment.body }}</p>
+            <small>{{ new Date(comment.created_at).toLocaleString() }}</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- View More Comments Button -->
+      <button v-if="comments.length > visibleCommentsLimit" @click="viewMoreComments" class="view-more-button">
+        View More Comments
+      </button>
+    </div>
+    <p v-else-if="showComments && !comments.length">No comments yet.</p>
+
+    <!-- Comment form -->
+    <div class="comment-form">
+      <textarea v-model="newComment" placeholder="Write a comment..." class="comment-input"></textarea>
+      <button @click="submitComment" class="comment-button">Post Comment</button>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue'; // Import computed here
 import { useRoute } from 'vue-router';
-import AuthApiServices from '@/services/AuthApiServices'; // Assuming this is the correct service
+import { useStore } from 'vuex';
+import AuthApiServices from '@/services/AuthApiServices';
 
 export default {
   name: 'ArticleDetails',
   setup() {
+    const store = useStore();
     const article = ref({});
+    const comments = ref([]);
+    const visibleCommentsLimit = ref(5); // Limit to show 5 comments initially
+    const newComment = ref('');
+    const showComments = ref(false); // Toggle comments visibility
     const route = useRoute();
+    const slug = route.params.slug;
 
+    // Fetch article details
     const fetchArticleDetails = async () => {
       try {
-        const slug = route.params.slug;
-        const token = localStorage.getItem('access_token'); // Get token from localStorage
-
-        if (token) {
-          const response = await AuthApiServices.GetRequest(`/articles/${slug}`, {}, token);
-          if (response.data && response.data.article) {
-            article.value = response.data.article; // Set article data
-          }
-        } else {
-          console.error('No access token found in localStorage');
+        const response = await AuthApiServices.GetRequest(`/articles/${slug}`);
+        if (response.data && response.data.article) {
+          article.value = response.data.article;
+          fetchComments(); // Fetch comments after getting the article details
         }
       } catch (error) {
         console.error('Error fetching article details:', error);
       }
     };
 
-    onMounted(() => {
-      fetchArticleDetails(); // Fetch article details on component mount
+    // Fetch comments
+    const fetchComments = async () => {
+      try {
+        await store.dispatch('CommentStore/fetchComments', slug);
+        if (store.state.CommentStore.comments) {
+          comments.value = store.state.CommentStore.comments;
+        }
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+      }
+    };
+
+    // Submit a new comment
+    const submitComment = async () => {
+      if (!newComment.value.trim()) {
+        console.error('Cannot post an empty comment');
+        return;
+      }
+
+      const payload = { body: newComment.value };
+
+      try {
+        await store.dispatch('CommentStore/postComment', { slug, commentData: payload });
+        newComment.value = ''; // Reset comment input
+        fetchComments(); // Refresh comments after posting
+      } catch (error) {
+        console.error('Error posting comment:', error);
+      }
+    };
+
+    // Toggle comments section visibility
+    const toggleComments = () => {
+      showComments.value = !showComments.value;
+    };
+
+    // Show more comments when the button is clicked
+    const viewMoreComments = () => {
+      visibleCommentsLimit.value += 5; // Show 5 more comments each time
+    };
+
+    // Return visible comments based on the limit
+    const visibleComments = computed(() => {
+      return comments.value.slice(0, visibleCommentsLimit.value);
     });
 
-    const statusIconClass = (status) => {
-      // Define icon classes based on status
-      return status === 'published'
-        ? 'fas fa-check-circle status-success' // Green tick for published
-        : 'fas fa-times-circle status-failed'; // Red cross for other statuses
+    const getUserAvatar = (userId) => {
+      return `https://ui-avatars.com/api/?name=User+${userId}`;
     };
+
+    // Get status icon based on the article status
+    const statusIconClass = (status) => {
+      return status === 'published'
+        ? 'fas fa-check-circle status-success'
+        : 'fas fa-times-circle status-failed';
+    };
+
+    onMounted(() => {
+      fetchArticleDetails();
+    });
 
     return {
       article,
+      comments,
+      newComment,
+      visibleCommentsLimit,
+      showComments,
+      visibleComments,
+      submitComment,
+      toggleComments,
+      viewMoreComments,
+      getUserAvatar,
       statusIconClass,
     };
   },
@@ -83,6 +177,7 @@ export default {
 </script>
 
 <style scoped>
+/* All the styles you previously had, along with the styles for comments and replies */
 .article-details-container {
   max-width: 800px;
   margin: 0 auto;
@@ -91,101 +186,116 @@ export default {
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   font-family: 'Arial', sans-serif;
-  opacity: 0; /* Start invisible for fade-in effect */
-  animation: fadeIn 0.5s forwards; /* Apply fade-in animation */
+  animation: fadeIn 0.5s forwards;
 }
 
 @keyframes fadeIn {
   to {
-    opacity: 1; /* Fade in to full visibility */
+    opacity: 1;
   }
 }
 
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
-  color: #2c3e50;
-  text-align: center; /* Center the title */
+/* Show Comments Button */
+.show-comments-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.image-container {
-  text-align: center;
-  margin-bottom: 1.5rem;
+.show-comments-button:hover {
+  background-color: #1d4ed8;
 }
 
-img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.article-body {
-  font-size: 1.125rem;
-  line-height: 1.8; /* Increased line height for better readability */
-  color: #34495e; /* Darker text color for contrast */
-  margin-bottom: 2rem;
-  padding: 0 1rem; /* Add padding for body text */
-}
-
-.article-details {
+/* Comments Section */
+.comments-section {
   margin-top: 2rem;
-  border-top: 2px solid #ecf0f1;
-  padding-top: 1.5rem;
 }
 
-h2 {
-  font-size: 1.75rem;
-  margin-bottom: 1rem;
-  color: #2c3e50;
-  text-transform: uppercase; /* Uppercase for a modern look */
-  letter-spacing: 1px; /* Add letter spacing for a refined appearance */
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-  color: #34495e;
-}
-
-li {
-  font-size: 1.1rem;
-  margin-bottom: 1rem; /* Increased margin for spacing */
+.comment-item {
   display: flex;
-  align-items: center; /* Center icons and text */
-  transition: transform 0.2s; /* Animation on hover */
+  margin-bottom: 1.5rem;
 }
 
-li:hover {
-  transform: scale(1.05); /* Slightly enlarge the list item on hover */
+.comment-header {
+  display: flex;
+  align-items: flex-start;
 }
 
-strong {
-  color: #2c3e50;
-  margin-left: 0.5rem; /* Add some space between icon and text */
+.user-avatar {
+  margin-right: 10px;
 }
 
-/* Icon styles */
-i {
-  margin-right: 0.5rem; /* Add space between icon and text */
-  font-size: 1.5rem; /* Adjust icon size for visibility */
-  transition: color 0.3s, transform 0.3s; /* Animation on hover */
+.user-avatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
 }
 
-i:hover {
-  transform: scale(1.2); /* Slightly enlarge the icon on hover */
+.comment-content {
+  background-color: #f1f1f1;
+  border-radius: 12px;
+  padding: 10px 15px;
+  max-width: 100%;
+  word-wrap: break-word;
 }
 
-/* Status icon colors */
-.status-success {
-  color: #28a745; /* Green color for success */
+.comment-content p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
 }
 
-.status-failed {
-  color: #dc3545; /* Red color for failed status */
+.comment-content small {
+  font-size: 0.8rem;
+  color: #888;
 }
 
-/* Responsive Styles */
+/* View More Button */
+.view-more-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.view-more-button:hover {
+  background-color: #1d4ed8;
+}
+
+/* Comment form */
+.comment-form {
+  margin-top: 2rem;
+}
+
+.comment-input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+}
+
+.comment-button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.comment-button:hover {
+  background-color: #1d4ed8;
+}
+
+/* Mobile Styles */
 @media (max-width: 600px) {
   .article-details-container {
     padding: 1rem;
@@ -195,26 +305,21 @@ i:hover {
     font-size: 2rem;
   }
 
-  h2 {
-    font-size: 1.5rem;
-  }
-
   .article-body {
     font-size: 1rem;
   }
 
-  li {
-    font-size: 1rem;
+  .comment-content {
+    padding: 8px 12px;
   }
-}
 
-/* Fade Transition */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter,
-.fade-leave-to /* .fade-leave-active in <2.1.8 */ {
-  opacity: 0;
+  .comment-input {
+    font-size: 0.9rem;
+  }
+
+  .comment-button {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
 }
 </style>

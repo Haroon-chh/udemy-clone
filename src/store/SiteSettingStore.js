@@ -30,6 +30,7 @@ const SiteSettingStore = {
         });
 
         const response = await AuthApiServices.PostRequest('/update-site-setting', formData);
+        console.log(updatedFields);
         commit('setSiteSettings', response.data);
         return response;
       } catch (error) {

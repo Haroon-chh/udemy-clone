@@ -8,32 +8,34 @@ const AuthApiServices = {
   init() {
     Vue.use(VueAxios, axios);
     axios.defaults.baseURL = baseURL;
-    axios.defaults.headers.common['Content-Type'] = 'application/json';
+    axios.defaults.headers.common['Content-Type'] = 'application/json'; // Set default headers to JSON
   },
 
   // Fetch the access token from localStorage
   getAuthHeaders() {
     const accessToken = localStorage.getItem('access_token');
-    if (accessToken) {
-      return {
-        Authorization: `Bearer ${accessToken}`, // Ensure access_token is passed
-        'Content-Type': 'multipart/form-data',
-        'ngrok-skip-browser-warning': 'true', // Handle ngrok bypass
-      };
-    }
-    return {
-      'Content-Type': 'application/json',
-      'ngrok-skip-browser-warning': 'true',
+    const headers = {
+      'Content-Type': 'application/json', // Set content type as JSON for non-file requests
+      'ngrok-skip-browser-warning': 'true', // Optional, only if you're using ngrok
     };
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`; // Attach the token if available
+    }
+    return headers;
   },
 
   // Generic GET request
   async GetRequest(endpoint, params = {}) {
     try {
+      const headers = this.getAuthHeaders();
+      console.log(`Making GET request to: ${baseURL}${endpoint}`, { params, headers });
+
       const response = await axios.get(`${baseURL}${endpoint}`, {
         params,
-        headers: this.getAuthHeaders(), // Pass authorization headers
+        headers,
       });
+
+      console.log('GET request successful:', response);
       return response.data; // Return the response data
     } catch (error) {
       console.error('GET request failed:', error);
@@ -47,9 +49,14 @@ const AuthApiServices = {
   // Generic POST request
   async PostRequest(endpoint, data) {
     try {
+      const headers = this.getAuthHeaders();
+      console.log(`Making POST request to: ${baseURL}${endpoint}`, { data, headers });
+
       const response = await axios.post(`${baseURL}${endpoint}`, data, {
-        headers: this.getAuthHeaders(), // Pass authorization headers
+        headers,
       });
+
+      console.log('POST request successful:', response);
       return response.data; // Return the response data
     } catch (error) {
       console.error('POST request failed:', error);
@@ -63,9 +70,14 @@ const AuthApiServices = {
   // Generic PUT request
   async PutRequest(endpoint, data) {
     try {
+      const headers = this.getAuthHeaders();
+      console.log(`Making PUT request to: ${baseURL}${endpoint}`, { data, headers });
+
       const response = await axios.put(`${baseURL}${endpoint}`, data, {
-        headers: this.getAuthHeaders(), // Pass authorization headers
+        headers,
       });
+
+      console.log('PUT request successful:', response);
       return response.data; // Return the response data
     } catch (error) {
       console.error('PUT request failed:', error);
@@ -79,10 +91,15 @@ const AuthApiServices = {
   // Generic DELETE request
   async DeleteRequest(endpoint, params = {}) {
     try {
+      const headers = this.getAuthHeaders();
+      console.log(`Making DELETE request to: ${baseURL}${endpoint}`, { params, headers });
+
       const response = await axios.delete(`${baseURL}${endpoint}`, {
         params,
-        headers: this.getAuthHeaders(), // Pass authorization headers
+        headers,
       });
+
+      console.log('DELETE request successful:', response);
       return response.data; // Return the response data
     } catch (error) {
       console.error('DELETE request failed:', error);

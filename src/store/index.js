@@ -8,6 +8,9 @@ import CategoriesStore from './CategoriesStore';
 import SiteSettingStore from './SiteSettingStore';
 import PurchaseStore from './PurchaseStore';
 import CommentStore from './CommentStore';
+import dynamicPage from './dynamicPage'; // Adjust path as needed
+
+import ArticleStore from './ArticleStore';
 
 export default createStore({
   modules: {
@@ -18,7 +21,9 @@ export default createStore({
     CategoriesStore,
     SiteSettingStore,
     PurchaseStore,
-    CommentStore
+    CommentStore,
+    dynamicPage,
+    ArticleStore
   },
   state: {
     user: null,
