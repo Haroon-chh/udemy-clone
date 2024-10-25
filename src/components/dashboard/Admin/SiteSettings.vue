@@ -1,5 +1,8 @@
 <template>
   <div class="container-fluid d-flex justify-content-center align-items-center min-vh-100 site-settings-container">
+    <SuccessPopup :show="showSuccessPopup" message="Settings saved successfully!" />
+    <ErrorPopup :show="showErrorPopup" :message="errorMessage" />
+
     <div class="row w-100 justify-content-center">
       <!-- Video on larger screens only -->
       <div class="col-lg-5 d-none d-lg-block">
@@ -64,9 +67,12 @@
 <script>
 import { ref, reactive } from "vue";
 import { useStore } from 'vuex';
+import SuccessPopup from "@/components/SuccessPopup.vue";
+import ErrorPopup from "@/components/ErrorPopup.vue";
 
 export default {
   name: "SiteSettingsComponent",
+  components: { SuccessPopup, ErrorPopup },
   setup() {
     const store = useStore();
 
@@ -77,6 +83,9 @@ export default {
     });
 
     const previewLogo = ref(null);
+    const showSuccessPopup = ref(false);
+    const showErrorPopup = ref(false);
+    const errorMessage = ref('');
 
     // Handle logo file change
     const onLogoChange = (event) => {
@@ -89,24 +98,31 @@ export default {
 
     // Save settings and allow partial updates
     const saveSettings = async () => {
-  try {
-    const updatedFields = {};
+      try {
+        const updatedFields = {};
 
-    updatedFields.site_title = siteSettings.websiteName || "Default Title";
-    updatedFields.logo_path = siteSettings.logo || new File(["dummy"], "dummy.png", { type: "image/png" }); // Provide a default file
-    updatedFields.copyright = siteSettings.setting1 || "Default Copyright";
+        updatedFields.site_title = siteSettings.websiteName || "Default Title";
+        updatedFields.logo_path = siteSettings.logo || new File(["dummy"], "dummy.png", { type: "image/png" });
+        updatedFields.copyright = siteSettings.setting1 || "Default Copyright";
 
-    // Log the fields that are being sent
-    console.log("Updated fields:", updatedFields);
+        console.log("Updated fields:", updatedFields);
 
-    // Dispatch the action with the updated fields
-    const response = await store.dispatch('SiteSettingStore/updateSiteSetting', updatedFields);
-    alert(response.message);
-  } catch (error) {
-    console.error('Error saving site settings:', error.response?.data || error.message);
-    alert('Failed to save settings.');
-  }
-};
+        // Dispatch the action without assigning to a variable
+        await store.dispatch('SiteSettingStore/updateSiteSetting', updatedFields);
+
+        showSuccessPopup.value = true;
+        setTimeout(() => {
+          showSuccessPopup.value = false;
+        }, 3000);
+      } catch (error) {
+        console.error('Error saving site settings:', error.response?.data || error.message);
+        errorMessage.value = 'Failed to save settings.';
+        showErrorPopup.value = true;
+        setTimeout(() => {
+          showErrorPopup.value = false;
+        }, 3000);
+      }
+    };
 
 
     return {
@@ -114,6 +130,9 @@ export default {
       previewLogo,
       onLogoChange,
       saveSettings,
+      showSuccessPopup,
+      showErrorPopup,
+      errorMessage,
     };
   },
 };
