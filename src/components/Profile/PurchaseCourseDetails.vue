@@ -1,10 +1,10 @@
 <template>
   <div class="course-details-container">
     <div class="course-card">
-      <div class="image-container" v-if="course && course.thumbnail_url">
+      <div class="image-container" v-if="course && course.thumbnail">
         <img
           class="course-thumbnail"
-          :src="course.thumbnail_url"
+          :src="course.thumbnail"
           alt="Course Thumbnail"
           ref="thumbnail"
         />
@@ -26,7 +26,7 @@
       <div class="articles-list">
         <div v-for="article in articles" :key="article.id" class="article-card">
           <h3>{{ article.title }}</h3>
-          <img v-if="article.image_url" :src="article.image_url" alt="Article Image" />
+          <img v-if="course.thumbnail" :src="course.thumbnail" alt="Article Image" />
           <router-link :to="`/articles/${article.slug}`" class="read-more">
             Read more
           </router-link>
@@ -138,9 +138,10 @@ export default {
 
 .course-thumbnail {
   width: 100%;
-  height: auto;
+  height: 100%;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
 }
 
 .content {

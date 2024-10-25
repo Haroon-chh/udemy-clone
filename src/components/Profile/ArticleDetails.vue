@@ -15,18 +15,20 @@
     <transition name="fade">
       <div class="article-details" v-if="article">
         <h2>Article Details</h2>
-        <ul>
+        <ul class="list-unstyled">
           <li>
-            <i class="fas fa-book"></i>
-            <strong>Course ID:</strong> {{ article.course_id }}
+            <i class="fas fa-book" style="color: blue;"></i>
+            <strong> Course ID:</strong> {{ article.course_id }}
           </li>
+         <li>
+         <i v-if="article.status === 'published'" class="fas fa-check-circle status-success"></i>
+         <strong> Status:</strong> {{ article.status }}
+         </li>
+
+
           <li>
-            <i :class="statusIconClass(article.status)"></i>
-            <strong>Status:</strong> {{ article.status }}
-          </li>
-          <li>
-            <i class="fas fa-calendar-alt"></i>
-            <strong>Created At:</strong> {{ new Date(article.created_at).toLocaleString() }}
+            <i class="fas fa-calendar-alt" style="color: blue;"></i>
+            <strong> Created At:</strong> {{ new Date(article.created_at).toLocaleString() }}
           </li>
         </ul>
       </div>
@@ -149,11 +151,8 @@ export default {
     };
 
     // Get status icon based on the article status
-    const statusIconClass = (status) => {
-      return status === 'published'
-        ? 'fas fa-check-circle status-success'
-        : 'fas fa-times-circle status-failed';
-    };
+
+
 
     onMounted(() => {
       fetchArticleDetails();
@@ -170,7 +169,6 @@ export default {
       toggleComments,
       viewMoreComments,
       getUserAvatar,
-      statusIconClass,
     };
   },
 };
@@ -322,4 +320,12 @@ export default {
     padding: 0.5rem 1rem;
   }
 }
+.status-success {
+  color: green;
+}
+
+.status-failed {
+  color: red;
+}
+
 </style>

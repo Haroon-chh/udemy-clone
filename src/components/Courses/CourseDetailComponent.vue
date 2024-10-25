@@ -5,7 +5,7 @@
         <div class="image-container">
           <img
             class="course-thumbnail"
-            :src="course.thumbnail_url"
+            :src="course.thumbnail"
             alt="Course Thumbnail"
             ref="thumbnail"
           />
@@ -32,7 +32,6 @@
         </div>
       </div>
     </div>
-
     <div class="learning-points">
       <h2 class="learning-points-title">What you'll learn</h2>
       <div class="learning-points-content">
@@ -394,7 +393,7 @@ export default {
 .learning-points {
   padding: 2rem;
   border-radius: 15px;
-  margin-top: 2rem;
+  margin-top: -9rem;
 }
 
 .learning-points-title {
