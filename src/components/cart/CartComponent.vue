@@ -19,7 +19,7 @@
       <div v-for="item in cartItems" :key="item.id" class="card mb-4 p-3">
         <div class="row">
           <div class="col-md-4">
-            <img :src="item.image_url" alt="Course Image" class="img-fluid" />
+            <img :src="item.thumbnail" alt="Course Image" class="img-fluid" />
           </div>
           <div class="col-md-8">
             <h4>{{ item.name }}</h4>
