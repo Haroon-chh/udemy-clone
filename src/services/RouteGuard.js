@@ -2,7 +2,7 @@ import store from "../store";
 
 const RouteGuard = (to, from, next) => {
   // Define public pages that don't require authentication
-  const publicPages = ['/login', '/signup', '/about', '/ContactUs', '/cart', '/teaching','/dashboard'];
+  const publicPages = ['/login', '/signup', '/about', '/contactUs', '/cart', '/teaching','/dashboard'];
 
   // Get the logged-in user's role (assuming the role is available in Vuex store)
   const userRole = store.getters.getUserRole; 
