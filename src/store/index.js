@@ -90,7 +90,7 @@ export default createStore({
         const response = await AuthApiServices.PostRequest('/login', credentials);
         console.log('Login API response:', response); // Debug response
     
-        if (response && response.message === 'Successfully logged in.' && response.data) {
+        if (response && response.message === 'OK' && response.data) {
           commit('setUser', response.data);
           commit('setLoggedIn', true);
     

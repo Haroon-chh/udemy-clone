@@ -7,38 +7,47 @@
         <img :src="require('@/assets/signup-pic.png')" alt="Login Image" class="img-fluid w-100 h-100" />
       </div>
       
-      <!-- Right Side - Login Form -->
+      <!-- Right Side - Login and 2FA Forms -->
       <div class="col-md-6 bg-white p-5">
         <h1 class="mb-4">Log in to your account</h1>
         
         <!-- Success and Error Popup Components -->
         <SuccessPopupComponent :show="showSuccess" :message="successMessage" />
         <ErrorPopupComponent :show="showError" :message="errorMessage" />
-        
+
         <!-- Login Form -->
-        <form @submit.prevent="submitForm">
-          
-          <!-- Email -->
-          <div class="mb-3 inputs position-relative">
-            <input type="email" id="email" v-model="email" class="form-control border-0" required placeholder="" />
-            <label for="email" class="form-label">Email</label>
-            <div v-if="emailError" class="text-danger">{{ emailError }}</div>
-          </div>
-          
-          <!-- Password -->
-          <div class="mb-3 inputs position-relative">
-            <input type="password" id="password" v-model="password" class="form-control border-0" required minlength="8" placeholder="" />
-            <label for="password" class="form-label">Password</label>
-            <div v-if="passwordError" class="text-danger">{{ passwordError }}</div>
-          </div>
-          
-          <!-- Login Button -->
-<!-- Login Button -->
+        <div v-if="!is2FAEnabled">
+          <form @submit.prevent="submitForm">
+            <!-- Email -->
+            <div class="mb-3 inputs position-relative">
+              <input type="email" id="email" v-model="email" class="form-control border-0" required placeholder="" />
+              <label for="email" class="form-label">Email</label>
+              <div v-if="emailError" class="text-danger">{{ emailError }}</div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3 inputs position-relative">
+              <input type="password" id="password" v-model="password" class="form-control border-0" required minlength="8" placeholder="" />
+              <label for="password" class="form-label">Password</label>
+              <div v-if="passwordError" class="text-danger">{{ passwordError }}</div>
+            </div>
+
+            <!-- Login Button -->
             <button type="submit" class="btn login-btn w-100 rounded-0" :disabled="loginDisabled">Log In</button>
-        </form>
+          </form>
+        </div>
+
+        <!-- 2FA OTP Input Fields -->
+        <div v-else class="otp-container">
+          <h5 class="mb-3">Enter 2FA Code</h5>
+          <div class="otp-inputs">
+            <input v-for="(digit, index) in otpDigits" :key="index" v-model="otpDigits[index]" maxlength="1" @input="moveFocus(index)" type="text" class="otp-box border-1" />
+          </div>
+          <button class="btn otp-btn w-100 mt-3 rounded-0" @click="verify2FA">Verify</button>
+        </div>
 
         <!-- Other Log In Options -->
-        <div class="mt-4 text-center">
+        <div class="mt-4 text-center" v-if="!is2FAEnabled">
           <div class="separator">Other log in options</div>
           <div class="social-icons d-flex justify-content-center my-3">
             <button class="btn btn-outline-secondary mx-2" @click="socialLogin('Google')">
@@ -53,66 +62,43 @@
           </div>
         </div>
 
-        <!-- Modal for 2FA Verification -->
-        <div v-if="show2FAModal" class="modal show d-block" tabindex="-1">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Enter 2FA Code</h5>
-                <button type="button" class="btn-close" @click="show2FAModal = false"></button>
-              </div>
-              <div class="modal-body">
-                <input type="text" v-model="otp" maxlength="6" class="form-control" placeholder="6-digit code" />
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-primary" @click="verify2FA">Verify</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Don't Have an Account & Organization Login -->
+        <!-- Sign Up Option -->
         <div class="mt-4 text-center">
           Don't have an account? <a href="/signup">Sign up</a>
-        </div>
-        <div class="mt-2 text-center">
-          <a href="#" class="organization-login">Log in with your organization</a>
         </div>
       </div>
     </div>
   </div>
 </template>
 
+
 <script setup>
 import { ref, defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import SuccessPopup from '../SuccessPopup.vue'; // Adjust path if necessary
-import ErrorPopup from '../ErrorPopup.vue'; // Adjust path if necessary
+import SuccessPopup from '../SuccessPopup.vue';
+import ErrorPopup from '../ErrorPopup.vue';
 
 const SuccessPopupComponent = defineComponent(SuccessPopup);
 const ErrorPopupComponent = defineComponent(ErrorPopup);
 
 const email = ref('');
 const password = ref('');
-const otp = ref(''); // OTP input for 2FA
+const otpDigits = ref(Array(6).fill('')); // Array for 6 OTP boxes
 
 const emailError = ref('');
 const passwordError = ref('');
 const router = useRouter();
 const store = useStore();
 
-const show2FAModal = ref(false); // 2FA modal visibility state
+const is2FAEnabled = ref(false); // Track 2FA state
 const showSuccess = ref(false);
 const showError = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
-const loginDisabled = ref(false); // State to disable the login button
+const loginDisabled = ref(false);
 
-const validateEmail = (email) => {
-  const re = /\S+@\S+\.\S+/;
-  return re.test(email);
-};
+const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
 const submitForm = async () => {
   emailError.value = '';
@@ -135,69 +121,56 @@ const submitForm = async () => {
     });
 
     if (response.success) {
-      const is2FAEnabled = response.data?.['2fa'] === true; // Double-check evaluation
+      is2FAEnabled.value = response.data?.['2fa'] === true;
 
-      if (is2FAEnabled) {
-        show2FAModal.value = true; // Show the modal
-      } else {
+      if (!is2FAEnabled.value) {
         successMessage.value = response.message;
         showSuccess.value = true;
-
-        setTimeout(() => {
-          showSuccess.value = false;
-          router.push('/dashboard'); // Redirect if 2FA is not required
-        }, 2000);
+        setTimeout(() => router.push('/dashboard'), 2000);
       }
     } else {
       throw new Error(response.message || 'Unexpected response format');
     }
   } catch (error) {
-    errorMessage.value =
-      error.response?.data?.errors?.credentials?.[0] ||
-      'An error occurred. Please try again later.';
+    errorMessage.value = error.response?.data?.errors?.credentials?.[0] || 'An error occurred. Please try again later.';
     showError.value = true;
-    
-    // Disable the login button for 10 seconds after an error
     loginDisabled.value = true;
-    setTimeout(() => {
-      loginDisabled.value = false;
-    }, 10000);
-
-    setTimeout(() => {
-      showError.value = false;
-    }, 5000);
+    setTimeout(() => { loginDisabled.value = false; }, 10000);
+    setTimeout(() => { showError.value = false; }, 5000);
   }
 };
 
 const verify2FA = async () => {
-  try {
-    const response = await store.dispatch('verify2FA', { otp: otp.value });
+  const otp = otpDigits.value.join('');
+  if (otp.length !== 6) {
+    errorMessage.value = 'Please enter a 6-digit code';
+    showError.value = true;
+    return;
+  }
 
+  try {
+    const response = await store.dispatch('verify2FA', { otp });
     if (response.success) {
-      show2FAModal.value = false; // Hide 2FA modal
       successMessage.value = '2FA verified successfully!';
       showSuccess.value = true;
-
-      setTimeout(() => {
-        showSuccess.value = false;
-        router.push('/dashboard'); // Redirect after successful 2FA verification
-      }, 2000);
+      setTimeout(() => router.push('/dashboard'), 2000);
     } else {
       throw new Error(response.message || 'Invalid 2FA code');
     }
   } catch (error) {
-    errorMessage.value =
-      error.response?.data?.errors?.one_time_password?.[0] ||
-      'Invalid 2FA code. Please try again.';
+    errorMessage.value = error.response?.data?.errors?.one_time_password?.[0] || 'Invalid 2FA code. Please try again.';
     showError.value = true;
-
-    setTimeout(() => {
-      showError.value = false;
-    }, 5000);
+    setTimeout(() => { showError.value = false; }, 5000);
   }
 };
 
+const moveFocus = (index) => {
+  if (otpDigits.value[index].length === 1 && index < 5) {
+    document.querySelectorAll('.otp-box')[index + 1].focus();
+  }
+};
 </script>
+
 
 
 <style scoped>
@@ -207,8 +180,19 @@ const verify2FA = async () => {
   border: none;
 }
 
+.otp-btn {
+  background-color: #a436f1;
+  color: #fff;
+  border: none;
+}
+
 .login-btn:hover {
   background-color: #50575e;
+}
+
+.otp-btn:hover{
+  background-color: #50575e;
+
 }
 
 .separator {
@@ -304,7 +288,6 @@ input:not(:placeholder-shown) {
 }
 
 @media (max-width: 768px) {
-  /* Container adjustments to reduce free space */
   .container-fluid {
     display: flex;
     flex-direction: column;
@@ -314,7 +297,6 @@ input:not(:placeholder-shown) {
     box-sizing: border-box;
   }
 
-  /* Ensure the row does not overflow and centers */
   .row {
     flex-direction: column;
     align-items: center;
@@ -323,33 +305,28 @@ input:not(:placeholder-shown) {
     padding: 0; /* Remove any default paddings */
   }
 
-  /* Hide the image container on mobile view */
   .col-md-6.p-0 {
     display: none; /* Hide the image on mobile screens */
   }
 
-  /* Adjust login form section */
   .col-md-6.bg-white.p-5 {
     width: 100%;
     padding: 20px;
     text-align: center;
   }
 
-  /* Adjust heading text */
   .col-md-6.bg-white.p-5 h1 {
     font-size: 16px; /* Smaller font size for mobile */
     margin-top: 10px;
     line-height: 1.4;
   }
 
-  /* Keep social icons in a single line */
   .social-icons {
     flex-direction: row !important;
     justify-content: center;
     flex-wrap: nowrap;
   }
 
-  /* Adjust social button size and spacing */
   .social-icons button {
     width: auto;
     margin: 0 8px;
@@ -357,55 +334,76 @@ input:not(:placeholder-shown) {
     padding: 10px;
   }
 
-  /* Adjust form fields and buttons */
   .form-control {
     font-size: 14px;
     padding: 10px;
   }
 
-  /* Adjust button styling */
   .btn {
     font-size: 16px;
     padding: 12px;
   }
 
-  /* Adjust separator width */
   .separator {
     width: 100% !important;
   }
 
-  /* Adjust text alignment and spacing */
   .text-center h1 {
     font-size: 16px;
     margin-top: 10px;
     color: #333;
   }
 
-  /* Adjust anchor link styles */
   .text-center a {
     display: block;
     margin: 5px 0;
     font-size: 14px;
   }
 
-  /* Adjust organization login link */
   .organization-login {
     font-size: 14px;
   }
 
-  /* Adjust text center alignment */
   .text-center {
     font-size: 14px;
   }
 
-  /* Ensure footer is at the bottom without extra margin */
   footer {
     width: 100%;
     padding: 10px;
     background-color: #f9f9f9;
     text-align: center;
     box-sizing: border-box;
-    position: relative; /* Ensure footer stays below content */
+    position: relative; 
   }
 }
+.otp-container {
+  text-align: center;
+}
+
+.otp-inputs {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+.otp-box {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  font-size: 18px;
+  border: 1px solid #2f2f2f  !important; 
+  margin: 0 5px;
+  box-sizing: border-box; 
+}
+
+
+
+.separator {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #080808;
+}
+
 </style>
