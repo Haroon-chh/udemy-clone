@@ -4,8 +4,8 @@
     <h1 v-if="article">{{ article.title }}</h1>
 
     <!-- Display article image if available -->
-    <div class="image-container" v-if="article && article.image_url">
-      <img :src="article.image_url" alt="Article Image" />
+    <div class="image-container" v-if="course && course.thumbnail">
+      <img class="course-thumbnail" :src="course.thumbnail" alt="Article Image" />
     </div>
 
     <!-- Display article body -->
@@ -15,18 +15,20 @@
     <transition name="fade">
       <div class="article-details" v-if="article">
         <h2>Article Details</h2>
-        <ul>
+        <ul class="list-unstyled">
           <li>
-            <i class="fas fa-book"></i>
-            <strong>Course ID:</strong> {{ article.course_id }}
+            <i class="fas fa-book" style="color: blue;"></i>
+            <strong> Course ID:</strong> {{ article.course_id }}
           </li>
+         <li>
+         <i v-if="article.status === 'published'" class="fas fa-check-circle status-success"></i>
+         <strong> Status:</strong> {{ article.status }}
+         </li>
+
+
           <li>
-            <i :class="statusIconClass(article.status)"></i>
-            <strong>Status:</strong> {{ article.status }}
-          </li>
-          <li>
-            <i class="fas fa-calendar-alt"></i>
-            <strong>Created At:</strong> {{ new Date(article.created_at).toLocaleString() }}
+            <i class="fas fa-calendar-alt" style="color: blue;"></i>
+            <strong> Created At:</strong> {{ new Date(article.created_at).toLocaleString() }}
           </li>
         </ul>
       </div>
@@ -72,11 +74,13 @@
 import { ref, onMounted, computed } from 'vue'; // Import computed here
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
-import AuthApiServices from '@/services/AuthApiServices';
+import AuthApiServices from '@/services/AuthApiServices.js';
 
 export default {
   name: 'ArticleDetails',
   setup() {
+    const course = computed(() => store.getters['PurchaseStore/getCourse']);
+    // const articles = computed(() => store.getters['PurchaseStore/getArticles']);
     const store = useStore();
     const article = ref({});
     const comments = ref([]);
@@ -149,17 +153,25 @@ export default {
     };
 
     // Get status icon based on the article status
-    const statusIconClass = (status) => {
-      return status === 'published'
-        ? 'fas fa-check-circle status-success'
-        : 'fas fa-times-circle status-failed';
-    };
+
+
 
     onMounted(() => {
       fetchArticleDetails();
     });
 
+    onMounted(() => {
+      store.dispatch('PurchaseStore/fetchCourseDetails', slug).then(() => {
+        // Only attempt to check the cart if course data is available
+        if (course.value && course.value.id) {
+          store.dispatch('PurchaseStore/checkIfAddedToCart', course.value.id);
+        }
+      });
+      store.dispatch('PurchaseStore/fetchArticles', slug);
+    });
+
     return {
+      course,
       article,
       comments,
       newComment,
@@ -170,7 +182,6 @@ export default {
       toggleComments,
       viewMoreComments,
       getUserAvatar,
-      statusIconClass,
     };
   },
 };
@@ -194,7 +205,13 @@ export default {
     opacity: 1;
   }
 }
-
+.course-thumbnail {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
 /* Show Comments Button */
 .show-comments-button {
   margin-top: 1rem;
@@ -322,4 +339,12 @@ export default {
     padding: 0.5rem 1rem;
   }
 }
+.status-success {
+  color: green;
+}
+
+.status-failed {
+  color: red;
+}
+
 </style>

@@ -139,9 +139,9 @@ export default {
 .course-thumbnail {
   width: 100%;
   height: 100%;
-  object-fit: cover;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
 }
 
 .content {
