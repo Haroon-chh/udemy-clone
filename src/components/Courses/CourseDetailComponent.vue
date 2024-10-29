@@ -5,7 +5,7 @@
         <div class="image-container">
           <img
             class="course-thumbnail"
-            :src="course.thumbnail_url"
+            :src="course.thumbnail"
             alt="Course Thumbnail"
             ref="thumbnail"
           />

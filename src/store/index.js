@@ -10,6 +10,7 @@ import PurchaseStore from './PurchaseStore';
 import CommentStore from './CommentStore';
 import dynamicPage from './dynamicPage'; // Adjust path as needed
 
+import ArticleStore from './ArticleStore';
 
 export default createStore({
   modules: {
@@ -21,7 +22,8 @@ export default createStore({
     SiteSettingStore,
     PurchaseStore,
     CommentStore,
-    dynamicPage
+    dynamicPage,
+    ArticleStore
   },
   state: {
     user: null,
@@ -88,7 +90,7 @@ export default createStore({
         const response = await AuthApiServices.PostRequest('/login', credentials);
         console.log('Login API response:', response); // Debug response
     
-        if (response && response.message === 'OK' && response.data) {
+        if (response && response.message === 'Successfully logged in.' && response.data) {
           commit('setUser', response.data);
           commit('setLoggedIn', true);
     

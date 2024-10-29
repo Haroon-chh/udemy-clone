@@ -156,6 +156,7 @@ h2 {
   gap: 1rem;
   white-space: nowrap;
   padding-left: 15px;
+  /* margin-right: 30%; */
 }
 
 .course-categories {
@@ -189,6 +190,7 @@ h2 {
   gap: 1rem;
   white-space: nowrap;
   padding-left: 15px;
+  margin-left: 25%;
 }
 .btn-category {
   background-color: #f1f3f4;
@@ -364,6 +366,9 @@ h2 {
     display: none; /* Hide scroll arrows on mobile as we'll use swipe to scroll */
   }
   .course-categories {
+  margin-left: 0%;
+}
+.categories-nav {
   margin-left: 0%;
 }
 }
