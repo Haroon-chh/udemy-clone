@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { testimonials } from '@/Data/TestimonialData';
+import { testimonials } from '@/data/TestimonialData';
 
 export default {
   name: "TestimonialComponent",
