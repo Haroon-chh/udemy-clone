@@ -30,7 +30,7 @@
         <div class="card-header">
           <!-- Student Icon and Name -->
           <div class="student-info">
-            <i class="fas fa-user-graduate student-icon"></i>
+            <i class="fas fa-user-graduate student-icon "></i>
             <p class="student-name">{{ subscription.name }}</p>
           </div>
           <!-- Status Badge with Icon -->
@@ -130,10 +130,10 @@ export default {
 /* Title with Icon */
 .page-title {
   font-size: 36px;
-  font-weight: 600;
+  font-weight: 200;
   color: black;
   margin-bottom: 40px;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
   letter-spacing: 1.5px;
   /* background: linear-gradient(45deg, #3498db, #8e44ad); */
   /* -webkit-background-clip: text; */
