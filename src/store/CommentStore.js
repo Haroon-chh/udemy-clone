@@ -4,42 +4,55 @@ const state = {
   comments: [],
 };
 
+// Helper function to organize comments with replies
 const organizeComments = (comments) => {
-  // Organize comments by grouping replies under their parent comments
   const commentMap = {};
 
   comments.forEach((comment) => {
     if (!comment.parent_comment_id) {
-      // If it's a root comment (no parent), store it in the map
+      // Root comment
       commentMap[comment.id] = { ...comment, replies: [] };
     } else {
-      // If it's a reply, find its parent and push it to the replies array
-      if (commentMap[comment.parent_comment_id]) {
-        commentMap[comment.parent_comment_id].replies.push(comment);
+      // Reply - find the parent
+      if (!commentMap[comment.parent_comment_id]) {
+        commentMap[comment.parent_comment_id] = { id: comment.parent_comment_id, replies: [] };
       }
+      commentMap[comment.parent_comment_id].replies.push(comment);
     }
   });
 
-  // Return only the root comments (which now have their replies embedded)
+  // Return only the root comments with nested replies
   return Object.values(commentMap);
 };
 
 const mutations = {
   SET_COMMENTS(state, comments) {
-    const organizedComments = organizeComments(comments); // Organize comments before committing
+    const organizedComments = organizeComments(comments);
     state.comments = organizedComments;
   },
   ADD_COMMENT(state, comment) {
-    if (!state.comments) {
-      state.comments = [];
+    if (!comment.parent_comment_id) {
+      // It's a root-level comment, add it to the main list
+      state.comments.push({ ...comment, replies: [] });
+    } else {
+      // If it's a reply, delegate to ADD_REPLY for consistency
+      this.commit('CommentStore/ADD_REPLY', { reply: comment, parentCommentId: comment.parent_comment_id });
     }
-    state.comments.push(comment); // Safely push the new comment
   },
   ADD_REPLY(state, { reply, parentCommentId }) {
-    const parentComment = state.comments.find((comment) => comment.id === parentCommentId);
-    if (parentComment) {
-      parentComment.replies.push(reply);
-    }
+    const addReplyToParent = (parentComments) => {
+      for (const parent of parentComments) {
+        if (parent.id === parentCommentId) {
+          parent.replies.push(reply);
+          return true;
+        }
+        if (parent.replies && addReplyToParent(parent.replies)) {
+          return true;
+        }
+      }
+      return false;
+    };
+    addReplyToParent(state.comments);
   },
 };
 
@@ -47,12 +60,8 @@ const actions = {
   async fetchComments({ commit }, slug) {
     try {
       const response = await AuthApiServices.GetRequest(`/articles/${slug}/comments`);
-      
-      // Log the full response to verify structure
-      console.log('Full comments API response:', response);
-      
       if (response && response.data) {
-        commit('SET_COMMENTS', response.data); // Organize and set the comments
+        commit('SET_COMMENTS', response.data);
       } else {
         throw new Error('Invalid comments data structure');
       }
@@ -66,7 +75,8 @@ const actions = {
     try {
       const response = await AuthApiServices.PostRequest(`/articles/${slug}/post-comment`, commentData);
       if (response && response.data) {
-        commit('ADD_COMMENT', response.data); // Add the posted comment to the store
+        commit('ADD_COMMENT', response.data);
+        return response;
       } else {
         throw new Error('Error posting comment');
       }
@@ -76,11 +86,14 @@ const actions = {
     }
   },
 
-  async postReply({ commit }, { slug, payload }) {
+  async postReply({ commit }, { slug, parentCommentId, replyData }) {
     try {
-      const response = await AuthApiServices.PostRequest(`/articles/${slug}/post-comment`, payload);
+      console.log(`Making POST request to: /articles/${slug}/post-comment/${parentCommentId}`, replyData);
+      
+      const response = await AuthApiServices.PostRequest(`/articles/${slug}/post-comment/${parentCommentId}`, replyData);
       if (response && response.data) {
-        commit('ADD_REPLY', { reply: response.data, parentCommentId: payload.parent_comment_id });
+        commit('ADD_REPLY', { reply: response.data, parentCommentId });
+        return response;
       } else {
         throw new Error('Error posting reply');
       }
@@ -88,7 +101,7 @@ const actions = {
       console.error('Error posting reply:', error);
       throw error;
     }
-  },
+  },  
 };
 
 export default {

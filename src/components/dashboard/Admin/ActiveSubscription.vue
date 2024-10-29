@@ -120,7 +120,7 @@ export default {
   margin: 0 auto;
   padding: 20px;
   text-align: center;
-  background: linear-gradient(135deg, #f0f8ff, #dbeafe);
+  background-color:#f9f9f9;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -135,9 +135,9 @@ export default {
   margin-bottom: 40px;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  background: linear-gradient(45deg, #3498db, #8e44ad);
+  /* background: linear-gradient(45deg, #3498db, #8e44ad); */
   /* -webkit-background-clip: text; */
-  -webkit-text-fill-color: transparent;
+  /* -webkit-text-fill-color: transparent; */
 }
 
 .page-title i {

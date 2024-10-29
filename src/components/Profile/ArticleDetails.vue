@@ -1,38 +1,22 @@
 <template>
   <div class="article-details-container">
-    <!-- Display article title -->
     <h1 v-if="article">{{ article.title }}</h1>
-
-    <!-- Display article image if available -->
     <div class="image-container" v-if="article && article.image_url">
       <img :src="article.image_url" alt="Article Image" />
     </div>
-
-    <!-- Display article body -->
     <p class="article-body" v-if="article">{{ article.body }}</p>
 
-    <!-- Display additional article details -->
     <transition name="fade">
       <div class="article-details" v-if="article">
         <h2>Article Details</h2>
         <ul>
-          <li>
-            <i class="fas fa-book"></i>
-            <strong>Course ID:</strong> {{ article.course_id }}
-          </li>
-          <li>
-            <i :class="statusIconClass(article.status)"></i>
-            <strong>Status:</strong> {{ article.status }}
-          </li>
-          <li>
-            <i class="fas fa-calendar-alt"></i>
-            <strong>Created At:</strong> {{ new Date(article.created_at).toLocaleString() }}
-          </li>
+          <li><i class="fas fa-book"></i><strong>Course ID:</strong> {{ article.course_id }}</li>
+          <li><i :class="statusIconClass(article.status)"></i><strong>Status:</strong> {{ article.status }}</li>
+          <li><i class="fas fa-calendar-alt"></i><strong>Created At:</strong> {{ new Date(article.created_at).toLocaleString() }}</li>
         </ul>
       </div>
     </transition>
 
-    <!-- Show Comments Button -->
     <button @click="toggleComments" class="show-comments-button">
       {{ showComments ? 'Hide Comments' : 'Show Comments' }}
     </button>
@@ -49,18 +33,60 @@
             <strong>{{ comment.user_id }}</strong>
             <p>{{ comment.body }}</p>
             <small>{{ new Date(comment.created_at).toLocaleString() }}</small>
+
+            <button @click="toggleReplyForm(comment.id)" class="reply-button">
+              {{ showReplyForm === comment.id ? 'Hide Reply' : 'Reply' }}
+            </button>
+
+            <div v-if="showReplyForm === comment.id" class="reply-form">
+              <textarea v-model="newReply" placeholder="Write a reply..." class="reply-input"></textarea>
+              <button @click="submitReply(comment.id)" class="reply-submit-button">Post Reply</button>
+            </div>
           </div>
         </div>
+
+        <!-- Replies Section -->
+        <div class="replies" v-if="comment.replies && comment.replies.length">
+  <div
+    v-for="reply in comment.replies.slice(0, replyLimit[comment.id] || 3)"
+    :key="reply.id"
+    class="reply-item"
+  >
+    <div class="user-avatar">
+      <img :src="getUserAvatar(reply.user_id)" alt="User Avatar" />
+    </div>
+    <div class="reply-content">
+      <strong>{{ reply.user_id }}</strong>
+      <p>{{ reply.body }}</p>
+      <small>{{ new Date(reply.created_at).toLocaleString() }}</small>
+    </div>
+  </div>
+
+  <button
+    v-if="comment.replies.length > (replyLimit[comment.id] || 3)"
+    @click="loadMoreReplies(comment.id)"
+    class="view-more-replies-button"
+  >
+    View More Replies
+  </button>
+
+  <button
+    v-if="(replyLimit[comment.id] || 3) > 3"
+    @click="hideReplies(comment.id)"
+    class="hide-replies-button"
+  >
+    Hide Replies
+  </button>
+</div>
+
       </div>
 
-      <!-- View More Comments Button -->
       <button v-if="comments.length > visibleCommentsLimit" @click="viewMoreComments" class="view-more-button">
         View More Comments
       </button>
     </div>
     <p v-else-if="showComments && !comments.length">No comments yet.</p>
 
-    <!-- Comment form -->
     <div class="comment-form">
       <textarea v-model="newComment" placeholder="Write a comment..." class="comment-input"></textarea>
       <button @click="submitComment" class="comment-button">Post Comment</button>
@@ -69,7 +95,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue'; // Import computed here
+import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import AuthApiServices from '@/services/AuthApiServices';
@@ -80,38 +106,36 @@ export default {
     const store = useStore();
     const article = ref({});
     const comments = ref([]);
-    const visibleCommentsLimit = ref(5); // Limit to show 5 comments initially
+    const visibleCommentsLimit = ref(5);
     const newComment = ref('');
-    const showComments = ref(false); // Toggle comments visibility
+    const newReply = ref('');
+    const showReplyForm = ref(null);
+    const replyLimit = ref({});
+    const showComments = ref(false);
     const route = useRoute();
     const slug = route.params.slug;
 
-    // Fetch article details
     const fetchArticleDetails = async () => {
       try {
         const response = await AuthApiServices.GetRequest(`/articles/${slug}`);
         if (response.data && response.data.article) {
           article.value = response.data.article;
-          fetchComments(); // Fetch comments after getting the article details
+          fetchComments();
         }
       } catch (error) {
         console.error('Error fetching article details:', error);
       }
     };
 
-    // Fetch comments
     const fetchComments = async () => {
       try {
         await store.dispatch('CommentStore/fetchComments', slug);
-        if (store.state.CommentStore.comments) {
-          comments.value = store.state.CommentStore.comments;
-        }
+        comments.value = store.state.CommentStore.comments;
       } catch (error) {
         console.error('Error fetching comments:', error);
       }
     };
 
-    // Submit a new comment
     const submitComment = async () => {
       if (!newComment.value.trim()) {
         console.error('Cannot post an empty comment');
@@ -119,41 +143,58 @@ export default {
       }
 
       const payload = { body: newComment.value };
-
       try {
         await store.dispatch('CommentStore/postComment', { slug, commentData: payload });
-        newComment.value = ''; // Reset comment input
-        fetchComments(); // Refresh comments after posting
+        newComment.value = '';
+        fetchComments();
       } catch (error) {
         console.error('Error posting comment:', error);
       }
     };
 
-    // Toggle comments section visibility
     const toggleComments = () => {
       showComments.value = !showComments.value;
     };
 
-    // Show more comments when the button is clicked
-    const viewMoreComments = () => {
-      visibleCommentsLimit.value += 5; // Show 5 more comments each time
+    const toggleReplyForm = (commentId) => {
+      showReplyForm.value = showReplyForm.value === commentId ? null : commentId;
     };
 
-    // Return visible comments based on the limit
+    const submitReply = async (parentCommentId) => {
+      if (!newReply.value.trim()) {
+        console.error('Cannot post an empty reply');
+        return;
+      }
+
+      const payload = { body: newReply.value, parent_comment_id: parentCommentId };
+      try {
+        await store.dispatch('CommentStore/postReply', { slug, payload });
+        newReply.value = '';
+        showReplyForm.value = null;
+        fetchComments();
+      } catch (error) {
+        console.error('Error posting reply:', error);
+      }
+    };
+
+    const viewMoreComments = () => {
+      visibleCommentsLimit.value += 5;
+    };
+
+    const loadMoreReplies = (commentId) => {
+      replyLimit.value[commentId] = (replyLimit.value[commentId] || 3) + 3;
+    };
+
+    const hideReplies = (commentId) => {
+      replyLimit.value[commentId] = 3;
+    };
+
     const visibleComments = computed(() => {
       return comments.value.slice(0, visibleCommentsLimit.value);
     });
 
-    const getUserAvatar = (userId) => {
-      return `https://ui-avatars.com/api/?name=User+${userId}`;
-    };
-
-    // Get status icon based on the article status
-    const statusIconClass = (status) => {
-      return status === 'published'
-        ? 'fas fa-check-circle status-success'
-        : 'fas fa-times-circle status-failed';
-    };
+    const getUserAvatar = (userId) => `https://ui-avatars.com/api/?name=User+${userId}`;
+    const statusIconClass = (status) => (status === 'published' ? 'fas fa-check-circle status-success' : 'fas fa-times-circle status-failed');
 
     onMounted(() => {
       fetchArticleDetails();
@@ -163,7 +204,9 @@ export default {
       article,
       comments,
       newComment,
+      newReply,
       visibleCommentsLimit,
+      showReplyForm,
       showComments,
       visibleComments,
       submitComment,
@@ -171,13 +214,18 @@ export default {
       viewMoreComments,
       getUserAvatar,
       statusIconClass,
+      toggleReplyForm,
+      submitReply,
+      loadMoreReplies,
+      hideReplies,
+      replyLimit,
     };
   },
 };
 </script>
 
 <style scoped>
-/* All the styles you previously had, along with the styles for comments and replies */
+/* Existing and updated styles */
 .article-details-container {
   max-width: 800px;
   margin: 0 auto;
@@ -195,8 +243,7 @@ export default {
   }
 }
 
-/* Show Comments Button */
-.show-comments-button {
+.show-comments-button, .view-more-replies-button, .hide-replies-button {
   margin-top: 1rem;
   padding: 0.5rem 1rem;
   background-color: #2563eb;
@@ -206,17 +253,17 @@ export default {
   cursor: pointer;
 }
 
-.show-comments-button:hover {
+.show-comments-button:hover, .view-more-replies-button:hover, .hide-replies-button:hover {
   background-color: #1d4ed8;
 }
 
-/* Comments Section */
 .comments-section {
   margin-top: 2rem;
 }
 
 .comment-item {
   display: flex;
+  flex-direction: column;
   margin-bottom: 1.5rem;
 }
 
@@ -235,51 +282,57 @@ export default {
   border-radius: 50%;
 }
 
-.comment-content {
+.comment-content, .reply-content {
   background-color: #f1f1f1;
   border-radius: 12px;
   padding: 10px 15px;
   max-width: 100%;
   word-wrap: break-word;
-}
-
-.comment-content p {
-  margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: #333;
 }
 
-.comment-content small {
-  font-size: 0.8rem;
-  color: #888;
+.comment-content p, .reply-content p {
+  margin: 0;
 }
 
-/* View More Button */
-.view-more-button {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
+.reply-button, .reply-submit-button {
   background-color: #2563eb;
   color: white;
   border: none;
   border-radius: 5px;
+  padding: 0.5rem;
   cursor: pointer;
+  margin-top: 0.5rem;
 }
 
-.view-more-button:hover {
+.reply-button:hover, .reply-submit-button:hover {
   background-color: #1d4ed8;
 }
 
-/* Comment form */
-.comment-form {
-  margin-top: 2rem;
+.replies {
+  margin-left: 2rem;
+  border-left: 2px solid #ddd;
+  padding-left: 1rem;
+  margin-top: 1rem;
 }
 
-.comment-input {
+.reply-item {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.comment-form, .reply-form {
+  margin-top: 1.5rem;
+}
+
+.comment-input, .reply-input {
   width: 100%;
   padding: 0.75rem;
   margin-bottom: 1rem;
   border-radius: 12px;
   border: 1px solid #ccc;
+  resize: none;
 }
 
 .comment-button {
@@ -295,31 +348,18 @@ export default {
   background-color: #1d4ed8;
 }
 
-/* Mobile Styles */
 @media (max-width: 600px) {
   .article-details-container {
     padding: 1rem;
   }
-
   h1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
-
-  .article-body {
-    font-size: 1rem;
-  }
-
-  .comment-content {
-    padding: 8px 12px;
-  }
-
-  .comment-input {
+  .article-body, .comment-content, .reply-content {
     font-size: 0.9rem;
   }
-
-  .comment-button {
+  .comment-input, .reply-input {
     font-size: 0.9rem;
-    padding: 0.5rem 1rem;
   }
 }
 </style>
