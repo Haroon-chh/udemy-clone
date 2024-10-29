@@ -26,7 +26,7 @@
 
 <script>
 // Import the dynamic data
-import { newsData } from "@/Data/NewsData.js";
+import { newsData } from "@/data/NewsData.js";
 
 export default {
   name: "NewsComponent",
