@@ -4,8 +4,8 @@
     <h1 v-if="article">{{ article.title }}</h1>
 
     <!-- Display article image if available -->
-    <div class="image-container" v-if="article && article.image_url">
-      <img :src="article.image_url" alt="Article Image" />
+    <div class="image-container" v-if="course && course.thumbnail">
+      <img class="course-thumbnail" :src="course.thumbnail" alt="Article Image" />
     </div>
 
     <!-- Display article body -->
@@ -74,11 +74,13 @@
 import { ref, onMounted, computed } from 'vue'; // Import computed here
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
-import AuthApiServices from '@/services/AuthApiServices';
+import AuthApiServices from '@/services/AuthApiServices.js';
 
 export default {
   name: 'ArticleDetails',
   setup() {
+    const course = computed(() => store.getters['PurchaseStore/getCourse']);
+    // const articles = computed(() => store.getters['PurchaseStore/getArticles']);
     const store = useStore();
     const article = ref({});
     const comments = ref([]);
@@ -158,7 +160,18 @@ export default {
       fetchArticleDetails();
     });
 
+    onMounted(() => {
+      store.dispatch('PurchaseStore/fetchCourseDetails', slug).then(() => {
+        // Only attempt to check the cart if course data is available
+        if (course.value && course.value.id) {
+          store.dispatch('PurchaseStore/checkIfAddedToCart', course.value.id);
+        }
+      });
+      store.dispatch('PurchaseStore/fetchArticles', slug);
+    });
+
     return {
+      course,
       article,
       comments,
       newComment,
@@ -192,7 +205,13 @@ export default {
     opacity: 1;
   }
 }
-
+.course-thumbnail {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
 /* Show Comments Button */
 .show-comments-button {
   margin-top: 1rem;
