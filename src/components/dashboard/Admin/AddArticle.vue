@@ -1,5 +1,8 @@
 <template>
   <div class="add-article-page">
+    <SuccessPopup :show="showSuccessPopup" message="Article published successfully!" />
+    <ErrorPopup :show="showErrorPopup" :message="errorMessage" />
+
     <!-- Toolbar with Back and Publish Buttons -->
     <div class="editor-toolbar">
       <button class="btn btn-danger" @click="goBackToDashboard">Back to Dashboard</button>
@@ -52,16 +55,23 @@ import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+import SuccessPopup from '@/components/SuccessPopup.vue';
+import ErrorPopup from '@/components/ErrorPopup.vue';
 
 export default {
   name: 'AddArticle',
+  components: { SuccessPopup, ErrorPopup },
   setup() {
     const quillEditor = ref(null);
     let quill = null;
     const router = useRouter();
     const store = useStore();
     const htmlOutput = ref('');
-    const selectedImage = ref(null); // Reference to store the selected file
+    const selectedImage = ref(null);
+
+    const showSuccessPopup = ref(false);
+    const showErrorPopup = ref(false);
+    const errorMessage = ref('');
 
     const articleData = reactive({
       title: '',
@@ -101,80 +111,65 @@ export default {
       }
     };
 
-    // Handle image file selection
     const handleImageUpload = (event) => {
       const file = event.target.files[0];
-
       if (file) {
         const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-        const maxSize = 2 * 1024 * 1024; // 2MB
-
-        // Validate file type
+        const maxSize = 2 * 1024 * 1024;
         if (!validImageTypes.includes(file.type)) {
-          alert('Invalid file type. Only JPEG, JPG, PNG, or GIF files are allowed.');
+          errorMessage.value = 'Invalid file type. Only JPEG, JPG, PNG, or GIF files are allowed.';
+          showErrorPopup.value = true;
           selectedImage.value = null;
           return;
         }
-
-        // Validate file size
         if (file.size > maxSize) {
-          alert('File size exceeds the 2MB limit.');
+          errorMessage.value = 'File size exceeds the 2MB limit.';
+          showErrorPopup.value = true;
           selectedImage.value = null;
           return;
         }
-
-        selectedImage.value = file; // Store the valid file
-        console.log("Selected Image: ", file);  // Log the selected image
+        selectedImage.value = file;
       }
     };
 
     const publishArticle = async () => {
       if (!articleData.title || !articleData.course_id || !articleData.user_id || !articleData.status) {
-        alert('Please fill in all required fields.');
+        errorMessage.value = 'Please fill in all required fields.';
+        showErrorPopup.value = true;
         return;
       }
 
       if (quill) {
         articleData.body = quill.root.innerHTML;
-
         if (!articleData.body || articleData.body === '<p><br></p>') {
-          alert('Please enter content for the article body.');
+          errorMessage.value = 'Please enter content for the article body.';
+          showErrorPopup.value = true;
           return;
         }
 
         try {
-          // Prepare FormData for sending the article
           const formData = new FormData();
           formData.append('title', articleData.title);
           formData.append('body', articleData.body);
           formData.append('user_id', articleData.user_id);
           formData.append('course_id', articleData.course_id);
           formData.append('status', articleData.status);
-
-          // Append image file if available
           if (selectedImage.value) {
             formData.append('image_file', selectedImage.value);
           }
 
-          // Dispatch the action to create the article with the image
           const response = await store.dispatch('AdminStore/createArticle', formData);
-          console.log('Backend Response:', response);  // Log the response from the backend
+          console.log('Backend Response:', response);
 
-          // Log the full article data to check image_path and image_url
-          console.log('Article Data:', response.data.article);
-
-          alert('Article published successfully!');
-          goBackToDashboard();
+          showSuccessPopup.value = true;
+          setTimeout(() => {
+            showSuccessPopup.value = false;
+            goBackToDashboard();
+          }, 3000);
         } catch (error) {
           console.error('Error occurred while publishing the article:', error);
-
-          if (error.response) {
-            console.log('Error Response Data:', error.response.data);
-            console.log('Error Status:', error.response.status);
-            console.log('Error Headers:', error.response.headers);
-          } else {
-            console.log('Error Message:', error.message);
-          }
+          errorMessage.value = 'An error occurred while publishing the article.';
+          showErrorPopup.value = true;
         }
       }
     };
@@ -195,6 +190,9 @@ export default {
       htmlOutput,
       convertToHtml,
       handleImageUpload,
+      showSuccessPopup,
+      showErrorPopup,
+      errorMessage,
     };
   },
 };
