@@ -50,13 +50,13 @@
         <div class="mt-4 text-center" v-if="!is2FAEnabled">
           <div class="separator">Other log in options</div>
           <div class="social-icons d-flex justify-content-center my-3">
-            <button class="btn btn-outline-secondary mx-2" @click="socialLogin('Google')">
+            <button class="btn btn-outline-secondary mx-2">
               <i class="fab fa-google"></i> <!-- Google Icon -->
             </button>
-            <button class="btn btn-outline-secondary mx-2" @click="socialLogin('Facebook')">
+            <button class="btn btn-outline-secondary mx-2">
               <i class="fab fa-facebook-f"></i> <!-- Facebook Icon -->
             </button>
-            <button class="btn btn-outline-secondary mx-2" @click="socialLogin('Apple')">
+            <button class="btn btn-outline-secondary mx-2">
               <i class="fab fa-apple"></i> <!-- Apple Icon -->
             </button>
           </div>
