@@ -1,18 +1,43 @@
 <template>
   <div class="article-details-container">
     <h1 v-if="article">{{ article.title }}</h1>
+<<<<<<< HEAD
     <div class="image-container" v-if="article && article.image_url">
       <img :src="article.image_url" alt="Article Image" />
+=======
+
+    <!-- Display article image if available -->
+    <div class="image-container" v-if="course && course.thumbnail">
+      <img class="course-thumbnail" :src="course.thumbnail" alt="Article Image" />
+>>>>>>> development
     </div>
     <p class="article-body" v-if="article">{{ article.body }}</p>
 
     <transition name="fade">
       <div class="article-details" v-if="article">
         <h2>Article Details</h2>
+<<<<<<< HEAD
         <ul>
           <li><i class="fas fa-book"></i><strong>Course ID:</strong> {{ article.course_id }}</li>
           <li><i :class="statusIconClass(article.status)"></i><strong>Status:</strong> {{ article.status }}</li>
           <li><i class="fas fa-calendar-alt"></i><strong>Created At:</strong> {{ new Date(article.created_at).toLocaleDateString() }}</li>
+=======
+        <ul class="list-unstyled">
+          <li>
+            <i class="fas fa-book" style="color: blue;"></i>
+            <strong> Course ID:</strong> {{ article.course_id }}
+          </li>
+         <li>
+         <i v-if="article.status === 'published'" class="fas fa-check-circle status-success"></i>
+         <strong> Status:</strong> {{ article.status }}
+         </li>
+
+
+          <li>
+            <i class="fas fa-calendar-alt" style="color: blue;"></i>
+            <strong> Created At:</strong> {{ new Date(article.created_at).toLocaleString() }}
+          </li>
+>>>>>>> development
         </ul>
       </div>
     </transition>
@@ -75,11 +100,13 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
-import AuthApiServices from '@/services/AuthApiServices';
+import AuthApiServices from '@/services/AuthApiServices.js';
 
 export default {
   name: 'ArticleDetails',
   setup() {
+    const course = computed(() => store.getters['PurchaseStore/getCourse']);
+    // const articles = computed(() => store.getters['PurchaseStore/getArticles']);
     const store = useStore();
     const article = ref({});
     const comments = ref([]);
@@ -176,14 +203,35 @@ export default {
       return comments.value.slice(0, visibleCommentsLimit.value);
     });
 
+<<<<<<< HEAD
     const getUserAvatar = (userId) => `https://ui-avatars.com/api/?name=User+${userId}`;
     const statusIconClass = (status) => status === 'published' ? 'fas fa-check-circle status-success' : 'fas fa-times-circle status-failed';
+=======
+    const getUserAvatar = (userId) => {
+      return `https://ui-avatars.com/api/?name=User+${userId}`;
+    };
+
+    // Get status icon based on the article status
+
+
+>>>>>>> development
 
     onMounted(() => {
       fetchArticleDetails();
     });
 
+    onMounted(() => {
+      store.dispatch('PurchaseStore/fetchCourseDetails', slug).then(() => {
+        // Only attempt to check the cart if course data is available
+        if (course.value && course.value.id) {
+          store.dispatch('PurchaseStore/checkIfAddedToCart', course.value.id);
+        }
+      });
+      store.dispatch('PurchaseStore/fetchArticles', slug);
+    });
+
     return {
+      course,
       article,
       comments,
       newComment,
@@ -198,11 +246,14 @@ export default {
       toggleComments,
       viewMoreComments,
       getUserAvatar,
+<<<<<<< HEAD
       statusIconClass,
       toggleReplyForm,
       submitReply,
       toggleViewMoreReplies,
       limitedReplies,
+=======
+>>>>>>> development
     };
   },
 };
@@ -225,7 +276,13 @@ export default {
     opacity: 1;
   }
 }
-
+.course-thumbnail {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
 /* Show Comments Button */
 .toggle-comments-button {
   margin-top: 1rem;
@@ -379,4 +436,12 @@ export default {
     padding: 0.5rem 1rem;
   }
 }
+.status-success {
+  color: green;
+}
+
+.status-failed {
+  color: red;
+}
+
 </style>

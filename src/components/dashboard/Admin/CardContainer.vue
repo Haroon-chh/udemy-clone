@@ -34,7 +34,7 @@ export default {
     const cards = ref([
       { id: 1, title: 'Add Articles', description: 'Create and publish new articles.', icon: 'fas fa-file-alt', color: '#4caf50', link: { name: 'add-article' } },
       { id: 2, title: 'View Articles', description: 'Browse and manage all published articles.', icon: 'fas fa-book-open', color: '#2196f3', link: { name: 'view-articles' } },
-      { id: 3, title: 'Analytics', description: 'View site analytics, user trends.', icon: 'fas fa-chart-line', color: '#ff9800', link: null },
+      { id: 3, title: '2FA Settings', description: 'Handle Student 2fa Settings.', icon: 'fas fa-shield-alt', color: '#ff9800', link: null },
       { id: 4, title: 'Page Settings', description: 'Configure site settings and preferences.', icon: 'fas fa-cogs', color: '#9c27b0', link: { name: 'PageSettings' } },
       { id: 5, title: 'Site Settings', description: 'Update site title, logo, and copyright.', icon: 'fas fa-cog', color: '#f44336', link: { name: 'SiteSettings' } },
       { id: 6, title: 'Active Subscriptions', description: 'Check active subscriptions.', icon: 'fas fa-plus', color: '#337939', link: { name: 'active-subscriptions' } },

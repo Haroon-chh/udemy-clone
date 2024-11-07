@@ -4,20 +4,17 @@
       <!-- Heading -->
       <div class="row">
         <div class="col-12 col-md-6 news-div">
-          <h1 class="display-4">Top trends for the future of work</h1>
-          <p class="">
-            GenAI and leadership are at the core of today's skills-based economy.
-            Get the 2024 Global Learning & Skills Trends Report to learn more.
-          </p>
-          <a href="#" class="btn btn-outline-dark btn-lg rounded-0">Get the report →</a>
+          <h1 class="display-4">{{ news.title }}</h1>
+          <p>{{ news.description }}</p>
+          <a :href="news.reportLink" class="btn btn-outline-dark btn-lg rounded-0">{{ news.buttonText }}</a>
         </div>
         
         <!-- Image of the report -->
         <div class="col-12 col-md-6">
           <div class="report-image-wrapper">
             <img
-              src="@/assets/news-report.png"
-              alt="2024 Global Learning & Skills Trends Report"
+              :src="news.imageUrl"
+              :alt="news.imageAlt"
               class="img-fluid"
             />
           </div>
@@ -28,8 +25,16 @@
 </template>
 
 <script>
+// Import the dynamic data
+import { newsData } from "@/data/NewsData.js";
+
 export default {
   name: "NewsComponent",
+  data() {
+    return {
+      news: newsData
+    };
+  },
 };
 </script>
 
