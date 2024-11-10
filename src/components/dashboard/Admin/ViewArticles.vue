@@ -1,4 +1,5 @@
 <template>
+
   <div class="articles-container">
     <h2 class="articles-title">Published Articles</h2>
 
@@ -8,7 +9,7 @@
 
     <div v-else class="articles-list">
       <div v-for="article in articles" :key="article.id" class="article-card">
-        <img :src="article.image_url" alt="Article Image" class="article-image" />
+        <img :src="farhanImage" alt="Article Image" class="article-image" />
         <div class="article-content">
           <h3 class="article-title">{{ article.title }}</h3>
           <p class="article-body" v-html="truncateText(article.body)"></p>
@@ -56,7 +57,7 @@
 import { onMounted, computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { Modal } from 'bootstrap'; // Explicit import
-
+// import farhanImage from '@/assets/farhan.jpg';
 export default {
   name: 'ViewArticles',
   setup() {
